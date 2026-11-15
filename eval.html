@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Iron Council — Training evaluation</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 18px; }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--head); font-size: 12px; letter-spacing: .1em; color: var(--muted); }
+  .ok { color: #7fdc99; } .bad { color: #ff6b6b; }
+  .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; min-width: 160px; }
+  .stat b { display: block; font-family: var(--head); font-size: 28px; }
+  .stat span { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h2 class="section-title">Training evaluation</h2>
+  <p class="sub">Labeled test messages run through the engine. Re-open this page after adding training to check nothing got worse.</p>
+  <div class="stats" id="stats"></div>
+  <table id="tbl"><thead><tr><th>Message</th><th>Expected</th><th>Engine read</th><th></th></tr></thead><tbody></tbody></table>
+</main>
+<script src="js/characters.js"></script>
+<script src="js/training-pack.js"></script>
+<script src="js/training-pack-2.js"></script>
+<script src="js/training-pack-3.js"></script>
+  <script src="js/training-pack-4.js"></script>
+  <script src="js/training-pack-5.js"></script>
+  <script src="js/training-pack-6.js"></script>
+  <script src="js/training-pack-7.js"></script>
+  <script src="js/training-pack-8.js"></script>
+  <script src="js/c-bilge.js"></script>
+  <script src="js/c-rumi.js"></script>
+  <script src="js/c-timur.js"></script>
+  <script src="js/c-leonidas.js"></script>
+  <script src="js/c-hannibal.js"></script>
+  <script src="js/c-attila.js"></script>
+  <script src="js/c-joan.js"></script>
+  <script src="js/c-napoleon.js"></script>
+  <script src="js/c-nietzsche.js"></script>
+  <script src="js/c-tesla.js"></script>
+  <script src="js/training-pack-9.js"></script>
+<script src="js/engine.js"></script>
+<script>
+// [message, expected feeling ("general" = none), expected topic (null = none), expected intent (optional)]
+const CASES = [
+  ["I failed my driving test for the third time", "failed", "study"],
+  ["Got rejected from the university I wanted", "failed", "study"],
+  ["I bombed my final exam", "failed", "study"],
+  ["I'm so exhausted after work every day", "tired", "work"],
+  ["I have zero energy to go to the gym", "tired", "training"],
+  ["I'm terrified of my job interview tomorrow", "afraid", "work"],
+  ["I'm anxious about money all the time", "afraid", "money"],
+  ["I keep procrastinating on my thesis", "lazy", "study"],
+  ["I have no motivation to work out", "lazy", "training"],
+  ["I wasted the whole day on youtube", "general", "phone"],
+  ["I feel so lonely since I moved to a new city", "alone", null],
+  ["Nobody understands me", "alone", null],
+  ["I don't know what to do with my life", "lost", null],
+  ["I feel empty inside", "lost", null],
+  ["My boss humiliated me in front of everyone and I'm furious", "angry", "work"],
+  ["I hate how unfair my parents are", "angry", "family"],
+  ["I don't think I'm good enough to be a programmer", "doubt", "creative"],
+  ["I want to give up on my diet", "doubt", "training"],
+  ["Should I take the job offer or stay in school?", "general", "decision"],
+  ["I can't decide between two universities", "general", "decision"],
+  ["My girlfriend cheated on me", "general", "love"],
+  ["My best friend betrayed me", "general", "friends"],
+  ["Everyone my age is ahead of me", "general", "envy"],
+  ["I'm jealous of my friend's success", "general", "envy"],
+  ["I'm 30, is it too late to start over?", "general", "time"],
+  ["I wasted my twenties", "general", "time"],
+  ["I got injured and can't train for months", "general", "health"],
+  ["I want to quit smoking", "doubt", "habits"],
+  ["I can't build a routine", "general", "habits"],
+  ["I stay up until 4am every night", "general", "sleep"],
+  ["I can't get out of bed in the morning", "general", "sleep"],
+  ["I'm in debt and broke", "general", "money"],
+  ["I want to start writing my novel", "general", "creative"],
+  ["I failed again, like always", "failed", null],
+  ["hi", "general", null, "greet"],
+  ["hello there", "general", null, "greet"],
+  ["thank you", "general", null, "thanks"],
+  ["thanks, that helped", "general", null, "thanks"],
+  ["who are you?", "general", null, "who"],
+  ["tell me about yourself", "general", null, "who"],
+  // round 4: unseen messages that failed first, then were trained on
+  ["I flunked chemistry", "failed", "study"],
+  ["My coach says I'm too slow and I believe him", "doubt", "training"],
+  ["I'm scared I'll never find a job", "afraid", "work"],
+  ["I've been skipping classes all week", "lazy", "study"],
+  ["Nobody calls me anymore", "alone", null],
+  ["I'm so burned out from my startup", "tired", "work"],
+  ["My ex keeps texting me", "general", "love"],
+  ["My sister always gets compared to me", "general", "envy"],
+  ["I gamble my salary away", "general", "money"],
+  ["I'm addicted to video games", "general", "phone"],
+  ["I can't sleep at night", "general", "sleep"],
+  ["I'm 45 and starting university, am I crazy?", "general", "time"],
+  ["Which offer should I accept?", "general", "decision"],
+  ["I lost the championship final", "failed", "training"],
+  ["I'm furious at my brother", "angry", "family"],
+  ["I don't feel like drawing anymore", "lazy", "creative"],
+  ["I got diagnosed with a chronic illness", "general", "health"],
+  ["I eat junk food every night", "general", "habits"],
+  ["bugün yine spora gitmedim", "lazy", "training"],
+  ["annemle kavga ettim, çok sinirliyim", "angry", "family"],
+  ["kimse beni anlamıyor", "alone", null],
+  ["iş bulamıyorum, umudum kalmadı", "doubt", "work"],
+  ["kitabımı bitiremiyorum", "general", "creative"],
+  ["arkadaşlarım beni dışladı", "alone", "friends"],
+  // round 5: second unseen batch (4/12 before training)
+  ["I bombed the job interview", "failed", "work"],
+  ["my roommate stole from me and I'm livid", "angry", "friends"],
+  ["I'm too lazy to cook healthy food", "lazy", "habits"],
+  ["I'm nervous about my first marathon", "afraid", "training"],
+  ["everyone on instagram looks happier than me", "general", "envy"],
+  ["I'm 50, can I still learn guitar?", "general", "time"],
+  ["ödevimi yapmadım", "lazy", "study"],
+  ["işimden kovuldum", "failed", "work"],
+  ["hayatımın anlamı yok", "lost", null],
+  ["kardeşim beni hiç desteklemiyor", "alone", "family"],
+  ["sigara yine başladım", "general", "habits"],
+  ["sevdiğim kız beni reddetti", "failed", "love"],
+  // round 6: questions ABOUT HIM (speaker: Mehmed) and opinions of other members
+  ["how do you feel today?", "general", null, "about:feel"],
+  ["are you afraid of death?", "general", null, "about:death"],
+  ["what do you fear the most?", "general", null, "about:fear"],
+  ["do you regret anything?", "general", null, "about:regret"],
+  ["what is your proudest moment?", "general", null, "about:proud"],
+  ["what was the hardest moment of your life?", "general", null, "about:hardest"],
+  ["have you ever been in love?", "general", null, "about:love"],
+  ["tell me about your father", "general", null, "about:family"],
+  ["how did you die?", "general", null, "about:death"],
+  ["who was your greatest enemy?", "general", null, "about:enemy"],
+  ["do you believe in god?", "general", null, "about:faith"],
+  ["what makes you happy?", "general", null, "about:happy"],
+  ["were you lonely?", "general", null, "about:lonely"],
+  ["what would you tell your younger self?", "general", null, "about:younger"],
+  ["what was a typical day for you?", "general", null, "about:day"],
+  ["what is your biggest weakness?", "general", null, "about:weakness"],
+  ["what do you think about today's world?", "general", null, "about:modern"],
+  ["what do you think of me?", "general", null, "about:me"],
+  ["what do you think of Vlad?", "general", null, "opinion:vlad"],
+  ["Atatürk hakkında ne düşünüyorsun?", "general", null, "opinion:ataturk"],
+  ["do you respect Musashi?", "general", null, "opinion:musashi"],
+  ["nasılsın?", "general", null, "about:feel"],
+  ["neden korkarsın?", "general", null, "about:fear"],
+  ["pişman mısın?", "general", null, "about:regret"],
+  ["hiç aşık oldun mu?", "general", null, "about:love"],
+  ["baban nasıl biriydi?", "general", null, "about:family"],
+  ["nasıl öldün?", "general", null, "about:death"],
+  ["tanrıya inanıyor musun?", "general", null, "about:faith"],
+  ["en zor anın neydi?", "general", null, "about:hardest"],
+  // round 7: unseen questions about him (8/14 before training)
+  ["what scares you?", "general", null, "about:fear"],
+  ["are you sad?", "general", null, "about:feel"],
+  ["what was your biggest mistake?", "general", null, "about:regret"],
+  ["who did you love most?", "general", null, "about:love"],
+  ["do you miss your family?", "general", null, "about:family"],
+  ["were you ever betrayed?", "general", null, "about:enemy"],
+  ["do you pray?", "general", null, "about:faith"],
+  ["how old were you when you died?", "general", null, "about:death"],
+  ["what's Marcus like?", "general", null, "opinion:marcus"],
+  ["mutlu musun?", "general", null, "about:happy"],
+  ["en büyük hatan neydi?", "general", null, "about:regret"],
+  ["Cengiz Han'ı sever misin?", "general", null, "opinion:genghis"],
+  ["yalnız hissettin mi?", "general", null, "about:lonely"],
+  ["günümüz dünyası hakkında ne düşünüyorsun?", "general", null, "about:modern"],
+  // round 8: opinions of the ten newer members (speaker: Mehmed)
+  ["what do you think of Napoleon?", "general", null, "opinion:napoleon"],
+  ["Mevlana hakkında ne düşünüyorsun?", "general", null, "opinion:rumi"],
+  ["do you respect Leonidas?", "general", null, "opinion:leonidas"],
+  ["Tesla hakkında ne düşünüyorsun?", "general", null, "opinion:tesla"],
+  ["what's your opinion of Timur?", "general", null, "opinion:timur"],
+  ["Bilge Kağan'ı sever misin?", "general", null, "opinion:bilge"],
+  ["what do you think about Joan of Arc?", "general", null, "opinion:joan"],
+  ["Nietzsche hakkında fikrin ne?", "general", null, "opinion:nietzsche"],
+  ["what do you think of Hannibal?", "general", null, "opinion:hannibal"],
+  ["Atilla hakkında ne düşünüyorsun?", "general", null, "opinion:attila"],
+  // round 9: misreadings found in live chat
+  ["everyone says I am too young to start", "doubt", null],
+  ["nobody believes in my startup idea", "doubt", "work"],
+  // guards: these are about the USER, not him
+  ["I'm afraid of death", "afraid", null],
+  ["you know, I failed again", "failed", null],
+  ["can you help me? I failed my exam", "failed", "study"],
+  ["do you think I should quit my job?", "doubt", "work"],
+  ["ölümden korkuyorum", "afraid", null],
+  // Turkish
+  ["sınavda kaldım", "failed", "study"],
+  ["çok yorgunum, işten geldim", "tired", "work"],
+  ["iş görüşmesinden korkuyorum", "afraid", "work"],
+  ["ders çalışmaya üşeniyorum", "lazy", "study"],
+  ["kendimi çok yalnız hissediyorum", "alone", null],
+  ["hayatta ne yapacağımı bilmiyorum", "lost", null],
+  ["patronuma çok sinirliyim", "angry", "work"],
+  ["yapamayacağımı düşünüyorum", "doubt", null],
+  ["sevgilim beni terk etti", "alone", "love"],
+  ["en yakın arkadaşım bana ihanet etti", "general", "friends"],
+  ["herkes benden önde", "general", "envy"],
+  ["30 yaşındayım, çok geç mi?", "general", "time"],
+  ["sigarayı bırakmak istiyorum", "general", "habits"],
+  ["sabah kalkamıyorum", "general", "sleep"],
+  ["telefondan kafamı kaldıramıyorum", "general", "phone"],
+  ["param yok, borç içindeyim", "general", "money"],
+  ["babam bana inanmıyor", "doubt", "family"],
+  ["selam", "general", null, "greet"],
+  ["teşekkürler", "general", null, "thanks"],
+  ["sen kimsin?", "general", null, "who"]
+];
+
+const body = document.querySelector("tbody");
+let moodOk = 0, topicOk = 0, intentOk = 0, intentN = 0, allOk = 0;
+let aboutOk = 0, aboutN = 0, guardOk = 0, guardN = 0;
+for (const [text, mood, topic, intent] of CASES) {
+  const m = Engine.detectMood(text), t = Engine.detectTopic(text), i = Engine.detectIntent(text);
+  const ab = Engine.detectAbout(text, "mehmed");
+  const general = ab && ab.kind === "about" && ab.subject === "general";
+  const effAb = ab && !(general && (m !== "general" || t || i)) ? ab.kind + ":" + (ab.subject || ab.target) : null;
+  const isAbout = intent && /^(about|opinion):/.test(intent);
+  let mGood = true, tGood = true, iGood = true;
+  if (isAbout) { iGood = effAb === intent; aboutN++; aboutOk += iGood; }
+  else if (intent) { iGood = !effAb && i === intent; intentN++; intentOk += iGood; }
+  else { mGood = m === mood; tGood = t === topic; iGood = !effAb; moodOk += mGood; topicOk += tGood; if (/you|sen|mısın|musun|korkuyorum/i.test(text)) { guardN++; guardOk += mGood && tGood && iGood; } }
+  const good = mGood && tGood && iGood; allOk += good;
+  const exp = intent ? intent : `${mood} / ${topic || "—"}`;
+  const got = isAbout || effAb ? (effAb || "—") : intent ? (i || "—") : `${m} / ${t || "—"}`;
+  body.insertAdjacentHTML("beforeend", `<tr><td>${text}</td><td>${exp}</td><td class="${good ? "ok" : "bad"}">${got}</td><td class="${good ? "ok" : "bad"}">${good ? "✓" : "✗"}</td></tr>`);
+}
+const n = CASES.length - intentN - aboutN;
+// variety + speed
+const c = CHARACTERS[0]; let t0 = performance.now(); const seen = new Set();
+for (let k = 0; k < 2000; k++) seen.add(Engine.forgeReply(c, "I failed my exam and I want to quit").text);
+const ms = (performance.now() - t0) / 2000;
+Object.keys(localStorage).filter((k) => k.startsWith("ironcouncil.recent.")).forEach((k) => localStorage.removeItem(k));
+const lines = CHARACTERS.map((ch) => ch.openers.length + ch.principles.length + ch.closers.length + Object.values(ch.counsel).flat().length + Object.values(ch.topics).flat().length + Object.values(ch.intents || {}).flat().length + (ch.again || []).length + ch.examples.length + Object.values(ch.about || {}).flat().length + Object.values(ch.opinions || {}).flat().length + (ch.pivots || []).length);
+const pct = (a, b) => Math.round((a / b) * 100) + "%";
+document.getElementById("stats").innerHTML = [
+  [pct(allOk, CASES.length), `fully correct (${allOk}/${CASES.length})`],
+  [pct(moodOk, n), "feeling read correctly"],
+  [pct(topicOk, n), "topic read correctly"],
+  [pct(intentOk, intentN), "greeting / thanks / who"],
+  [pct(aboutOk, aboutN), `questions about him (${aboutOk}/${aboutN})`],
+  [pct(guardOk, guardN), `"you" messages kept as yours (${guardOk}/${guardN})`],
+  [lines.reduce((a, b) => a + b, 0), `lines total (${Math.min(...lines)}–${Math.max(...lines)} each)`],
+  [seen.size, "different answers / 2000 asks"],
+  [ms.toFixed(2) + " ms", "to build one answer"]
+].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+window.EVAL = { aboutOk, aboutN, guardOk, guardN, allOk, total: CASES.length, moodOk, topicOk, n, intentOk, intentN, lines, variety: seen.size, ms,
+  misses: [...body.querySelectorAll("tr")].filter((r) => r.querySelector(".bad")).map((r) => r.innerText.replace(/\t/g, " | ")) };
+</script>
+</body>
+</html>
