@@ -117,6 +117,10 @@
     c.about = p.about || {};
     c.opinions = p.opinions || {};
     c.pivots = p.pivots || [];
+    // drop exact duplicate lines inside every pool (several training rounds can repeat a line)
+    const uniq = (arr) => [...new Set(arr)];
+    for (const k of ["openers", "principles", "closers", "again", "pivots"]) c[k] = uniq(c[k] || []);
+    for (const group of [c.counsel, c.topics, c.about, c.opinions, c.intents]) for (const k of Object.keys(group || {})) group[k] = uniq(group[k]);
   }
 
   // ---------- training store (what you teach) ----------
@@ -218,17 +222,31 @@
     if (!recent[id]) { try { recent[id] = JSON.parse(localStorage.getItem(RKEY(id)) || "[]"); } catch (e) { recent[id] = []; } }
     return recent[id];
   }
+  // Two lines that share most of their key words say the same thing; never put both in one answer.
+  const KEYW = new Map();
+  function keyWords(line) {
+    if (!KEYW.has(line)) KEYW.set(line, new Set(tokens(line).filter((w) => w.length > 3).map((w) => w.slice(0, 5))));
+    return KEYW.get(line);
+  }
+  function tooSimilar(a, b) {
+    const A = keyWords(a), B = keyWords(b);
+    if (A.size < 2 || B.size < 2) return false;
+    let n = 0; for (const w of A) if (B.has(w)) n++;
+    return n / Math.min(A.size, B.size) >= 0.5;
+  }
   function pick(id, pool, avoid) {
     if (!pool || !pool.length) return null;
     const used = recentFor(id);
-    let options = pool.filter((l) => !used.includes(l) && !avoid.includes(l));
-    if (!options.length) options = pool.filter((l) => !avoid.includes(l));
+    const ok = (l) => !avoid.includes(l) && !avoid.some((x) => tooSimilar(x, l));
+    let options = pool.filter((l) => !used.includes(l) && ok(l));
+    if (!options.length) options = pool.filter(ok);
     if (!options.length) return null;
     const choice = options[Math.floor(Math.random() * options.length)];
     used.push(choice); if (used.length > 80) used.shift();
     return choice;
   }
   const chance = (p) => Math.random() < p;
+  const TERSE = new Set(["swordsman", "leonidas"]); // short lines are their voice
   function saveRecent(id) { try { localStorage.setItem(RKEY(id), JSON.stringify(recentFor(id))); } catch (e) { /* storage full: fine */ } }
 
   // ---------- composing ----------
@@ -238,6 +256,9 @@
     const mood = forcedMood || detectMood(text);
     const topic = text ? detectTopic(text) : null;
     const tr = getTraining(char.id);
+    // The main lines of an answer should carry real content: skip one- or two-word fragments
+    // when fuller lines exist (except for the deliberately terse characters).
+    const full = (pool) => { if (TERSE.has(char.id)) return pool; const f = pool.filter((l) => l.split(/\s+/).length > 2); return f.length >= 3 ? f : pool; };
 
     // 0) Questions about HIM: his feelings, life, opinions of the others.
     const ab = forcedMood ? null : detectAbout(text, char.id);
@@ -248,7 +269,7 @@
       if (!userProblem) {
         const pool = ab.kind === "opinion"
           ? (char.opinions[ab.target] || []).concat(tr.lines["opinion:" + ab.target] || [])
-          : (char.about[ab.subject] || []).concat(tr.lines["about:" + ab.subject] || []);
+          : full((char.about[ab.subject] || []).concat(tr.lines["about:" + ab.subject] || []));
         const fallback = (char.about.general || []).concat(tr.lines["about:general"] || []);
         const parts = [];
         const add = (p) => { const l = pick(char.id, p, parts); if (l) parts.push(l); };
@@ -280,10 +301,10 @@
       if (top.s >= 0.5 && chance(0.85)) return { text: top.e.a, mood, topic, taught: true };
     }
 
-    const moodPool = (char.counsel[mood] || char.counsel.general).concat(tr.lines[mood] || []);
-    const topicPool = topic ? (char.topics[topic] || []).concat(tr.lines["topic:" + topic] || []) : [];
+    const moodPool = full((char.counsel[mood] || char.counsel.general).concat(tr.lines[mood] || []));
+    const topicPool = topic ? full((char.topics[topic] || []).concat(tr.lines["topic:" + topic] || [])) : [];
     const principlePool = char.principles.concat(tr.beliefs || []);
-    const generalPool = char.counsel.general.concat(tr.lines.general || []);
+    const generalPool = full(char.counsel.general.concat(tr.lines.general || []));
 
     // 2) Build the answer: topic take first (it shows he understood), then feeling, then conviction.
     const parts = [];
