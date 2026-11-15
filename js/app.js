@@ -91,7 +91,10 @@
 
   function viewChar(id) {
     const c = byId(id); if (!c) return viewHall();
-    const log = state.chats[id] || (state.chats[id] = []);
+    const CKEY = "ironcouncil.chat." + id;
+    if (!state.chats[id]) { try { state.chats[id] = JSON.parse(localStorage.getItem(CKEY) || "[]").filter((m) => !m.pending); } catch (e) { state.chats[id] = []; } }
+    const log = state.chats[id];
+    const persist = () => { try { localStorage.setItem(CKEY, JSON.stringify(log.slice(-40))); } catch (e) { /* full: fine */ } };
     app.innerHTML = `
       <div class="char-layout">
         <aside class="dossier" style="--c:${c.color}">
@@ -100,12 +103,16 @@
           <div class="ttl">${esc(c.title)}</div>
           <div class="meta">${esc(c.era)} · ${esc(c.region)}</div>
           <div class="idea">${esc(c.idea)}</div>
+          <button class="btn ghost small toggle-more" id="moreBtn">${g(c, "About him")}</button>
+          <div class="dossier-more">
           <p>${esc(c.bio)}</p>
           <h4>Words</h4>
           ${quotesHTML(c)}
           <div class="links">
             <a class="btn ghost small" href="#/forge/${c.id}">Train ${esc(c.name.split(" ")[0])}</a>
             <a class="btn ghost small" href="#/council">Council</a>
+            <button class="btn ghost small" id="clearChat">Clear chat</button>
+          </div>
           </div>
         </aside>
         <section class="chat" style="--c:${c.color}">
@@ -155,7 +162,8 @@
         if (done) { slot.pending = false; render(nearBottom()); } else paint(t);
       });
       if (slot.pending) { slot.pending = false; render(); }
-      setBusy(false); q.focus();
+      persist();
+      setBusy(false); if (matchMedia("(min-width: 861px)").matches) q.focus();
     }
 
     send.onclick = () => {
@@ -174,7 +182,9 @@
         toast(`Saved. ${c.name} will remember this answer.`);
       }
     };
-    render(); q.focus();
+    document.getElementById("moreBtn").onclick = (e) => { const d = e.target.closest(".dossier"); d.classList.toggle("open"); e.target.textContent = d.classList.contains("open") ? "Hide" : g(c, "About him"); };
+    document.getElementById("clearChat").onclick = () => { log.length = 0; persist(); render(); };
+    render(); if (matchMedia("(min-width: 861px)").matches) q.focus();
   }
 
   function viewCouncil() {

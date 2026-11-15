@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Iron Council — Training evaluation</title>
-<link rel="stylesheet" href="css/style.css?v=2">
+<link rel="stylesheet" href="css/style.css?v=3">
 <style>
   table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 18px; }
   th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -22,27 +22,27 @@
   <div class="stats" id="stats"></div>
   <table id="tbl"><thead><tr><th>Message</th><th>Expected</th><th>Engine read</th><th></th></tr></thead><tbody></tbody></table>
 </main>
-<script src="js/characters.js?v=2"></script>
-<script src="js/training-pack.js?v=2"></script>
-<script src="js/training-pack-2.js?v=2"></script>
-<script src="js/training-pack-3.js?v=2"></script>
-  <script src="js/training-pack-4.js?v=2"></script>
-  <script src="js/training-pack-5.js?v=2"></script>
-  <script src="js/training-pack-6.js?v=2"></script>
-  <script src="js/training-pack-7.js?v=2"></script>
-  <script src="js/training-pack-8.js?v=2"></script>
-  <script src="js/c-bilge.js?v=2"></script>
-  <script src="js/c-rumi.js?v=2"></script>
-  <script src="js/c-timur.js?v=2"></script>
-  <script src="js/c-leonidas.js?v=2"></script>
-  <script src="js/c-hannibal.js?v=2"></script>
-  <script src="js/c-attila.js?v=2"></script>
-  <script src="js/c-joan.js?v=2"></script>
-  <script src="js/c-napoleon.js?v=2"></script>
-  <script src="js/c-nietzsche.js?v=2"></script>
-  <script src="js/c-tesla.js?v=2"></script>
-  <script src="js/training-pack-9.js?v=2"></script>
-<script src="js/engine.js?v=2"></script>
+<script src="js/characters.js?v=3"></script>
+<script src="js/training-pack.js?v=3"></script>
+<script src="js/training-pack-2.js?v=3"></script>
+<script src="js/training-pack-3.js?v=3"></script>
+  <script src="js/training-pack-4.js?v=3"></script>
+  <script src="js/training-pack-5.js?v=3"></script>
+  <script src="js/training-pack-6.js?v=3"></script>
+  <script src="js/training-pack-7.js?v=3"></script>
+  <script src="js/training-pack-8.js?v=3"></script>
+  <script src="js/c-bilge.js?v=3"></script>
+  <script src="js/c-rumi.js?v=3"></script>
+  <script src="js/c-timur.js?v=3"></script>
+  <script src="js/c-leonidas.js?v=3"></script>
+  <script src="js/c-hannibal.js?v=3"></script>
+  <script src="js/c-attila.js?v=3"></script>
+  <script src="js/c-joan.js?v=3"></script>
+  <script src="js/c-napoleon.js?v=3"></script>
+  <script src="js/c-nietzsche.js?v=3"></script>
+  <script src="js/c-tesla.js?v=3"></script>
+  <script src="js/training-pack-9.js?v=3"></script>
+<script src="js/engine.js?v=3"></script>
 <script>
 // [message, expected feeling ("general" = none), expected topic (null = none), expected intent (optional)]
 const CASES = [
@@ -185,6 +185,12 @@ const CASES = [
   ["I gave up on learning guitar", "doubt", "creative"],
   ["everyone says I am too young to start", "doubt", null],
   ["nobody believes in my startup idea", "doubt", "work"],
+  // round 10: text-handling bugs (Turkish capital İ, curly apostrophes, verb forms, "still")
+  ["İşimden kovuldum", "failed", "work"],
+  ["I CAN’T START ANYTHING", "lazy", null],
+  ["I am losing every match", "failed", "training"],
+  ["I gave up on my diet", "doubt", "training"],
+  ["I still love her", "general", "love"],
   // guards: these are about the USER, not him
   ["I'm afraid of death", "afraid", null],
   ["you know, I failed again", "failed", null],

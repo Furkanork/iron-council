@@ -20,7 +20,7 @@
   // English + Turkish. A keyword matches at the start of a word, so stems work ("procrastinat", "sınav" → "sınavım").
   const MOOD_WORDS = {
     tired: ["tired", "exhausted", "sleepy", "drained", "burnout", "burned out", "burnt out", "worn out", "no energy", "zero energy", "low energy", "enerjim", "fatigue", "weary", "yorgun", "bitkin", "tükendim", "enerjim yok"],
-    failed: ["fail", "fired", "laid off", "turned me down", "kovuldum", "kovdu", "reddet", "red yedim", "bombed", "blew it", "flopped", "screwed it", "flunk", "rejected", "rejection", "mistake", "messed up", "screwed up", "didn't make it", "did not pass", "didn't pass", "lost the", "lost my", "defeat", "başaramadım", "kaybettim", "başarısız", "kaldım", "reddedildim", "rezil"],
+    failed: ["fail", "losing", "lose ", "keep losing", "got fired", "dropped out", "kaybediyorum", "fired", "laid off", "turned me down", "kovuldum", "kovdu", "reddet", "red yedim", "bombed", "blew it", "flopped", "screwed it", "flunk", "rejected", "rejection", "mistake", "messed up", "screwed up", "didn't make it", "did not pass", "didn't pass", "lost the", "lost my", "defeat", "başaramadım", "kaybettim", "başarısız", "kaldım", "reddedildim", "rezil"],
     afraid: ["afraid", "scared", "fear", "anxious", "anxiety", "nervous", "terrified", "worried", "worry", "panic", "korku", "korkuyorum", "endişe", "kaygı", "gergin"],
     lazy: ["lazy", "procrastinat", "can't start", "cant start", "no motivation", "unmotivated", "motivation", "don't feel like", "dont feel like", "skip", "bored", "couch", "can't focus", "cant focus", "distracted", "tembel", "erteliyorum", "üşeniyorum", "canım istemiyor", "odaklanamıyorum", "motivasyon", "gitmedim", "yapmadım", "atladım", "çalışamıyorum", "can't stop", "cant stop", "keep putting off", "duramıyorum"],
     alone: ["alone", "lonely", "nobody", "no one", "no friends", "isolated", "abandoned", "left me", "left out", "excluded", "no support", "doesn't support", "desteklemiyor", "yalnız bırak", "ignored", "dışla", "broke up", "dumped", "ayrıldı", "yalnız", "kimse", "terk"],
@@ -52,7 +52,7 @@
     thanks: ["thank", "thanks", "thx", "appreciate", "teşekkür", "sağol", "sağ ol", "eyvallah", "eline sağlık"],
     who: ["who are you", "tell me about yourself", "your story", "your life", "what did you do", "introduce yourself", "sen kimsin", "kimsin", "kendini anlat", "hayatını anlat", "hikayeni"]
   };
-  const AGAIN_WORDS = ["again", "always", "every time", "everytime", "keep failing", "still", "once more", "yine", "tekrar", "hep ", "hala", "hâlâ", "her seferinde"];
+  const AGAIN_WORDS = ["again", "always", "every time", "everytime", "keep failing", "still failing", "still can't", "still cant", "still not", "still haven't", "still stuck", "still the same", "once more", "yine", "tekrar", "hep ", "hala ", "hâlâ", "her seferinde"];
 
   // Questions about HIM ("are you afraid?", "pişman mısın?") — only when the message addresses him and asks.
   const ABOUT_KEYS = ["me", "modern", "death", "regret", "proud", "hardest", "younger", "weakness", "day", "enemy", "faith", "love", "family", "lonely", "happy", "fear", "feel"];
@@ -133,13 +133,31 @@
   }
 
   // ---------- reading the message ----------
+  // "İ".toLowerCase() gives "i" + a combining dot, which breaks Turkish words like "İşimden". Curly quotes from phones break "can't".
+  function norm(text) {
+    return String(text || "").replace(/İ/g, "i").toLowerCase().replace(/\u0307/g, "").replace(/[’‘´`]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim();
+  }
+  // Inflected forms for phrases whose first word changes shape (give up -> giving up / gave up).
+  const IRREGULAR = { give: ["giving", "gave", "gives"], lose: ["losing", "lost", "loses"], quit: ["quitting", "quits"], fall: ["falling", "fell"], feel: ["feeling", "felt", "feels"], keep: ["keeping", "kept"], get: ["getting", "got"], hate: ["hating", "hated"], "can't": ["cannot", "can not"] };
+  function inflect(table) {
+    for (const k of Object.keys(table)) {
+      const extra = [];
+      for (const w of table[k]) {
+        const [first, ...rest] = w.split(" ");
+        if (!rest.length) continue;
+        for (const f of IRREGULAR[first] || []) extra.push([f, ...rest].join(" "));
+      }
+      table[k] = table[k].concat(extra.filter((x) => !table[k].includes(x)));
+    }
+  }
+  inflect(MOOD_WORDS); inflect(TOPIC_WORDS);
   const reCache = new Map();
   function matcher(w) {
     if (!reCache.has(w)) reCache.set(w, new RegExp("(^|[^\\p{L}])" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "u"));
     return reCache.get(w);
   }
   function best(text, table, keys) {
-    const t = " " + (text || "").toLowerCase() + " ";
+    const t = " " + norm(text) + " ";
     let top = null, topScore = 0;
     for (const k of keys) {
       let s = 0; for (const w of table[k]) if (matcher(w).test(t)) s += w.length > 12 ? 3 : w.length > 5 ? 2 : 1; // longer phrases are more specific
@@ -149,9 +167,9 @@
   }
   const detectMood = (text) => best(text, MOOD_WORDS, MOODS) || "general";
   const AGE = /(\bi'?m|\bi am)\s+\d{2}\b|\d{2}\s*yaşında/i;
-  const detectTopic = (text) => (AGE.test(text || "") ? "time" : best(text, TOPIC_WORDS, TOPICS));
+  const detectTopic = (text) => (AGE.test(norm(text)) ? "time" : best(text, TOPIC_WORDS, TOPICS));
   function detectIntent(text) {
-    const t = " " + (text || "").toLowerCase().trim() + " ";
+    const t = " " + norm(text) + " ";
     const words = tokens(text).length;
     // whole words only, so "hi" doesn't fire on "hiç" or "sa" on "saat"
     const has = (k) => INTENT_WORDS[k].some((w) => new RegExp("(^|[^\\p{L}])" + w + "($|[^\\p{L}])", "u").test(t) || (w.length > 5 && matcher(w).test(t)));
@@ -162,10 +180,10 @@
   }
   // Is the user asking HIM something? Returns {kind:"about", subject} | {kind:"opinion", target} | null
   function detectAbout(text, selfId) {
-    const raw = (text || "").trim(); if (!raw) return null;
-    const t = " " + raw.toLowerCase() + " ";
+    const raw = norm(text); if (!raw) return null;
+    const t = " " + raw + " ";
     const addressed = YOU_EN.test(t) || YOU_TR.test(t);
-    const asking = ASKS.test(raw.toLowerCase());
+    const asking = ASKS.test(raw);
     for (const id of Object.keys(ALIASES)) {
       if (id === selfId) continue;
       if (ALIASES[id].some((a) => matcher(a).test(t)) && (addressed || OPINION.test(t))) return { kind: "opinion", target: id };
@@ -174,8 +192,8 @@
     const subject = best(raw, ABOUT_WORDS, ABOUT_KEYS);
     return subject ? { kind: "about", subject } : { kind: "about", subject: "general" };
   }
-  const saysAgain = (text) => { const t = " " + (text || "").toLowerCase() + " "; return AGAIN_WORDS.some((w) => matcher(w).test(t)); };
-  const isCrisis = (text) => { const t = (text || "").toLowerCase(); return CRISIS_WORDS.some((w) => t.includes(w)); };
+  const saysAgain = (text) => { const t = " " + norm(text) + " "; return AGAIN_WORDS.some((w) => matcher(w).test(t)); };
+  const isCrisis = (text) => { const t = norm(text); return CRISIS_WORDS.some((w) => t.includes(w)); };
   function describe(r) {
     if (!r || r.crisis || r.taught) return "";
     if (r.about) return "about himself · " + ABOUT_LABELS[r.about];
@@ -185,7 +203,7 @@
   }
 
   const STOP = new Set("i me my a an the and or but to of in on at for is am are was were be been it this that with so just really very do does did have has had can't cant don't dont not no".split(" "));
-  function tokens(s) { return (s || "").toLowerCase().replace(/[^\p{L}\p{N}\s']/gu, " ").split(/\s+/).filter((w) => w && !STOP.has(w)); }
+  function tokens(s) { return norm(s).replace(/[^\p{L}\p{N}\s']/gu, " ").split(/\s+/).filter((w) => w && !STOP.has(w)); }
   function similarity(a, b) {
     const A = new Set(tokens(a)), B = new Set(tokens(b));
     if (!A.size || !B.size) return 0;
@@ -287,7 +305,7 @@
   }
 
   window.Engine = {
-    MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, isCrisis, CRISIS_MESSAGE,
+    MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE,
     forgeReply, getTraining, saveTraining, exportAll, importAll
   };
 })();
