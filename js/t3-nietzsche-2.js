@@ -1,0 +1,12 @@
+/* ROUND 5 TRAINING (x3): Friedrich Nietzsche — part 2: life topics */
+IRON_TRAIN("nietzsche", {
+  topics: {
+    study: ["I was a professor at twenty-four; scholarship without life is dust. Study to live.", "Read slowly, deeply, with doors left open.", "Philology taught me to read slowly.", "Learn for growth, not for applause.", "Eventually rebel against your teacher — but first learn.", "Question everything you study.", "Read the Greeks.", "Study when your mind is fresh — after a walk.", "Write your own thoughts in the margins.", "Make knowledge your own."],
+    training: ["I walked for hours daily in the mountains.", "The body is a great reason.", "Discipline the body so the spirit can dance.", "Hardship trains; comfort weakens.", "Overcome limits step by step.", "Move daily.", "Climb.", "Breathe mountain air.", "Exercise the will through the body.", "Strength is joy."],
+    work: ["Do not work for the herd's approval.", "Turn your work into self-creation.", "Mediocre work is the comfortable lie.", "Create, do not merely produce.", "Make your work a yes to life.", "Work with passion.", "Leave conventional paths if needed.", "Value quality over quantity.", "Work alone if necessary.", "Become who you are in your work."],
+    money: ["He who possesses little is less possessed.", "A small poverty can be freedom.", "I lived on a modest pension and wrote freely.", "Do not sell your spirit for comfort.", "Money is a tool, never a value.", "Need less.", "Avoid luxury.", "Spend on books and travel.", "Freedom over wealth.", "Independence matters."],
+    love: ["Lou Salomé refused me; soon after I wrote Zarathustra.", "Love sees things as they are not.", "A love that does not make you greater is a cage.", "Grieve, then create.", "Be worth loving.", "Love courageously.", "Friendship can be greater than romance.", "Heal by creating.", "Do not cling.", "Love life itself."],
+    family: ["My father died when I was four.", "My sister twisted my words.", "Honor origins, but do not be imprisoned.", "Become more than expected.", "Choose spiritual family.", "My mother cared for me at the end.", "Family may not understand you.", "Forgive.", "Be independent.", "Create your own lineage."],
+    phone: ["The herd now has a screen; look up.", "Distraction is the last man's pleasure.", "Solitude is impossible with buzzing.", "Your mind needs silence.", "Put it down and walk.", "Limit noise.", "Seek depth.", "Read slowly instead.", "Protect attention.", "Create, do not consume."]
+  }
+});
