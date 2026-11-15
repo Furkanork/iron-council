@@ -1,0 +1,13 @@
+/* ROUND 5 TRAINING (x3): Timur — part 4: life topics (second half) */
+IRON_TRAIN("timur", {
+  topics: {
+    sleep: ["Rise early; the board is clearest in the morning.", "An exhausted commander makes careless moves.", "Rest well before the great move.", "Discipline your sleep like your troops.", "Do not stay awake for idle games.", "Plan tomorrow before sleeping.", "Sleep is preparation.", "Wake with a plan.", "Short rest is better than none.", "Order your nights."],
+    creative: ["I had the greatest builders of Asia make Samarkand beautiful.", "Design first, then build.", "A dome is many bricks; a work is many days.", "Measure grand ambitions carefully.", "Leave a monument.", "Bring together craftsmen of many lands.", "Beauty and strength together.", "Finish the building.", "Do not fear scale.", "Create something visited for centuries."],
+    decision: ["Consider every move, then commit.", "Look three moves ahead.", "Do not decide in anger.", "A good move now beats a perfect move too late.", "Choose what improves your position.", "Sacrifice a pawn if it wins the game.", "Consult the wise, then decide.", "Commit fully.", "Adjust as the board changes.", "Decide with the endgame in mind."],
+    friends: ["Loyalty earned by reward lasts.", "Test companions in small things.", "Keep skilled friends close.", "Watch for pieces that change color.", "Few, loyal, capable.", "Toktamish betrayed me after I helped him.", "Reward loyalty.", "Do not trust flatterers.", "Choose friends who strengthen you.", "Be loyal."],
+    envy: ["Do not envy another's empire; build yours.", "Learn from rivals' best moves.", "They had two good legs; I had a will.", "Envy wastes moves.", "Study the master, then surpass.", "Focus on your board.", "Others' success shows what is possible.", "Envy weakens strategy.", "Work instead.", "Build."],
+    time: ["I marched toward China in old age.", "There are moves left until the game ends.", "Begin today.", "Late starts can still checkmate.", "Use time wisely.", "Plan for years.", "Do not waste moves.", "Every age has its strength.", "Persist.", "Now."],
+    health: ["I lived with my wounds; heal what can be healed.", "Listen to physicians.", "Respect the body.", "Adapt to limitations.", "Rest when wounded.", "Strength returns slowly.", "Care for your health.", "A wounded king still rules.", "Do not ignore pain.", "Recover, then march."],
+    habits: ["The ant's habit was persistence.", "Daily discipline builds empires.", "Remove weak habits.", "Small moves win games.", "Make excellence routine.", "Start each day with a plan.", "Practice daily.", "Track progress.", "Consistency.", "Build habits like walls."]
+  }
+});
