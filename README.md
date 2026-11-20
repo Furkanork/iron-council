@@ -17,6 +17,9 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Bond**: each of them forms an opinion of you — Cold, Stranger, Respect, Trusted — from your visits, the oaths you keep or break, and whether you keep repeating the same complaint. It shows in how they greet and speak to you.
 - **Tone**: in each chat, set them to Gentle, Normal or Hard.
 - **Rivals**: members with real history (Mehmed and Vlad, Hannibal and Napoleon, Timur and Genghis, …) speak to each other about it in the Council.
+- **They ask you back**: sometimes a member ends with a question ("What exactly scares you about it?") and takes your next message as the answer.
+- **Campaigns** (Oath page): 14-day programs led by one member — Musashi (discipline), Napoleon (exam study), Leonidas (body), Marcus (mind), Tesla (finish a project). Each day's task becomes that day's oath.
+- **Backup** (Saved page): download everything in one file and restore it on another device or browser; restoring merges, nothing is lost.
 - **Saved**: save any chat or council, read it later, continue it, or download it as a text file.
 - **Forge**: train any character with your own beliefs, answers and lines (saved only in your browser).
 

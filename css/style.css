@@ -269,3 +269,20 @@ html, body { overflow-x: hidden; }
 .bond-trusted b { color: var(--gold); }
 .tone { font-family: var(--head); font-size: 12px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
 .tone select { background: #0e0e12; border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; font-size: 14px; text-transform: none; letter-spacing: 0; }
+
+/* ---------- campaigns & backup ---------- */
+.camp-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.camp { --c: var(--steel); background: #0e0e12; border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.camp .kind { font-family: var(--head); font-size: 11px; letter-spacing: .12em; color: var(--c); text-transform: uppercase; }
+.camp h4 { margin: 0; font-family: var(--head); font-size: 16px; }
+.camp p { margin: 0 0 6px; font-size: 15.5px; color: var(--muted); flex: 1; }
+.camp .btn { align-self: flex-start; }
+.camp-done { font-size: 13px; color: var(--gold); font-family: var(--head); letter-spacing: .06em; }
+.camp-active { --c: var(--steel); border-left: 4px solid var(--c); }
+.days { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; margin: 8px 0 12px; }
+.days span { text-align: center; font-family: var(--head); font-size: 12px; padding: 5px 0; border-radius: 4px; background: #0e0e12; border: 1px solid var(--line); color: var(--muted); }
+.days span.kept { color: #3ecf6e; border-color: #2a6b3f; }
+.days span.broken { color: var(--blood2); border-color: #5a1a22; }
+.days span.now { color: var(--text); border-color: var(--c); }
+.backup { margin-top: 22px; max-width: 860px; }
+@media (max-width: 600px) { .days { grid-template-columns: repeat(7, 1fr); } }

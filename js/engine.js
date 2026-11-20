@@ -125,7 +125,8 @@
     for (const k of ["openers", "principles", "closers", "again", "pivots"]) c[k] = uniq(c[k] || []);
     for (const group of [c.counsel, c.topics, c.about, c.opinions, c.intents]) for (const k of Object.keys(group || {})) group[k] = uniq(group[k]);
     // Lines for memory, the daily oath and the council ("{name}", "{topic}", "{goal}", "{oath}" are filled in).
-    for (const k of ["recall", "goalAsk", "oathTake", "oathKept", "oathBroken", "agree", "disagree", "stories", "gentle", "hard", "bondWarm", "bondCold", "bondUp"]) c[k] = uniq(p[k] || []);
+    for (const k of ["recall", "goalAsk", "oathTake", "oathKept", "oathBroken", "agree", "disagree", "stories", "gentle", "hard", "bondWarm", "bondCold", "bondUp", "heard"]) c[k] = uniq(p[k] || []);
+    c.askBack = p.askBack || {};
     c.rivals = p.rivals || {};
     // Thin one- or two-word lines are replaced by full ones (round 6); keep them only for the terse voices
     // or where a pool would otherwise be too small.
@@ -361,7 +362,9 @@
     const gentle = ctx.tone === "gentle" && char.gentle.length, hard = ctx.tone === "hard" && char.hard.length && !grief;
     // How he feels about you colours the first words now and then.
     const bondPool = ctx.bond === "cold" ? char.bondCold : (ctx.bond === "respect" || ctx.bond === "trusted") ? char.bondWarm : [];
-    if (bondPool.length && chance(ctx.bond === "trusted" ? 0.35 : 0.25)) add(bondPool);
+    // You are answering a question he asked you: he acknowledges it first.
+    if (ctx.answered && char.heard.length) add(char.heard);
+    else if (bondPool.length && chance(ctx.bond === "trusted" ? 0.35 : 0.25)) add(bondPool);
     else if (gentle) add(char.gentle);
     else if (grief) { if (char.gentle.length && chance(0.5)) add(char.gentle); }
     else if (again && char.again && char.again.length) add(char.again);
@@ -377,10 +380,15 @@
     if (!gentle && !grief && (parts.length < 2 || chance(0.35))) add(principlePool);
     if (grief && parts.length < 2) add(topicPool);
     if (parts.length > 4) parts.splice(1, parts.length - 4);
-    if (!grief) add(hard ? char.hard : char.closers); // no battle-cry ending after a loss
+    // Sometimes he ends with a question back to you instead of a closing line.
+    const askKey = mood !== "general" ? mood : topic ? "general" : null;
+    const askPool = askKey && ctx.canAsk && !ctx.answered && (char.askBack[askKey] || []);
+    let asked = null;
+    if (askPool && askPool.length && chance(0.33)) { const qn = pick(char.id, askPool, parts); if (qn) { parts.push(qn); asked = askKey; } }
+    if (!asked && !grief) add(hard ? char.hard : char.closers); // no battle-cry ending after a loss
 
     saveRecent(char.id);
-    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone };
+    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone, asked };
   }
 
   const SHORT = { ataturk: "Atatürk", atsiz: "Atsız", musashi: "Musashi", swordsman: "the Swordsman", nietzsche: "Nietzsche", rumi: "Rumi", tesla: "Tesla", genghis: "Genghis", hannibal: "Hannibal", napoleon: "Napoleon", bilge: "Bilge" };

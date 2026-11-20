@@ -97,6 +97,53 @@
   }
   const fileName = (s) => `iron-council-${s.ids.join("-")}-${s.date.slice(0, 10)}.txt`;
 
+  // ---------- backup & sync ----------
+  // Every key the site stores starts with "ironcouncil." (the "recent lines" memory is left out: it is only for variety).
+  const allKeys = () => Object.keys(localStorage).filter((k) => k.startsWith("ironcouncil.") && !k.startsWith("ironcouncil.recent."));
+  function backupData() {
+    const keys = {}; for (const k of allKeys()) keys[k] = localStorage.getItem(k);
+    return { app: "iron-council", version: 1, made: new Date().toISOString(), keys };
+  }
+  function backupSummary() {
+    const o = oaths().length, s = savedList().length, chats = allKeys().filter((k) => k.startsWith("ironcouncil.chat.")).length;
+    return `This browser holds ${o} oath${o === 1 ? "" : "s"}, ${s} saved conversation${s === 1 ? "" : "s"} and ${chats} chat${chats === 1 ? "" : "s"}.`;
+  }
+  // Merge a backup into this browser without losing anything here.
+  function restoreBackup(data) {
+    let n = 0;
+    const parse = (v, d) => { try { return JSON.parse(v); } catch (e) { return d; } };
+    for (const [k, v] of Object.entries(data.keys)) {
+      if (!k.startsWith("ironcouncil.") || typeof v !== "string") continue;
+      const here = localStorage.getItem(k);
+      let out = v;
+      if (here != null && here !== v) {
+        const a = parse(here, null), b = parse(v, null);
+        if (k === OKEY && Array.isArray(a) && Array.isArray(b)) {
+          // one oath per day: a judged oath beats a pending one
+          const byDay = {}; for (const o of a.concat(b)) { const cur = byDay[o.date]; if (!cur || (cur.status === "pending" && o.status !== "pending")) byDay[o.date] = o; }
+          out = JSON.stringify(Object.values(byDay).sort((x, y) => (x.date < y.date ? -1 : 1)));
+        } else if (k === SKEY && Array.isArray(a) && Array.isArray(b)) {
+          const seen = new Set(a.map((s) => s.sid));
+          out = JSON.stringify(a.concat(b.filter((s) => !seen.has(s.sid))).sort((x, y) => (x.date < y.date ? 1 : -1)));
+        } else if (k.startsWith("ironcouncil.chat.") && Array.isArray(a) && Array.isArray(b)) {
+          out = b.length > a.length ? v : here; // keep the longer conversation
+        } else if (k.startsWith("ironcouncil.bond.") && a && b) {
+          out = (b.score || 0) > (a.score || 0) ? v : here;
+        } else if (k === PKEY && a && b) {
+          out = JSON.stringify({ name: a.name || b.name || "", goal: a.goal || b.goal || "" });
+        } else if (k === CKEY_CAMP && a && b) {
+          out = (b.done || []).length > (a.done || []).length ? v : here; // the further-along campaign
+        } else if (k.startsWith("ironcouncil.forge.") && a && b) {
+          const u = (x, y) => x.concat(y.filter((i) => !x.some((j) => JSON.stringify(j) === JSON.stringify(i))));
+          const lines = Object.assign({}, a.lines || {}); for (const [m, arr] of Object.entries(b.lines || {})) lines[m] = u(lines[m] || [], arr);
+          out = JSON.stringify({ beliefs: u(a.beliefs || [], b.beliefs || []), examples: u(a.examples || [], b.examples || []), lines });
+        } else out = here; // anything else (tone, last seen…): this device wins
+      }
+      if (out !== here) { localStorage.setItem(k, out); n++; }
+    }
+    return n;
+  }
+
   // ---------- answering (shared by chat + council) ----------
   // Composed instantly in under a millisecond; revealed quickly so it reads as spoken.
   async function answer(char, question, mood, ctx, onUpdate) {
@@ -132,6 +179,8 @@
     if (due) { const c = byId(due.id) || C[0]; return `<a class="banner" href="#/oath" style="--c:${c.color}"><b>${esc(c.name)} is waiting.</b> ${hello ? hello + "did" : "Did"} you keep the oath you swore on ${esc(prettyDay(due.date))}? <span>Answer him →</span></a>`.replace("Answer him", g(c, "Answer him")); }
     const t = todaysOath();
     if (t) { const c = byId(t.id) || C[0]; return `<a class="banner" href="#/oath" style="--c:${c.color}"><b>Today's oath:</b> “${esc(t.text)}” <span>${t.status === "kept" ? "Kept ✓" : "sworn to " + esc(c.name)}</span>${streak() ? ` <span class="streak">🔥 ${streak()}</span>` : ""}</a>`; }
+    const a = activeCampaign();
+    if (a) { const k = CAMPS.find((x) => x.id === a.id), c = byId(k.leader); return `<a class="banner" href="#/oath" style="--c:${c.color}"><b>${esc(k.title)} · day ${a.done.length + 1} of 14.</b> ${esc(c.name)} has today's task ready. <span>See it →</span></a>`; }
     return `<a class="banner" href="#/oath"><b>${hello}swear today's oath.</b> One task, sworn before one of them. Tomorrow they will ask. <span>Swear →</span></a>`;
   }
 
@@ -290,8 +339,11 @@
       // Bond: coming back on a new day counts.
       { const b = bond(c.id); if (b.day !== dayKey()) { b.day = dayKey(); store(BKEY(c.id), b); bump(c.id, 1); } }
       const tone = localStorage.getItem(TKEY) || "";
-      await answer(c, question, mood, { lastTopic, prefix, tone, bond: bondLevel(bond(c.id).score) }, (t, done, meta) => {
-        slot.content = t; Object.assign(slot, { taught: meta.taught, crisis: meta.crisis, topic: meta.topic, feel: meta.mood, intent: meta.intent, read: g(c, E.describe(meta)) });
+      // Did he ask you something last time? Then this message is your answer.
+      const prev = log.filter((m) => m.role === "char" && m !== slot).pop();
+      const answered = !!(text && prev && prev.asked);
+      await answer(c, question, mood, { lastTopic, prefix, tone, bond: bondLevel(bond(c.id).score), canAsk: !answered, answered }, (t, done, meta) => {
+        slot.content = t; Object.assign(slot, { taught: meta.taught, crisis: meta.crisis, topic: meta.topic, feel: meta.mood, intent: meta.intent, asked: meta.asked, read: g(c, [E.describe(meta), meta.asked ? "asks you" : ""].filter(Boolean).join(" · ")) });
         if (done) { slot.pending = false; render(nearBottom()); } else paint(t);
       });
       if (slot.pending) { slot.pending = false; render(); }
@@ -485,6 +537,63 @@
     };
   }
 
+  // ---------- campaigns: 14-day programs; each day's task is that day's oath ----------
+  const CKEY_CAMP = "ironcouncil.campaign", CHIST = "ironcouncil.campaigns.done";
+  const CAMPS = window.CAMPAIGNS || [];
+  const activeCampaign = () => { const a = load(CKEY_CAMP, null); return a && CAMPS.find((x) => x.id === a.id) ? a : null; };
+  function campaignHTML(today) {
+    const a = activeCampaign(), hist = load(CHIST, []);
+    if (!a) {
+      return `<div class="panel camps"><div class="label">Campaigns · 14 days with one of them</div>
+        <p class="help">A campaign gives you one task a day for fourteen days, chosen by its leader. Each day's task becomes your oath, and the leader judges you.</p>
+        <div class="camp-list">${CAMPS.map((k) => { const c = byId(k.leader); const done = hist.filter((h) => h.id === k.id);
+          return `<div class="camp" style="--c:${c.color}"><div class="kind">${esc(k.kind)} · led by ${esc(c.name)}</div><h4>${esc(k.title)}</h4><p>${esc(k.about)}</p>
+          ${done.length ? `<div class="camp-done">Completed ${done.length}× · best ${Math.max(...done.map((h) => h.kept))}/14 kept</div>` : ""}
+          <button class="btn small" data-camp="${k.id}">Begin</button></div>`; }).join("")}</div></div>`;
+    }
+    const k = CAMPS.find((x) => x.id === a.id), c = byId(k.leader), n = a.done.length + 1, day = k.days[n - 1];
+    const pendingPast = oaths().find((o) => o.campaign === k.id && o.status === "pending" && o.date < dayKey());
+    let body;
+    if (pendingPast) body = `<p class="ask">First tell ${esc(c.name)} whether you kept day ${pendingPast.day} (above).</p>`;
+    else if (today && today.campaign === k.id) body = `<p class="ask">Day ${today.day} is sworn. ${today.status === "pending" ? "Mark it below when it's done." : "Come back tomorrow for day " + (today.day + 1) + "."}</p>`;
+    else if (today) body = `<p class="ask">You already swore another oath today. Day ${n} waits for tomorrow.</p>`;
+    else body = `<blockquote>${esc(day.task)}</blockquote><div class="msg char"><span class="who">${esc(c.name)}</span><span class="body">${esc(day.word)}</span></div>
+      <button class="btn" id="campSwear">Swear day ${n}</button>`;
+    const boxes = k.days.map((d, i) => { const r = a.done[i]; return `<span class="${r ? r.status : i === n - 1 ? "now" : ""}" title="Day ${i + 1}: ${esc(d.task)}">${r ? (r.status === "kept" ? "✓" : "✗") : i + 1}</span>`; }).join("");
+    return `<div class="panel camp-active" style="--c:${c.color}">
+      <div class="label">${esc(k.title)} · day ${Math.min(n, 14)} of 14 · led by ${esc(c.name)}</div>
+      <div class="days">${boxes}</div>${body}
+      <div class="row" style="margin-top:10px"><button class="btn ghost small" id="campQuit">Abandon campaign</button></div></div>`;
+  }
+  function wireCampaign() {
+    app.querySelectorAll("[data-camp]").forEach((b) => b.onclick = () => {
+      const k = CAMPS.find((x) => x.id === b.dataset.camp), c = byId(k.leader);
+      store(CKEY_CAMP, { id: k.id, started: dayKey(), done: [] });
+      viewOath();
+      document.getElementById("verdict").innerHTML = `<div class="panel" style="--c:${c.color}"><div class="msg char"><span class="who">${esc(c.name)}</span><span class="body">${esc(k.start)}</span></div></div>`;
+    });
+    const sw = document.getElementById("campSwear");
+    if (sw) sw.onclick = () => {
+      const a = activeCampaign(), k = CAMPS.find((x) => x.id === a.id), n = a.done.length + 1;
+      const all = oaths(); all.push({ date: dayKey(), id: k.leader, text: k.days[n - 1].task, status: "pending", reply: k.days[n - 1].word, campaign: k.id, day: n }); saveOaths(all);
+      viewOath();
+    };
+    const q = document.getElementById("campQuit");
+    if (q) q.onclick = () => { if (confirm("Abandon this campaign? Your progress in it will be lost.")) { localStorage.removeItem(CKEY_CAMP); viewOath(); } };
+  }
+  // Called when an oath is judged: a campaign day is recorded; after day 14 the leader gives his verdict.
+  function campaignJudged(o, status) {
+    const a = activeCampaign(); if (!a || o.campaign !== a.id || a.done.some((d) => d.day === o.day)) return "";
+    a.done.push({ day: o.day, status });
+    const k = CAMPS.find((x) => x.id === a.id);
+    if (a.done.length < k.days.length) { store(CKEY_CAMP, a); return ""; }
+    const kept = a.done.filter((d) => d.status === "kept").length;
+    const hist = load(CHIST, []); hist.push({ id: k.id, kept, finished: dayKey() }); store(CHIST, hist);
+    localStorage.removeItem(CKEY_CAMP);
+    bump(k.leader, kept >= 12 ? 5 : kept >= 8 ? 2 : 0);
+    return `${k.title} — complete. ${kept} of 14 kept. ` + (kept >= 12 ? k.finish.great : kept >= 8 ? k.finish.good : k.finish.poor);
+  }
+
   // ---------- the oath page ----------
   function viewOath() {
     const p = profile(), list = oaths(), due = unjudged(), t = todaysOath();
@@ -521,6 +630,7 @@
       <div class="stats"><div><b>${streak()}</b><span>day streak</span></div><div><b>${kept}</b><span>kept</span></div><div><b>${broken}</b><span>broken</span></div></div>
       <div id="verdict"></div>
       ${judgeHTML}
+      ${campaignHTML(t)}
       ${todayHTML}
       <div class="panel">
         <div class="label">What they remember about you</div>
@@ -543,13 +653,17 @@
       const [date, status] = b.dataset.judge.split(":");
       const all = oaths(), o = all.find((x) => x.date === date); if (!o) return;
       const c = byId(o.id) || C[0];
-      if (o.status === "pending") bump(o.id, status === "kept" ? 3 : -3);
+      if (o.status !== "pending") return;
+      bump(o.id, status === "kept" ? 3 : -3);
       o.status = status;
       o.verdict = E.say(c, status === "kept" ? "oathKept" : "oathBroken", { oath: o.text });
       saveOaths(all);
+      const finale = campaignJudged(o, status);
       viewOath();
-      if (date !== dayKey()) document.getElementById("verdict").innerHTML = `<div class="panel" style="--c:${c.color}"><div class="msg char"><span class="who">${esc(c.name)}</span><span class="body">${esc(o.verdict)}</span></div></div>`;
+      const say = (who, text) => `<div class="msg char"><span class="who">${esc(who.name)}</span><span class="body">${esc(text)}</span></div>`;
+      if (date !== dayKey() || finale) document.getElementById("verdict").innerHTML = `<div class="panel" style="--c:${c.color}">${date !== dayKey() ? say(c, o.verdict) : ""}${finale ? say(c, finale) : ""}</div>`;
     });
+    wireCampaign();
     document.getElementById("pSave").onclick = () => { saveProfile({ name: document.getElementById("pName").value.trim(), goal: document.getElementById("pGoal").value.trim() }); toast("They will remember."); };
     document.getElementById("pForget").onclick = () => { saveProfile({ name: "", goal: "" }); viewOath(); toast("Forgotten."); };
   }
@@ -590,7 +704,32 @@
       ${list.length ? `<ul class="saved">${list.map((s) => { const c = byId(s.ids[0]) || C[0]; return `<li style="--c:${c.color}">
         <a href="#/saved/${s.sid}"><b>${esc(s.title)}</b><span>${s.kind === "council" ? "Council · " : ""}${esc(names(s))} · ${esc(new Date(s.date).toLocaleDateString())} · ${s.messages.length} messages</span></a>
         <button class="btn ghost small" data-dl="${s.sid}">Download</button></li>`; }).join("")}</ul>`
-        : `<div class="note">Nothing saved yet. In any chat or council, press <b>Save conversation</b>.</div>`}`;
+        : `<div class="note">Nothing saved yet. In any chat or council, press <b>Save conversation</b>.</div>`}
+      <div class="panel backup">
+        <div class="label">Backup · move to another device</div>
+        <p class="help">Everything lives only in this browser: your name and goal, oaths and streak, campaigns, how each of them sees you, chats, saved conversations and what you taught in the Forge. Download one backup file here, then open the site on your phone, laptop or the online version and restore it there. Restoring <b>merges</b> — nothing on that device is lost.</p>
+        <div class="row"><button class="btn small" id="bk">Download backup</button>
+        <label class="btn ghost small" style="cursor:pointer">Restore from backup<input type="file" id="rs" accept=".json,application/json" hidden></label></div>
+        <p class="help" id="bkInfo"></p>
+      </div>`;
+    document.getElementById("bkInfo").textContent = backupSummary();
+    document.getElementById("bk").onclick = () => {
+      const data = backupData();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
+      a.download = `iron-council-backup-${dayKey()}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      toast("Backup downloaded.");
+    };
+    document.getElementById("rs").onchange = async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      try {
+        const data = JSON.parse(await f.text());
+        if (!data || data.app !== "iron-council" || typeof data.keys !== "object") throw new Error("not a backup");
+        const n = restoreBackup(data);
+        for (const k of Object.keys(state.chats)) delete state.chats[k];
+        toast(`Restored and merged ${n} item${n === 1 ? "" : "s"}.`); viewSaved();
+      } catch (err) { toast("That file isn't an Iron Council backup."); }
+    };
     app.querySelectorAll("[data-dl]").forEach((b) => b.onclick = () => { const s = list.find((x) => x.sid === b.dataset.dl); download(fileName(s), asText(s)); });
   }
 
