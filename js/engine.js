@@ -121,7 +121,20 @@
     const uniq = (arr) => [...new Set(arr)];
     for (const k of ["openers", "principles", "closers", "again", "pivots"]) c[k] = uniq(c[k] || []);
     for (const group of [c.counsel, c.topics, c.about, c.opinions, c.intents]) for (const k of Object.keys(group || {})) group[k] = uniq(group[k]);
+    // Lines for memory, the daily oath and the council ("{name}", "{topic}", "{goal}", "{oath}" are filled in).
+    for (const k of ["recall", "goalAsk", "oathTake", "oathKept", "oathBroken", "agree", "disagree"]) c[k] = uniq(p[k] || []);
+    // Thin one- or two-word lines are replaced by full ones (round 6); keep them only for the terse voices
+    // or where a pool would otherwise be too small.
+    if (!["swordsman", "leonidas"].includes(c.id)) {
+      const thick = (arr) => { const f = arr.filter((l) => l.split(/\s+/).length > 2); return f.length >= 4 ? f : arr; };
+      c.principles = thick(c.principles);
+      for (const group of [c.counsel, c.topics, c.about]) for (const k of Object.keys(group)) group[k] = thick(group[k]);
+    }
   }
+  // How each member tends to see the others in the council: same temper → usually agree.
+  const TEMPER = { vlad: "iron", genghis: "iron", attila: "iron", timur: "iron", swordsman: "iron", leonidas: "iron", napoleon: "iron", hannibal: "iron",
+    marcus: "calm", rumi: "calm", musashi: "calm", tesla: "calm", bilge: "calm",
+    mehmed: "fire", ataturk: "fire", atsiz: "fire", joan: "fire", nietzsche: "fire" };
 
   // ---------- training store (what you teach) ----------
   const KEY = (id) => "ironcouncil.forge." + id;
@@ -229,6 +242,12 @@
     return KEYW.get(line);
   }
   function tooSimilar(a, b) {
+    // one line contained in the other ("The Way is in training." inside a longer line)
+    const na = norm(a).replace(/[^\p{L}\p{N} ]/gu, ""), nb = norm(b).replace(/[^\p{L}\p{N} ]/gu, "");
+    if (na.length > 8 && nb.length > 8 && (na.includes(nb) || nb.includes(na))) return true;
+    // or the two share a whole sentence ("Begin." and "Begin. The will grows...")
+    const sa = new Set(norm(a).split(/(?<=[.!?])\s+/));
+    if (norm(b).split(/(?<=[.!?])\s+/).some((s) => sa.has(s))) return true;
     const A = keyWords(a), B = keyWords(b);
     if (A.size < 2 || B.size < 2) return false;
     let n = 0; for (const w of A) if (B.has(w)) n++;
@@ -325,8 +344,33 @@
     return { text: parts.join(" "), mood, topic, again };
   }
 
+  const SHORT = { ataturk: "Atatürk", atsiz: "Atsız", musashi: "Musashi", swordsman: "the Swordsman", nietzsche: "Nietzsche", rumi: "Rumi", tesla: "Tesla", genghis: "Genghis", hannibal: "Hannibal", napoleon: "Napoleon", bilge: "Bilge" };
+  const shortName = (c) => SHORT[c.id] || c.name.split(" ")[0];
+  // One line from a named pool, with {placeholders} filled in. Returns "" if the pool is empty.
+  function say(char, key, vars) {
+    const l = pick(char.id, char[key] || [], []); saveRecent(char.id);
+    if (!l) return "";
+    const s = l.replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m));
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  // A council member reacting to someone who spoke before him.
+  function react(char, other) {
+    const same = TEMPER[char.id] === TEMPER[other.id];
+    const agree = same ? chance(0.7) : chance(0.35);
+    const short = shortName(other);
+    // (his stored opinion of the other is not added here: it can contradict an "I agree")
+    return { text: say(char, agree ? "agree" : "disagree", { name: short }), agree };
+  }
+  // A short reply in his voice to a line someone else said (council round two).
+  function rebut(char, other) {
+    const r = react(char, other);
+    const p = pick(char.id, full3(char.principles), [r.text]); saveRecent(char.id);
+    return { text: [r.text, p].filter(Boolean).join(" "), agree: r.agree };
+  }
+  const full3 = (pool) => { const f = pool.filter((l) => l.split(/\s+/).length > 2); return f.length >= 3 ? f : pool; };
+
   window.Engine = {
     MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE,
-    forgeReply, getTraining, saveTraining, exportAll, importAll
+    forgeReply, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName
   };
 })();

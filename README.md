@@ -10,7 +10,10 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 ## What it does
 - **Chat** with any member: tell them what you're facing (English or Türkçe) and they answer from their own position.
 - **Ask about them**: their feelings, fears, regrets, love, death, and what they think of each other.
-- **Council**: ask one question, hear up to four members answer.
+- **Council**: ask one question; up to four members answer in turn, react to each other (agree or push back), and can be told to answer each other in a second round.
+- **Memory**: tell any of them "my name is …" or "my goal is …". They use your name, and on a new day they bring up what you last talked about or ask about your goal.
+- **Oath**: swear one task a day before one member. Next time they ask whether you kept it, react to the answer, and keep your streak.
+- **Saved**: save any chat or council, read it later, continue it, or download it as a text file.
 - **Forge**: train any character with your own beliefs, answers and lines (saved only in your browser).
 
 ## How it works
