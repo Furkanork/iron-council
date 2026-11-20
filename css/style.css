@@ -307,3 +307,20 @@ html, body { overflow-x: hidden; }
 .camp-go { margin-bottom: 30px; }
 #campTask { width: 100%; min-height: 64px; background: #0e0e12; border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; }
 @media (max-width: 600px) { .plan li { grid-template-columns: 1fr; } .plan .dn { grid-row: auto; } .camp-head .sigil.big { display: none; } }
+
+/* ---------- debate & journal ---------- */
+.modes { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 6px; }
+.modes .chip.on { border-color: var(--blood2); color: var(--text); background: rgba(208,40,58,.12); }
+.mode-help { color: var(--muted); font-style: italic; font-size: 15.5px; margin: 0 0 12px; }
+.tally { max-width: 860px; text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; font-family: var(--head); letter-spacing: .08em; font-size: 15px; }
+.tally b { font-size: 26px; color: var(--gold); margin: 0 4px; }
+.tally p { font-family: var(--body); letter-spacing: 0; font-size: 18px; margin: 8px 0 0; font-style: italic; }
+.journal-new, .journal-list { max-width: 860px; }
+.journal-new textarea { min-height: 120px; background: #0e0e12; border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+.journal-list { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
+.entry { --c: var(--steel); background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 6px; padding: 14px 16px; }
+.entry-head { display: flex; justify-content: space-between; font-family: var(--head); font-size: 12px; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+.entry-head button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; }
+.entry-head button:hover { color: var(--blood2); }
+.entry-text { white-space: pre-wrap; margin: 8px 0 10px; }
+.entry .msg.char { max-width: 100%; }

@@ -125,7 +125,7 @@
     for (const k of ["openers", "principles", "closers", "again", "pivots"]) c[k] = uniq(c[k] || []);
     for (const group of [c.counsel, c.topics, c.about, c.opinions, c.intents]) for (const k of Object.keys(group || {})) group[k] = uniq(group[k]);
     // Lines for memory, the daily oath and the council ("{name}", "{topic}", "{goal}", "{oath}" are filled in).
-    for (const k of ["recall", "goalAsk", "oathTake", "oathKept", "oathBroken", "agree", "disagree", "stories", "gentle", "hard", "bondWarm", "bondCold", "bondUp", "heard"]) c[k] = uniq(p[k] || []);
+    for (const k of ["recall", "goalAsk", "oathTake", "oathKept", "oathBroken", "agree", "disagree", "stories", "gentle", "hard", "bondWarm", "bondCold", "bondUp", "heard", "pro", "con", "journal"]) c[k] = uniq(p[k] || []);
     c.askBack = p.askBack || {};
     c.rivals = p.rivals || {};
     // Thin one- or two-word lines are replaced by full ones (round 6); keep them only for the terse voices
@@ -418,10 +418,21 @@
     const p = pick(char.id, full3(char.principles), [r.text]); saveRecent(char.id);
     return { text: [r.text, p].filter(Boolean).join(" "), agree: r.agree };
   }
+  // One line that speaks to the subject of a question (its topic, else its feeling, else a conviction).
+  function topicLine(char, text) {
+    // "Should I…" is always a decision; look past that to what the decision is about (university, job, love…).
+    let topic = detectTopic(text);
+    if (topic === "decision") topic = best(norm(text).replace(EXCLAIM, " "), TOPIC_WORDS, TOPICS.filter((t) => t !== "decision" && t !== "time"));
+    const mood = detectMood(text);
+    const pool = (topic && char.topics[topic]) || (mood !== "general" && char.counsel[mood]) || char.principles;
+    const l = pick(char.id, full3(pool), []); saveRecent(char.id);
+    return l || "";
+  }
+  const temper = (c) => TEMPER[c.id];
   const full3 = (pool) => { const f = pool.filter((l) => l.split(/\s+/).length > 2); return f.length >= 3 ? f : pool; };
 
   window.Engine = {
     MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE,
-    forgeReply, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName, isStory
+    forgeReply, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName, isStory, topicLine, temper
   };
 })();

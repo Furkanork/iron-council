@@ -386,13 +386,16 @@
 
   function viewCouncil() {
     const chosen = new Set(JSON.parse(localStorage.getItem("ironcouncil.council") || '["mehmed","ataturk","musashi","swordsman"]'));
+    const mode = localStorage.getItem("ironcouncil.councilMode") || "counsel";
     app.innerHTML = `
       <h2 class="section-title">The Council</h2>
       <p class="sub">Ask once. Hear several convictions answer the same problem.</p>
+      <div class="modes" id="modes"><button class="chip ${mode === "counsel" ? "on" : ""}" data-mode="counsel">Counsel — they advise you</button><button class="chip ${mode === "debate" ? "on" : ""}" data-mode="debate">Debate — they argue for and against</button></div>
+      <p class="help mode-help">${mode === "debate" ? "Ask a yes-or-no choice (“Should I take a gap year?”). They split into two sides, argue, answer each other, and each gives a final verdict." : "Tell them what you're facing, or pick a feeling."}</p>
       <div class="pick" id="pick">${C.map((c) => `<button class="chip ${chosen.has(c.id) ? "on" : ""}" data-id="${c.id}" style="--c:${c.color}">${esc(c.monogram)} ${esc(c.name)}</button>`).join("")}</div>
       <div class="council-box">
-        <div class="moods" style="border-top:none" id="cm">${E.MOODS.concat("general").map((m) => `<button class="chip" data-m="${m}">${E.MOOD_LABELS[m]}</button>`).join("")}</div>
-        <div class="composer"><textarea id="cq" placeholder="What are you facing?"></textarea><button class="btn" id="cs">Summon</button></div>
+        ${mode === "debate" ? "" : `<div class="moods" style="border-top:none" id="cm">${E.MOODS.concat("general").map((m) => `<button class="chip" data-m="${m}">${E.MOOD_LABELS[m]}</button>`).join("")}</div>`}
+        <div class="composer"><textarea id="cq" placeholder="${mode === "debate" ? "Should I …? — e.g. Should I quit my job to start a business?" : "What are you facing?"}"></textarea><button class="btn" id="cs">${mode === "debate" ? "Open the debate" : "Summon"}</button></div>
       </div>
       <div class="answers" id="ans"></div>`;
     document.getElementById("pick").onclick = (e) => {
@@ -461,9 +464,72 @@
       ans.insertAdjacentHTML("beforeend", tools()); wireTools();
       busy = false;
     }
-    cs.onclick = () => { const t = cq.value.trim(); if (t) summon(t, null); };
+    // ---- Debate: two sides, three rounds, a verdict from each, and the count.
+    async function debate(text) {
+      if (busy) return;
+      const list = C.filter((c) => chosen.has(c.id));
+      if (list.length < 2) return toast("Choose at least two members for a debate.");
+      if (E.isCrisis(text)) { ans.innerHTML = `<div class="answer crisis"><div>${esc(E.CRISIS_MESSAGE)}</div></div>`; return; }
+      busy = true; cs.disabled = true;
+      // Bold tempers lean "do it", calm ones lean "not yet" — with chance, and never all on one side.
+      const lean = { iron: 0.62, fire: 0.55, calm: 0.35 };
+      const ranked = list.map((c) => ({ c, s: (lean[E.temper(c)] || 0.5) + Math.random() * 0.45 })).sort((x, y) => y.s - x.s);
+      const half = Math.ceil(list.length / 2);
+      const side = new Map(ranked.map((r, i) => [r.c.id, i < half ? "pro" : "con"]));
+      const LABEL = { pro: "for — do it", con: "against — not yet" };
+      session = { question: text, list, said: [] };
+      ans.innerHTML = "";
+      let n = 0;
+      const say = async (c, tag, body, prefix) => { ans.insertAdjacentHTML("beforeend", block(c, tag, n)); session.said.push({ c, text: (prefix || "") + body }); await speak(n, body, c); n++; };
+      ans.insertAdjacentHTML("beforeend", `<div class="round">Opening arguments</div>`);
+      for (const r of ranked) {
+        const c = r.c, sd = side.get(c.id);
+        const body = [E.say(c, sd), E.topicLine(c, text)].filter(Boolean).join(" ");
+        await say(c, LABEL[sd], body, `[${sd === "pro" ? "for" : "against"}] `);
+      }
+      ans.insertAdjacentHTML("beforeend", `<div class="round">They answer the other side</div>`);
+      for (const r of ranked) {
+        const c = r.c, sd = side.get(c.id);
+        const opp = ranked.map((x) => x.c).filter((o) => side.get(o.id) !== sd);
+        const target = opp.find((o) => c.rivals[o.id]) || opp[Math.floor(Math.random() * opp.length)];
+        // A rival speaks to their shared history; anyone else answers with a second argument for his own side
+        // (his generic "I disagree" lines are about temperament and could contradict the side he argues).
+        const riv = c.rivals[target.id];
+        const first = riv && riv.length && chance(0.8) ? E.say(c, null, null, riv) : "";
+        const body = [first, E.say(c, sd), first ? "" : E.say(c, sd)].filter(Boolean).join(" ");
+        await say(c, "to " + E.shortName(target), body, `(to ${E.shortName(target)}) `);
+      }
+      ans.insertAdjacentHTML("beforeend", `<div class="round">Verdicts</div>`);
+      const votes = { pro: 0, con: 0 };
+      for (const r of ranked) {
+        const c = r.c; let sd = side.get(c.id), body = "";
+        // Now and then a member is persuaded by the other side.
+        if (chance(0.15)) {
+          const opp = ranked.map((x) => x.c).filter((o) => side.get(o.id) !== sd);
+          const won = opp[Math.floor(Math.random() * opp.length)];
+          sd = sd === "pro" ? "con" : "pro";
+          body = E.say(c, "agree", { name: E.shortName(won) }) + " I have changed my mind. ";
+        }
+        votes[sd]++;
+        // a "do it" verdict ends with his call to action; a "not yet" with one of his cautious lines
+        body += sd === "pro" ? "My verdict: do it. " + E.say(c, "closers") : "My verdict: not yet. " + E.say(c, "con");
+        await say(c, "verdict: " + (sd === "pro" ? "do it" : "not yet"), body.trim(), "[verdict] ");
+      }
+      const total = votes.pro + votes.con;
+      const summary = votes.pro === votes.con ? `The Council is split, ${votes.pro} to ${votes.con}. The choice is yours — and so is the responsibility.`
+        : votes.pro > votes.con ? `${votes.pro} of ${total} say do it. The Council leans toward action.` : `${votes.con} of ${total} say not yet. The Council leans toward caution.`;
+      ans.insertAdjacentHTML("beforeend", `<div class="tally"><b>${votes.pro}</b> do it · <b>${votes.con}</b> not yet<p>${esc(summary)}</p></div>`);
+      session.said.push({ c: { name: "The Council" }, text: summary });
+      ans.insertAdjacentHTML("beforeend", `<div class="council-tools"><button class="btn ghost small" id="csave">Save this debate</button><button class="btn ghost small" id="cdl">Download</button></div>`);
+      const msgs = () => [{ who: "You", text: "Debate: " + session.question }].concat(session.said.map((s) => ({ who: s.c.name, text: s.text })));
+      document.getElementById("csave").onclick = () => saveConversation("council", session.list.map((c) => c.id), msgs());
+      document.getElementById("cdl").onclick = () => { const s = { ids: session.list.map((c) => c.id), kind: "council", date: new Date().toISOString(), messages: msgs() }; download(fileName(s), asText(s)); };
+      busy = false; cs.disabled = false;
+    }
+    cs.onclick = () => { const t = cq.value.trim(); if (!t) return; if (mode === "debate") debate(t); else summon(t, null); };
     cq.onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); cs.click(); } };
-    document.getElementById("cm").onclick = (e) => { const m = e.target.dataset.m; if (m) summon("", m); };
+    const cm = document.getElementById("cm"); if (cm) cm.onclick = (e) => { const m = e.target.dataset.m; if (m) summon("", m); };
+    document.getElementById("modes").onclick = (e) => { const m = e.target.dataset.mode; if (m && m !== mode) { localStorage.setItem("ironcouncil.councilMode", m); viewCouncil(); } };
   }
 
   function viewForge(id) {
@@ -601,6 +667,50 @@
     localStorage.removeItem(CKEY_CAMP);
     bump(k.leader, kept >= 12 ? 5 : kept >= 8 ? 2 : 0);
     return `${k.title} — complete. ${kept} of 14 kept. ` + (kept >= 12 ? k.finish.great : kept >= 8 ? k.finish.good : k.finish.poor);
+  }
+
+  // ---------- journal: write about your day, one of them answers ----------
+  const JKEY = "ironcouncil.journal";
+  function viewJournal() {
+    const list = load(JKEY, []);
+    const lastWho = (list[0] || {}).who || "marcus";
+    const p = profile();
+    app.innerHTML = `
+      <h2 class="section-title">Journal</h2>
+      <p class="sub">${p.name ? esc(p.name) + ", write" : "Write"} about your day — what happened, what you did, what is weighing on you. One of them reads it and answers. It stays in this browser.</p>
+      <div class="panel journal-new">
+        <div class="field"><select id="jWho">${C.map((c) => `<option value="${c.id}" ${c.id === lastWho ? "selected" : ""}>${esc(c.name)} reads it</option>`).join("")}</select>
+        <textarea id="jText" maxlength="3000" placeholder="Today I…"></textarea></div>
+        <div class="row"><button class="btn" id="jWrite">Write it</button>${list.length ? `<span style="flex:1"></span><button class="btn ghost small" id="jDl">Download journal</button>` : ""}</div>
+      </div>
+      <div class="journal-list">${list.map((e, i) => { const c = byId(e.who) || C[0]; return `
+        <div class="entry" style="--c:${c.color}">
+          <div class="entry-head"><span>${esc(new Date(e.at).toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }))}</span><button data-jdel="${i}" title="Delete this entry">×</button></div>
+          <div class="entry-text">${esc(e.text)}</div>
+          <div class="msg char"><span class="who">${esc(c.name)}</span><span class="body">${esc(e.reply)}</span></div>
+        </div>`; }).join("") || `<div class="note">No entries yet. Write your first one above.</div>`}</div>`;
+    const jt = document.getElementById("jText");
+    document.getElementById("jWrite").onclick = () => {
+      const text = jt.value.trim(); if (!text) return toast("Write something first.");
+      const c = byId(document.getElementById("jWho").value);
+      let reply;
+      if (E.isCrisis(text)) reply = E.CRISIS_MESSAGE;
+      else {
+        learn(text);
+        const r = E.forgeReply(c, text, null, { tone: localStorage.getItem("ironcouncil.tone." + c.id) || "", bond: bondLevel(bond(c.id).score) });
+        reply = [E.say(c, "journal"), r.text].filter(Boolean).join(" ");
+        // Writing to him once a day counts toward the bond.
+        const b = bond(c.id); if (b.wrote !== dayKey()) { b.wrote = dayKey(); store(BKEY(c.id), b); bump(c.id, 1); }
+      }
+      const all = load(JKEY, []); all.unshift({ at: new Date().toISOString(), who: c.id, text, reply }); store(JKEY, all.slice(0, 500));
+      viewJournal();
+    };
+    app.querySelectorAll("[data-jdel]").forEach((b) => b.onclick = () => {
+      if (!confirm("Delete this journal entry? This can't be undone.")) return;
+      const all = load(JKEY, []); all.splice(+b.dataset.jdel, 1); store(JKEY, all); viewJournal();
+    });
+    const dl = document.getElementById("jDl");
+    if (dl) dl.onclick = () => download(`iron-council-journal-${dayKey()}.txt`, "The Iron Council — Journal\n\n" + load(JKEY, []).slice().reverse().map((e) => `${new Date(e.at).toLocaleString()}\n${e.text}\n\n${(byId(e.who) || {}).name}: ${e.reply}\n`).join("\n----------------\n\n"));
   }
 
   // ---------- a campaign's plan & rules ----------
@@ -800,6 +910,7 @@
     else if (h[0] === "council") viewCouncil();
     else if (h[0] === "forge") viewForge(h[1]);
     else if (h[0] === "oath") viewOath();
+    else if (h[0] === "journal") viewJournal();
     else if (h[0] === "campaign") viewCampaign(h[1]);
     else if (h[0] === "saved") viewSaved(h[1]);
     else viewHall();

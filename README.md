@@ -19,6 +19,9 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Rivals**: members with real history (Mehmed and Vlad, Hannibal and Napoleon, Timur and Genghis, …) speak to each other about it in the Council.
 - **They ask you back**: sometimes a member ends with a question ("What exactly scares you about it?") and takes your next message as the answer.
 - **Campaigns** (Oath page): 14-day programs led by one member — Musashi (discipline), Napoleon (exam study), Leonidas (body), Marcus (mind), Tesla (finish a project). Each day's task becomes that day's oath.
+- **Council debate**: switch the Council to Debate, ask a yes-or-no choice; they split into for and against, argue, answer the other side, and each gives a verdict. The count is shown at the end.
+- **Journal**: write about your day; the member you choose reads it and answers.
+- **Campaigns** also include Atatürk's Reading Campaign, Rumi's Fourteen Days of Calm and Genghis's Discipline of the Steppe.
 - **Backup** (Saved page): download everything in one file and restore it on another device or browser; restoring merges, nothing is lost.
 - **Saved**: save any chat or council, read it later, continue it, or download it as a text file.
 - **Forge**: train any character with your own beliefs, answers and lines (saved only in your browser).
