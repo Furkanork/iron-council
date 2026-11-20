@@ -46,6 +46,21 @@
     return got;
   }
 
+  // ---------- bond: how each of them feels about you ----------
+  // Grows when you come back, keep oaths sworn to him, and thank him; shrinks when you break those oaths
+  // or bring him the same complaint again and again without acting.
+  const BKEY = (id) => "ironcouncil.bond." + id;
+  const bond = (id) => Object.assign({ score: 0, day: "", shown: "stranger" }, load(BKEY(id), {}));
+  const BOND_LEVELS = [["cold", -Infinity], ["stranger", -5], ["respect", 5], ["trusted", 15]];
+  const bondLevel = (score) => BOND_LEVELS.filter(([, min]) => score >= min).pop()[0];
+  const BOND_LABEL = { cold: "Cold", stranger: "Stranger", respect: "Respect", trusted: "Trusted" };
+  function bump(id, n) { const b = bond(id); b.score = Math.max(-20, Math.min(40, b.score + n)); store(BKEY(id), b); return b; }
+  function bondHTML(c) {
+    const b = bond(c.id), lv = bondLevel(b.score);
+    const dots = Math.max(0, Math.min(5, Math.round((b.score + 5) / 5)));
+    return `<div class="bond bond-${lv}" title="${g(c, "How he sees you. It grows when you return, keep oaths sworn to him and thank him; it drops when you break those oaths or repeat the same complaint without acting.")}"><span>Bond</span> <b>${BOND_LABEL[lv]}</b> <i>${"●".repeat(dots)}${"○".repeat(5 - dots)}</i></div>`;
+  }
+
   // ---------- the daily oath ----------
   const OKEY = "ironcouncil.oaths";
   const oaths = () => load(OKEY, []);
@@ -158,7 +173,7 @@
     .replace(/\bhis\b/g, "her").replace(/\bHis\b/g, "Her").replace(/\bhe'd\b/g, "she'd").replace(/\bHe'll\b/g, "She'll")
     .replace(/\bhe\b/g, "she").replace(/\bHe\b/g, "She");
 
-  const ASKS = ["How do you feel?", "What do you fear?", "Do you regret anything?", "Your proudest moment?", "Your hardest moment?", "Who did you love?", "How did you die?", "What do you think of me?"];
+  const ASKS = ["Tell me a story", "How do you feel?", "What do you fear?", "Do you regret anything?", "Your proudest moment?", "Your hardest moment?", "Who did you love?", "How did you die?", "What do you think of me?"];
 
   function viewChar(id) {
     const c = byId(id); if (!c) return viewHall();
@@ -180,6 +195,17 @@
       if (line) { log.push({ role: "char", content: line, read: "remembers", memory: true }); persist(); }
     }
     localStorage.setItem(SEEN, dayKey());
+    // Bond: if how he sees you has changed since you last spoke, he says so.
+    {
+      const b = bond(id), lv = bondLevel(b.score), order = ["cold", "stranger", "respect", "trusted"];
+      if (lv !== b.shown) {
+        const up = order.indexOf(lv) > order.indexOf(b.shown);
+        const line = up && lv !== "stranger" ? E.say(c, "bondUp") : lv === "cold" ? E.say(c, "bondCold") : "";
+        if (line) { log.push({ role: "char", content: line, read: up ? (lv === "trusted" ? g(c, "trusts you now") : g(c, "respects you now")) : g(c, "has grown cold toward you"), memory: true }); persist(); }
+        b.shown = lv; store(BKEY(id), b);
+      }
+    }
+    const TKEY = "ironcouncil.tone." + id;
     app.innerHTML = `
       <div class="char-layout">
         <aside class="dossier" style="--c:${c.color}">
@@ -188,6 +214,7 @@
           <div class="ttl">${esc(c.title)}</div>
           <div class="meta">${esc(c.era)} · ${esc(c.region)}</div>
           <div class="idea">${esc(c.idea)}</div>
+          ${bondHTML(c)}
           <button class="btn ghost small toggle-more" id="moreBtn">${g(c, "About him")}</button>
           <div class="dossier-more">
           <p>${esc(c.bio)}</p>
@@ -205,6 +232,8 @@
             <button class="btn ghost small" id="saveChat" title="Keep a copy under Saved">Save conversation</button>
             <button class="btn ghost small" id="dlChat" title="Download as a text file">Download</button>
             <span style="flex:1"></span>
+            <label class="tone" title="${g(c, "How hard he is on you")}">Tone <select id="tone">
+              <option value="gentle">Gentle</option><option value="">Normal</option><option value="hard">Hard</option></select></label>
             <button class="btn ghost small" id="clearChat">Clear chat</button>
           </div>
           <div class="log" id="log"></div>
@@ -258,11 +287,20 @@
         Object.assign(slot, { content: (prefix ? prefix + " " : "") + E.say(c, "goalAsk", { goal: learned.goal }), pending: false, memory: true, read: "remembers your goal" });
         render(); persist(); setBusy(false); return;
       }
-      await answer(c, question, mood, { lastTopic, prefix }, (t, done, meta) => {
-        slot.content = t; Object.assign(slot, { taught: meta.taught, crisis: meta.crisis, topic: meta.topic, read: g(c, E.describe(meta)) });
+      // Bond: coming back on a new day counts.
+      { const b = bond(c.id); if (b.day !== dayKey()) { b.day = dayKey(); store(BKEY(c.id), b); bump(c.id, 1); } }
+      const tone = localStorage.getItem(TKEY) || "";
+      await answer(c, question, mood, { lastTopic, prefix, tone, bond: bondLevel(bond(c.id).score) }, (t, done, meta) => {
+        slot.content = t; Object.assign(slot, { taught: meta.taught, crisis: meta.crisis, topic: meta.topic, feel: meta.mood, intent: meta.intent, read: g(c, E.describe(meta)) });
         if (done) { slot.pending = false; render(nearBottom()); } else paint(t);
       });
       if (slot.pending) { slot.pending = false; render(); }
+      // Bond: thanks (once a day) raises it; the same complaint three times in a row lowers it.
+      const b = bond(c.id);
+      if (slot.intent === "thanks" && b.thanked !== dayKey()) { b.thanked = dayKey(); store(BKEY(c.id), b); bump(c.id, 1); }
+      const feels = log.filter((m) => m.role === "char" && m.feel).slice(-3).map((m) => m.feel);
+      if (feels.length === 3 && feels[0] !== "general" && feels.every((f) => f === feels[0]) && !log.slice(-6).some((m) => m.complained)) { slot.complained = true; bump(c.id, -1); }
+      const bEl = document.querySelector(".dossier .bond"); if (bEl) bEl.outerHTML = bondHTML(c);
       persist();
       setBusy(false); if (matchMedia("(min-width: 861px)").matches) q.focus();
     }
@@ -285,6 +323,9 @@
     };
     document.getElementById("moreBtn").onclick = (e) => { const d = e.target.closest(".dossier"); d.classList.toggle("open"); e.target.textContent = d.classList.contains("open") ? "Hide" : g(c, "About him"); };
     document.getElementById("clearChat").onclick = () => { if (log.length && !confirm("Clear this chat? Save it first if you want to keep it.")) return; log.length = 0; persist(); render(); };
+    const toneEl = document.getElementById("tone");
+    toneEl.value = localStorage.getItem(TKEY) || "";
+    toneEl.onchange = () => { localStorage.setItem(TKEY, toneEl.value); toast(toneEl.value === "gentle" ? g(c, `${c.name} will be gentler with you.`) : toneEl.value === "hard" ? `${c.name} will not spare you.` : `${c.name} speaks as usual.`); };
     const asMessages = () => log.filter((m) => !m.pending && m.content).map((m) => ({ who: m.role === "user" ? "You" : c.name, text: m.content }));
     document.getElementById("saveChat").onclick = () => saveConversation("chat", [c.id], asMessages());
     document.getElementById("dlChat").onclick = () => { const m = asMessages(); if (!m.length) return toast("Nothing to download yet."); const s = { ids: [c.id], kind: "chat", date: new Date().toISOString(), messages: m }; download(fileName(s), asText(s)); };
@@ -338,10 +379,11 @@
         const c = list[i];
         const r = E.forgeReply(c, text, mood, {});
         let body = r.text, tag = "";
-        if (!r.crisis && i > 0 && chance(0.65)) {
-          const other = session.said[Math.floor(Math.random() * session.said.length)].c;
+        const rival = i > 0 && session.said.map((s) => s.c).find((o) => c.rivals[o.id]);
+        if (!r.crisis && i > 0 && (rival || chance(0.65))) {
+          const other = rival || session.said[Math.floor(Math.random() * session.said.length)].c;
           const re = E.react(c, other);
-          if (re.text) { body = re.text + " " + body; tag = (re.agree ? "agrees with " : "answers ") + E.shortName(other); }
+          if (re.text) { body = re.text + " " + body; tag = re.rival ? "to " + E.shortName(other) : (re.agree ? "agrees with " : "answers ") + E.shortName(other); }
         } else if (!r.crisis && i === 0 && p.name && chance(0.3)) body = p.name + ". " + body;
         ans.insertAdjacentHTML("beforeend", block(c, tag, i));
         session.said.push({ c, text: body });
@@ -358,9 +400,9 @@
       ans.insertAdjacentHTML("beforeend", `<div class="round">They answer each other</div>`);
       const L = session.list, base = session.said.length;
       for (let i = 0; i < L.length; i++) {
-        const c = L[i], other = L[(i + L.length - 1) % L.length];
+        const c = L[i], other = L.find((o) => o !== c && c.rivals[o.id]) || L[(i + L.length - 1) % L.length];
         const r = E.rebut(c, other);
-        ans.insertAdjacentHTML("beforeend", block(c, (r.agree ? "agrees with " : "answers ") + E.shortName(other), base + i));
+        ans.insertAdjacentHTML("beforeend", block(c, r.rival ? "to " + E.shortName(other) : (r.agree ? "agrees with " : "answers ") + E.shortName(other), base + i));
         session.said.push({ c, text: `(to ${E.shortName(other)}) ` + r.text });
         await speak(base + i, r.text, c);
       }
@@ -501,6 +543,7 @@
       const [date, status] = b.dataset.judge.split(":");
       const all = oaths(), o = all.find((x) => x.date === date); if (!o) return;
       const c = byId(o.id) || C[0];
+      if (o.status === "pending") bump(o.id, status === "kept" ? 3 : -3);
       o.status = status;
       o.verdict = E.say(c, status === "kept" ? "oathKept" : "oathBroken", { oath: o.text });
       saveOaths(all);

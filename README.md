@@ -13,6 +13,10 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Council**: ask one question; up to four members answer in turn, react to each other (agree or push back), and can be told to answer each other in a second round.
 - **Memory**: tell any of them "my name is …" or "my goal is …". They use your name, and on a new day they bring up what you last talked about or ask about your goal.
 - **Oath**: swear one task a day before one member. Next time they ask whether you kept it, react to the answer, and keep your streak.
+- **Stories**: ask any of them for a story ("tell me a story", "bir hikaye anlat") and they tell one from their life.
+- **Bond**: each of them forms an opinion of you — Cold, Stranger, Respect, Trusted — from your visits, the oaths you keep or break, and whether you keep repeating the same complaint. It shows in how they greet and speak to you.
+- **Tone**: in each chat, set them to Gentle, Normal or Hard.
+- **Rivals**: members with real history (Mehmed and Vlad, Hannibal and Napoleon, Timur and Genghis, …) speak to each other about it in the Council.
 - **Saved**: save any chat or council, read it later, continue it, or download it as a text file.
 - **Forge**: train any character with your own beliefs, answers and lines (saved only in your browser).
 

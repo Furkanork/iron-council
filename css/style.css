@@ -260,3 +260,12 @@ html, body { overflow-x: hidden; }
   .btn { padding: 10px 14px; }
   .section-title { font-size: 26px; }
 }
+
+/* ---------- bond and tone ---------- */
+.bond { margin-top: 12px; font-size: 14px; color: var(--muted); font-family: var(--head); letter-spacing: .06em; }
+.bond b { color: var(--text); font-weight: 700; }
+.bond i { font-style: normal; color: var(--c); letter-spacing: .15em; margin-left: 4px; }
+.bond-cold b { color: #7fa7c9; }
+.bond-trusted b { color: var(--gold); }
+.tone { font-family: var(--head); font-size: 12px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+.tone select { background: #0e0e12; border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; font-size: 14px; text-transform: none; letter-spacing: 0; }

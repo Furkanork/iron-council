@@ -8,14 +8,14 @@
  */
 (function () {
   const MOODS = ["tired", "failed", "afraid", "lazy", "alone", "lost", "angry", "doubt"];
-  const TOPICS = ["decision", "envy", "study", "training", "work", "money", "love", "family", "phone", "sleep", "creative", "friends", "time", "health", "habits"];
+  const TOPICS = ["grief", "bully", "decision", "faith", "envy", "study", "training", "work", "money", "love", "family", "phone", "sleep", "creative", "friends", "time", "health", "habits"];
 
   const MOOD_LABELS = {
     tired: "I'm exhausted", failed: "I failed", afraid: "I'm afraid", lazy: "I can't start",
     alone: "I feel alone", lost: "I'm lost", angry: "I'm angry", doubt: "I doubt myself", general: "Just speak"
   };
   const MOOD_SHORT = { tired: "exhaustion", failed: "defeat", afraid: "fear", lazy: "inertia", alone: "solitude", lost: "no direction", angry: "anger", doubt: "doubt" };
-  const TOPIC_LABELS = { study: "studies", training: "training", work: "work", money: "money", love: "love", family: "family", phone: "distraction", sleep: "sleep", creative: "your craft", decision: "a decision", friends: "friends", envy: "comparison", time: "time", health: "health", habits: "habits" };
+  const TOPIC_LABELS = { study: "studies", training: "training", work: "work", money: "money", love: "love", family: "family", phone: "distraction", sleep: "sleep", creative: "your craft", decision: "a decision", friends: "friends", envy: "comparison", time: "time", health: "health", habits: "habits", grief: "loss", bully: "being mocked", faith: "faith" };
 
   // English + Turkish. A keyword matches at the start of a word, so stems work ("procrastinat", "sınav" → "sınavım").
   const MOOD_WORDS = {
@@ -43,6 +43,9 @@
     time: ["too old", "too late", "wasted years", "wasted my", "my age", "running out of time", "behind in life", "years old", "yaşım", "geç kaldım", "çok geç", "yıllarımı", "yaşındayım"],
     health: ["sick", "illness", "injury", "injured", "hospital", "disease", "surgery", "chronic", "hasta", "sakat", "ameliyat", "sağlığım", "hastane"],
     habits: ["habit", "healthy", "cook", "sağlıklı", "discipline", "routine", "consistent", "consistency", "smoking", "cigarette", "junk food", "sugar", "alcohol", "alışkanlık", "disiplin", "rutin", "sigara", "düzenli"],
+    grief: ["passed away", "died", "has died", "funeral", "grief", "grieving", "mourning", "lost my father", "lost my mother", "lost my dad", "lost my mom", "lost my mum", "lost my brother", "lost my sister", "lost my grandfather", "lost my grandmother", "lost my grandma", "lost my grandpa", "lost my friend", "lost my best friend", "lost my dog", "lost my cat", "death of my", "miss him so much", "miss her so much", "vefat", "öldü", "cenaze", "yas tut", "babamı kaybettim", "annemi kaybettim", "kardeşimi kaybettim", "dedemi kaybettim", "ninemi kaybettim", "anneannemi kaybettim", "babaannemi kaybettim", "arkadaşımı kaybettim"],
+    bully: ["bully", "bullied", "bullies", "bullying", "picked on", "pick on me", "picks on me", "make fun of me", "makes fun of me", "made fun of me", "laugh at me", "laughs at me", "laughed at me", "mock me", "mocks me", "mocked me", "harass", "they call me", "zorbalık", "zorba", "dalga geç", "alay ed", "benimle uğraş", "aşağıla", "lakap tak"],
+    faith: ["in god", "god exist", "god is", "god real", "does god", "religion", "religious", "pray", "prayer", "atheist", "agnostic", "my faith", "church", "mosque", "sin ", "tanrı", "dinim", "dine ", "namaz", "dua ed", "inancım", "imanım", "allah'a", "allah var"],
     decision: ["should i", "or should", "choose", "decide", "decision", "between", "which one", "option", "dilemma", "karar", "seçmeli", "seçim", "hangisi", " mi yoksa", "yoksa"]
   };
 
@@ -122,7 +125,8 @@
     for (const k of ["openers", "principles", "closers", "again", "pivots"]) c[k] = uniq(c[k] || []);
     for (const group of [c.counsel, c.topics, c.about, c.opinions, c.intents]) for (const k of Object.keys(group || {})) group[k] = uniq(group[k]);
     // Lines for memory, the daily oath and the council ("{name}", "{topic}", "{goal}", "{oath}" are filled in).
-    for (const k of ["recall", "goalAsk", "oathTake", "oathKept", "oathBroken", "agree", "disagree"]) c[k] = uniq(p[k] || []);
+    for (const k of ["recall", "goalAsk", "oathTake", "oathKept", "oathBroken", "agree", "disagree", "stories", "gentle", "hard", "bondWarm", "bondCold", "bondUp"]) c[k] = uniq(p[k] || []);
+    c.rivals = p.rivals || {};
     // Thin one- or two-word lines are replaced by full ones (round 6); keep them only for the terse voices
     // or where a pool would otherwise be too small.
     if (!["swordsman", "leonidas"].includes(c.id)) {
@@ -161,7 +165,7 @@
       const extra = [];
       for (const w of table[k]) {
         const [first, ...rest] = w.split(" ");
-        if (!rest.length) continue;
+        if (!rest.join("").trim()) continue; // "lose " must not become "lost " (that is the lost-way feeling)
         for (const f of IRREGULAR[first] || []) extra.push([f, ...rest].join(" "));
       }
       table[k] = table[k].concat(extra.filter((x) => !table[k].includes(x)));
@@ -173,18 +177,34 @@
     if (!reCache.has(w)) reCache.set(w, new RegExp("(^|[^\\p{L}])" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "u"));
     return reCache.get(w);
   }
-  function best(text, table, keys) {
+  // "I'm not tired", "I don't feel afraid anymore", "yorgun değilim": the feeling is denied, so it doesn't count.
+  // (Phrases that contain the negation themselves, like "not good enough", still match on their own.)
+  const NEG_BEFORE = /(?:(?:^|[^\p{L}])(?:not|never|no longer)|n't)\s+(?:\p{L}+\s+)?$/u;
+  const NEG_AFTER = /^\p{L}*\s+değil/u;
+  function negated(t, w) {
+    const m = matcher(w).exec(t); if (!m) return false;
+    const start = m.index + m[1].length, end = start + w.length;
+    return NEG_BEFORE.test(t.slice(Math.max(0, start - 30), start)) || NEG_AFTER.test(t.slice(end));
+  }
+  function best(text, table, keys, checkNeg) {
     const t = " " + norm(text) + " ";
     let top = null, topScore = 0;
     for (const k of keys) {
-      let s = 0; for (const w of table[k]) if (matcher(w).test(t)) s += w.length > 12 ? 3 : w.length > 5 ? 2 : 1; // longer phrases are more specific
+      let s = 0;
+      for (const w of table[k]) if (matcher(w).test(t) && !(checkNeg && negated(t, w))) s += w.length > 12 ? 3 : w.length > 5 ? 2 : 1; // longer phrases are more specific
       if (s > topScore) { top = k; topScore = s; }
     }
     return top;
   }
-  const detectMood = (text) => best(text, MOOD_WORDS, MOODS) || "general";
+  // "I lost my mother" is grief, not defeat
+  const detectMood = (text) => { const m = best(text, MOOD_WORDS, MOODS, true) || "general"; return m === "failed" && detectTopic(text) === "grief" ? "general" : m; };
   const AGE = /(\bi'?m|\bi am)\s+\d{2}\b|\d{2}\s*yaşında/i;
-  const detectTopic = (text) => (AGE.test(norm(text)) ? "time" : best(text, TOPIC_WORDS, TOPICS));
+  // "oh my god", "thank god" are exclamations, not faith
+  const EXCLAIM = /\b(oh my god|my god|thank god|omg|for god's sake|god knows|god damn|goddamn)\b/g;
+  const detectTopic = (text) => (AGE.test(norm(text)) ? "time" : best(norm(text).replace(EXCLAIM, " "), TOPIC_WORDS, TOPICS));
+  // "tell me a story", "bir hikaye anlat" — but "your story / your life" is "who are you"
+  const STORY = /(^|[^\p{L}])(a story|another story|one more story|story time|tell me a tale|any stories|a memory|an anecdote|stories|bir hikaye|bir hikâye|hikaye anlat|hikâye anlat|başka bir hikaye|bir anını|anı anlat)/u;
+  const isStory = (text) => STORY.test(" " + norm(text) + " ") && !/your (life )?story|hikayeni|hayatını/.test(norm(text));
   function detectIntent(text) {
     const t = " " + norm(text) + " ";
     const words = tokens(text).length;
@@ -216,6 +236,7 @@
     if (r.about) return "about himself · " + ABOUT_LABELS[r.about];
     if (r.opinion) { const o = window.CHARACTERS.find((c) => c.id === r.opinion); return "on " + (o ? o.name : r.opinion); }
     if (r.intent) return { greet: "greeting", thanks: "thanks", who: "about himself" }[r.intent];
+    if (r.story) return "a story";
     return [r.again ? "persistence" : null, r.mood && r.mood !== "general" ? MOOD_SHORT[r.mood] : null, r.topic ? TOPIC_LABELS[r.topic] : null].filter(Boolean).join(" · ");
   }
 
@@ -269,11 +290,18 @@
   function saveRecent(id) { try { localStorage.setItem(RKEY(id), JSON.stringify(recentFor(id))); } catch (e) { /* storage full: fine */ } }
 
   // ---------- composing ----------
-  // ctx (optional): { lastTopic } from earlier in the same conversation.
+  // ctx (optional): { lastTopic, tone: "gentle"|"hard", bond: "cold"|"stranger"|"respect"|"trusted" }
   function forgeReply(char, text, forcedMood, ctx) {
     if (isCrisis(text)) return { text: CRISIS_MESSAGE, mood: "crisis", crisis: true };
-    const mood = forcedMood || detectMood(text);
+    ctx = ctx || {};
     const topic = text ? detectTopic(text) : null;
+    let mood = forcedMood || detectMood(text);
+
+    // A story from his life, when asked for one.
+    if (!forcedMood && text && isStory(text) && char.stories.length) {
+      const s = pick(char.id, char.stories, []); saveRecent(char.id);
+      return { text: s, mood, topic: null, story: true };
+    }
     const tr = getTraining(char.id);
     // The main lines of an answer should carry real content: skip one- or two-word fragments
     // when fuller lines exist (except for the deliberately terse characters).
@@ -328,33 +356,47 @@
     // 2) Build the answer: topic take first (it shows he understood), then feeling, then conviction.
     const parts = [];
     const add = (pool) => { const l = pick(char.id, pool, parts); if (l) parts.push(l); };
-    if (again && char.again && char.again.length) add(char.again); else if (chance(0.45)) add(char.openers);
+    // Grief is answered with care: no scolding openers, no "hard" closer, no lines about laziness or defeat.
+    const grief = topic === "grief";
+    const gentle = ctx.tone === "gentle" && char.gentle.length, hard = ctx.tone === "hard" && char.hard.length && !grief;
+    // How he feels about you colours the first words now and then.
+    const bondPool = ctx.bond === "cold" ? char.bondCold : (ctx.bond === "respect" || ctx.bond === "trusted") ? char.bondWarm : [];
+    if (bondPool.length && chance(ctx.bond === "trusted" ? 0.35 : 0.25)) add(bondPool);
+    else if (gentle) add(char.gentle);
+    else if (grief) { if (char.gentle.length && chance(0.5)) add(char.gentle); }
+    else if (again && char.again && char.again.length) add(char.again);
+    else if (chance(0.45)) add(char.openers);
     if (topicPool.length) {
       add(topicPool);
-      if (mood !== "general") add(moodPool); else if (chance(0.6)) add(principlePool);
+      if (grief && ["lazy", "failed", "doubt", "angry"].includes(mood)) add(topicPool);
+      else if (mood !== "general") add(moodPool); else if (chance(0.6)) add(principlePool);
     } else {
       add(mood === "general" ? generalPool : moodPool);
       if (chance(0.5)) add(principlePool); else if (chance(0.5)) add(mood === "general" ? principlePool : moodPool);
     }
-    if (parts.length < 2 || chance(0.35)) add(principlePool);
+    if (!gentle && !grief && (parts.length < 2 || chance(0.35))) add(principlePool);
+    if (grief && parts.length < 2) add(topicPool);
     if (parts.length > 4) parts.splice(1, parts.length - 4);
-    add(char.closers);
+    if (!grief) add(hard ? char.hard : char.closers); // no battle-cry ending after a loss
 
     saveRecent(char.id);
-    return { text: parts.join(" "), mood, topic, again };
+    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone };
   }
 
   const SHORT = { ataturk: "Atatürk", atsiz: "Atsız", musashi: "Musashi", swordsman: "the Swordsman", nietzsche: "Nietzsche", rumi: "Rumi", tesla: "Tesla", genghis: "Genghis", hannibal: "Hannibal", napoleon: "Napoleon", bilge: "Bilge" };
   const shortName = (c) => SHORT[c.id] || c.name.split(" ")[0];
   // One line from a named pool, with {placeholders} filled in. Returns "" if the pool is empty.
-  function say(char, key, vars) {
-    const l = pick(char.id, char[key] || [], []); saveRecent(char.id);
+  function say(char, key, vars, pool) {
+    const l = pick(char.id, pool || char[key] || [], []); saveRecent(char.id);
     if (!l) return "";
     const s = l.replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m));
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
   // A council member reacting to someone who spoke before him.
   function react(char, other) {
+    // Members with real history between them speak to that history.
+    const riv = char.rivals[other.id];
+    if (riv && riv.length && chance(0.85)) return { text: say(char, null, null, riv), agree: false, rival: true };
     const same = TEMPER[char.id] === TEMPER[other.id];
     const agree = same ? chance(0.7) : chance(0.35);
     const short = shortName(other);
@@ -364,6 +406,7 @@
   // A short reply in his voice to a line someone else said (council round two).
   function rebut(char, other) {
     const r = react(char, other);
+    if (r.rival) return r; // a rival line already says enough
     const p = pick(char.id, full3(char.principles), [r.text]); saveRecent(char.id);
     return { text: [r.text, p].filter(Boolean).join(" "), agree: r.agree };
   }
@@ -371,6 +414,6 @@
 
   window.Engine = {
     MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE,
-    forgeReply, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName
+    forgeReply, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName, isStory
   };
 })();
