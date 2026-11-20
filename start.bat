@@ -1,4 +1,5 @@
 @echo off
 cd /d "%~dp0"
-start "" http://localhost:8080
-node serve.js
+rem Starts the site and opens it in your browser once it is ready. Keep this window open while you use it.
+node serve.js --open
+pause
