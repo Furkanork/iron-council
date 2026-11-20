@@ -2,43 +2,47 @@
 window.CAMPAIGNS = [
   {
     id: "way", leader: "musashi", title: "Fourteen Days of the Way", kind: "Discipline",
+    focusQ: "What is your main work these two weeks?", focusHint: "e.g. studying for YKS, learning guitar, my job", focusDefault: "your main work",
+    rules: ["Do each task completely, not halfway. A half-done task is a broken oath.", "\"Phone in another room\" means another room — not face down on the desk.", "A focused session is 25 minutes of one task only. If you get distracted, start the 25 minutes again."],
     about: "Small, exact daily practices. By the end, discipline is no longer a decision — it is a habit.",
     start: "You have chosen the Way. For fourteen days, you will do one small thing each day, completely. Do nothing which is of no use.",
     days: [
       { task: "Wake at a fixed time and make your bed immediately.", word: "The first cut of the day decides the rest." },
-      { task: "Work 25 minutes on your most important task with the phone in another room.", word: "One opponent at a time." },
+      { task: "Work 25 minutes on {focus} with the phone in another room.", word: "One opponent at a time." },
       { task: "Clean and order your desk or workspace completely.", word: "A warrior's tools are always ready." },
       { task: "Write down three things you did badly yesterday, and one fix for each.", word: "See clearly, without excuses." },
-      { task: "Two focused sessions of 25 minutes on your main work.", word: "Repeat the cut." },
+      { task: "Two focused sessions of 25 minutes on {focus}.", word: "Repeat the cut." },
       { task: "Walk 30 minutes without your phone, paying attention to everything you see.", word: "The eye of perception is stronger than the eye of sight." },
       { task: "Do nothing useless for one full evening: no scrolling, no aimless videos.", word: "Do nothing which is of no use." },
       { task: "Practice one skill you want to master for 45 minutes.", word: "A thousand days to forge; ten thousand to polish. Today is one." },
       { task: "Finish one task you have been postponing for more than a week.", word: "Strike the opening before it closes." },
-      { task: "Wake 30 minutes earlier and use that time for your main work.", word: "While others sleep, the Way is quiet." },
-      { task: "Three focused sessions of 25 minutes on your main work.", word: "Your stance is steadier now. Lengthen the practice." },
+      { task: "Wake 30 minutes earlier and use that time for {focus}.", word: "While others sleep, the Way is quiet." },
+      { task: "Three focused sessions of 25 minutes on {focus}.", word: "Your stance is steadier now. Lengthen the practice." },
       { task: "Teach or explain something you have learned to someone else.", word: "From one thing, know ten thousand things." },
-      { task: "Spend one hour in complete focus on your hardest task.", word: "Face the strongest opponent with a calm mind." },
+      { task: "Spend one hour in complete focus on the hardest part of {focus}.", word: "Face the strongest opponent with a calm mind." },
       { task: "Write what you learned in these fourteen days, and the one practice you will keep forever.", word: "The Way does not end. It continues tomorrow." }
     ],
     finish: { great: "Fourteen days, and you kept nearly all of them. You are not the same person who began. Keep one practice forever.", good: "You walked most of the Way. The days you fell are lessons; the days you kept are your new stance.", poor: "You began, and you finished. Many do not. Walk it again — the second time, the Way is shorter." }
   },
   {
     id: "exam", leader: "napoleon", title: "The Exam Campaign", kind: "Study",
+    focusQ: "Which exam, and which subjects?", focusHint: "e.g. YKS — math, physics, chemistry", focusDefault: "your exam",
+    rules: ["Use real practice questions — past papers if you can get them.", "A study block is real study: phone in another room, notes closed when you test yourself.", "Day 8 is rest on purpose. Resting is part of the campaign, not a break from it.", "Correct every mistake you make; a mistake you don't review will come back on the exam."],
     about: "Two weeks of organized study: objectives, timetables, reviews and a final assault. For any exam.",
     start: "A campaign is won before the battle. For fourteen days you will study like an army moves: with a plan, with speed, and without wasted hours.",
     days: [
-      { task: "List every topic on your exam and mark each as strong, weak or unknown.", word: "Know the terrain before you march." },
+      { task: "List every topic of {focus} and mark each one as strong, weak or unknown.", word: "Know the terrain before you march." },
       { task: "Make a 14-day study timetable, hour by hour, and put it on your wall.", word: "Organize first; victories follow." },
       { task: "Study your weakest topic for 90 minutes.", word: "Attack the weakest point of the enemy line — your own." },
       { task: "Solve 20 practice questions and correct every mistake.", word: "Every error found now is a battle won later." },
       { task: "Two 50-minute study blocks with the phone in another room.", word: "Concentrate your forces." },
       { task: "Review everything from days 3 and 4 without notes, then check.", word: "An army that does not consolidate its gains loses them." },
-      { task: "Take a timed practice test on one subject, under exam conditions.", word: "Rehearse the battle." },
+      { task: "Take a timed practice test in one subject of {focus}, under exam conditions.", word: "Rehearse the battle." },
       { task: "Rest well: one light review hour, a walk, and sleep before 11.", word: "Even the Guard rests before the great battle." },
       { task: "Study your second-weakest topic for 90 minutes.", word: "Now the next weak point." },
       { task: "Write a one-page summary of a whole subject from memory.", word: "If you cannot write it, you do not command it." },
       { task: "Solve 30 practice questions, mixed topics, and correct them.", word: "Speed and precision." },
-      { task: "Take a full timed practice exam.", word: "This is your Austerlitz rehearsal." },
+      { task: "Take a full timed practice exam for {focus}.", word: "This is your Austerlitz rehearsal." },
       { task: "Fix every mistake from yesterday's exam and review those topics.", word: "Study your defeats more than your victories." },
       { task: "Light review of your summaries, prepare your materials, and sleep early.", word: "The plan is made. Tomorrow, execute it calmly." }
     ],
@@ -46,6 +50,7 @@ window.CAMPAIGNS = [
   },
   {
     id: "agoge", leader: "leonidas", title: "The Agoge", kind: "Body",
+    rules: ["Scale everything to your level: push-ups on your knees or against a wall are fine; if it's easy, add more.", "Walking counts as much as running. Pain in your joints or chest means stop — that is not weakness.", "If you have a health condition or injury, check with a doctor before you start.", "Day 7 is rest. Do not skip it to train more."],
     about: "Fourteen days of training the body — walking, bodyweight work, cold discipline, sleep. Adjust to your own health.",
     start: "Spartan boys trained for years. You will train for fourteen days. No complaints. Listen to your body; push it, do not break it.",
     days: [
@@ -68,6 +73,7 @@ window.CAMPAIGNS = [
   },
   {
     id: "stoic", leader: "marcus", title: "The Stoic Fortnight", kind: "Mind",
+    rules: ["Keep a notebook (or a notes file) for these fourteen days — most tasks are written.", "Do morning tasks in the morning and the review in the evening.", "Write honestly. Nobody reads it but you."],
     about: "Daily Stoic exercises for a calmer, steadier mind: control, perspective, gratitude, reflection.",
     start: "For fourteen days, we will train the mind as athletes train the body. Each morning a small exercise; each evening, a short review.",
     days: [
@@ -90,13 +96,15 @@ window.CAMPAIGNS = [
   },
   {
     id: "build", leader: "tesla", title: "The Builder's Sprint", kind: "Create",
+    focusQ: "What will you build or make?", focusHint: "e.g. a website, a short story, a song, a drawing", focusDefault: "your project",
+    rules: ["Pick a project you can realistically finish in two weeks. Small and finished beats big and abandoned.", "A work session counts only with the project open and distractions closed.", "Cutting features is allowed — day 11 even asks you to."],
     about: "Fourteen days to finish one real project — code, writing, art, music or anything you make.",
     start: "Every invention is first an image in the mind. For fourteen days, we will turn one image into a working thing. Choose your project.",
     days: [
-      { task: "Write a one-paragraph description of what you will build, and what 'finished' means.", word: "Define the machine before you build it." },
+      { task: "Write one paragraph describing {focus}, and exactly what 'finished' means.", word: "Define the machine before you build it." },
       { task: "Picture the finished project in detail for 10 minutes, then write or sketch it.", word: "I built my motors in my mind first." },
       { task: "Break the project into 10 or more small, concrete steps.", word: "Every great machine is many small parts." },
-      { task: "Work 60 minutes on the first step.", word: "Close the circuit." },
+      { task: "Work 60 minutes on the first step of {focus}.", word: "Close the circuit." },
       { task: "Work 60 minutes, and keep a short log of what you did.", word: "Record everything. Memory is unreliable." },
       { task: "Build the simplest possible working version of one part.", word: "A small working model beats a grand drawing." },
       { task: "Work 90 minutes with no distractions.", word: "Focus is current. Do not let it leak." },
@@ -106,7 +114,7 @@ window.CAMPAIGNS = [
       { task: "Cut one feature you do not need.", word: "Simplicity is precision." },
       { task: "Work 2 hours. Aim to have everything working by tonight.", word: "Push the voltage." },
       { task: "Polish: fix small errors, clean up, make it presentable.", word: "Precision in the details." },
-      { task: "Finish it and share or save the final version.", word: "An idea is worth nothing until it runs." }
+      { task: "Finish {focus} and share or save the final version.", word: "An idea is worth nothing until it runs." }
     ],
     finish: { great: "It works. You built something real in fourteen days. Now — the next invention.", good: "A working prototype, with some lost days. Finish the last parts this week.", poor: "The circuit opened many times. But you have more than you had. Start a smaller sprint." }
   }

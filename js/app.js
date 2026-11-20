@@ -540,6 +540,17 @@
   // ---------- campaigns: 14-day programs; each day's task is that day's oath ----------
   const CKEY_CAMP = "ironcouncil.campaign", CHIST = "ironcouncil.campaigns.done";
   const CAMPS = window.CAMPAIGNS || [];
+  // A task with {focus} filled in from what you told the leader when you began.
+  const fillTask = (k, text, focus) => text.replace(/\{focus\}/g, (focus && focus.trim()) || k.focusDefault || "your work");
+  const CAMP_RULES = [
+    "Fourteen days, one task a day. Each day's task becomes that day's oath, sworn to the leader.",
+    "On the Oath page press <b>Swear day N</b>, do the task, then mark it <b>kept</b> or <b>broken</b> — honestly. Nobody checks but you.",
+    "If a day's task doesn't fit your life, you can change its wording before you swear it. Keep it just as hard.",
+    "Missing a day doesn't end the campaign: the next day simply waits for you. But a broken oath stays broken.",
+    "One oath per day. If you swear a different oath, the campaign continues tomorrow.",
+    "At the end the leader judges you: 12 or more kept is a great finish, 8 or more a good one. A strong finish raises your bond with the leader.",
+    "You can abandon a campaign at any time on the Oath page."
+  ];
   const activeCampaign = () => { const a = load(CKEY_CAMP, null); return a && CAMPS.find((x) => x.id === a.id) ? a : null; };
   function campaignHTML(today) {
     const a = activeCampaign(), hist = load(CHIST, []);
@@ -549,7 +560,7 @@
         <div class="camp-list">${CAMPS.map((k) => { const c = byId(k.leader); const done = hist.filter((h) => h.id === k.id);
           return `<div class="camp" style="--c:${c.color}"><div class="kind">${esc(k.kind)} · led by ${esc(c.name)}</div><h4>${esc(k.title)}</h4><p>${esc(k.about)}</p>
           ${done.length ? `<div class="camp-done">Completed ${done.length}× · best ${Math.max(...done.map((h) => h.kept))}/14 kept</div>` : ""}
-          <button class="btn small" data-camp="${k.id}">Begin</button></div>`; }).join("")}</div></div>`;
+          <a class="btn small" href="#/campaign/${k.id}">See the plan & rules</a></div>`; }).join("")}</div></div>`;
     }
     const k = CAMPS.find((x) => x.id === a.id), c = byId(k.leader), n = a.done.length + 1, day = k.days[n - 1];
     const pendingPast = oaths().find((o) => o.campaign === k.id && o.status === "pending" && o.date < dayKey());
@@ -557,25 +568,23 @@
     if (pendingPast) body = `<p class="ask">First tell ${esc(c.name)} whether you kept day ${pendingPast.day} (above).</p>`;
     else if (today && today.campaign === k.id) body = `<p class="ask">Day ${today.day} is sworn. ${today.status === "pending" ? "Mark it below when it's done." : "Come back tomorrow for day " + (today.day + 1) + "."}</p>`;
     else if (today) body = `<p class="ask">You already swore another oath today. Day ${n} waits for tomorrow.</p>`;
-    else body = `<blockquote>${esc(day.task)}</blockquote><div class="msg char"><span class="who">${esc(c.name)}</span><span class="body">${esc(day.word)}</span></div>
+    else body = `<div class="msg char"><span class="who">${esc(c.name)}</span><span class="body">${esc(day.word)}</span></div>
+      <p class="help">Today's task — change the wording if it doesn't fit your day, but keep it as hard:</p>
+      <div class="field"><textarea id="campTask" maxlength="200">${esc(fillTask(k, day.task, a.focus))}</textarea></div>
       <button class="btn" id="campSwear">Swear day ${n}</button>`;
     const boxes = k.days.map((d, i) => { const r = a.done[i]; return `<span class="${r ? r.status : i === n - 1 ? "now" : ""}" title="Day ${i + 1}: ${esc(d.task)}">${r ? (r.status === "kept" ? "✓" : "✗") : i + 1}</span>`; }).join("");
     return `<div class="panel camp-active" style="--c:${c.color}">
       <div class="label">${esc(k.title)} · day ${Math.min(n, 14)} of 14 · led by ${esc(c.name)}</div>
+      ${a.focus ? `<p class="help">Your focus: <b>${esc(a.focus)}</b></p>` : ""}
       <div class="days">${boxes}</div>${body}
-      <div class="row" style="margin-top:10px"><button class="btn ghost small" id="campQuit">Abandon campaign</button></div></div>`;
+      <div class="row" style="margin-top:10px"><a class="btn ghost small" href="#/campaign/${k.id}">Plan & rules</a><button class="btn ghost small" id="campQuit">Abandon campaign</button></div></div>`;
   }
   function wireCampaign() {
-    app.querySelectorAll("[data-camp]").forEach((b) => b.onclick = () => {
-      const k = CAMPS.find((x) => x.id === b.dataset.camp), c = byId(k.leader);
-      store(CKEY_CAMP, { id: k.id, started: dayKey(), done: [] });
-      viewOath();
-      document.getElementById("verdict").innerHTML = `<div class="panel" style="--c:${c.color}"><div class="msg char"><span class="who">${esc(c.name)}</span><span class="body">${esc(k.start)}</span></div></div>`;
-    });
     const sw = document.getElementById("campSwear");
     if (sw) sw.onclick = () => {
       const a = activeCampaign(), k = CAMPS.find((x) => x.id === a.id), n = a.done.length + 1;
-      const all = oaths(); all.push({ date: dayKey(), id: k.leader, text: k.days[n - 1].task, status: "pending", reply: k.days[n - 1].word, campaign: k.id, day: n }); saveOaths(all);
+      const text = (document.getElementById("campTask").value || "").trim() || fillTask(k, k.days[n - 1].task, a.focus);
+      const all = oaths(); all.push({ date: dayKey(), id: k.leader, text, status: "pending", reply: k.days[n - 1].word, campaign: k.id, day: n }); saveOaths(all);
       viewOath();
     };
     const q = document.getElementById("campQuit");
@@ -592,6 +601,55 @@
     localStorage.removeItem(CKEY_CAMP);
     bump(k.leader, kept >= 12 ? 5 : kept >= 8 ? 2 : 0);
     return `${k.title} — complete. ${kept} of 14 kept. ` + (kept >= 12 ? k.finish.great : kept >= 8 ? k.finish.good : k.finish.poor);
+  }
+
+  // ---------- a campaign's plan & rules ----------
+  function viewCampaign(id) {
+    const k = CAMPS.find((x) => x.id === id); if (!k) { location.hash = "#/oath"; return; }
+    const c = byId(k.leader), a = activeCampaign(), mine = !!(a && a.id === k.id), other = a && !mine ? CAMPS.find((x) => x.id === a.id) : null;
+    const hist = load(CHIST, []).filter((h) => h.id === k.id);
+    const focus = mine ? a.focus || "" : "";
+    app.innerHTML = `
+      <div class="camp-page" style="--c:${c.color}">
+        <a class="btn ghost small" href="#/oath">← Oath</a>
+        <div class="camp-head">
+          <div class="sigil big" style="--c:${c.color}">${esc(c.monogram)}</div>
+          <div><div class="kind">${esc(k.kind)} · 14 days · led by ${esc(c.name)}</div><h2 class="section-title">${esc(k.title)}</h2><p class="sub">${esc(k.about)}</p></div>
+        </div>
+        <div class="msg char"><span class="who">${esc(c.name)}</span><span class="body">${esc(k.start)}</span></div>
+        <div class="panel"><div class="label">How a campaign works</div><ol class="rules">${CAMP_RULES.map((r) => `<li>${r}</li>`).join("")}</ol></div>
+        <div class="panel"><div class="label">${esc(E.shortName(c))}'s rules for this campaign</div><ul class="rules">${(k.rules || []).map((r) => `<li>${esc(r)}</li>`).join("")}</ul></div>
+        ${k.focusQ ? `<div class="panel"><div class="label">Your focus</div><p class="help">${esc(k.focusQ)} The plan below fills it in for you.</p>
+          <div class="field"><input id="focus" maxlength="80" placeholder="${esc(k.focusHint || "")}" value="${esc(focus)}"></div>${mine ? `<button class="btn ghost small" id="focusSave">Save focus</button>` : ""}</div>` : ""}
+        <div class="panel"><div class="label">The plan · day by day</div><ol class="plan" id="plan"></ol></div>
+        <div class="panel"><div class="label">The verdict at the end</div><ul class="rules">
+          <li><b>12–14 kept:</b> ${esc(k.finish.great)}</li><li><b>8–11 kept:</b> ${esc(k.finish.good)}</li><li><b>Fewer:</b> ${esc(k.finish.poor)}</li></ul></div>
+        ${hist.length ? `<p class="camp-done">Completed ${hist.length}× · best ${Math.max(...hist.map((h) => h.kept))}/14 kept</p>` : ""}
+        <div class="row camp-go">${mine ? `<a class="btn" href="#/oath">Go to today's task</a>`
+          : other ? `<p class="help">You are already in <b>${esc(other.title)}</b>. Finish or abandon it on the Oath page to begin this one.</p>`
+          : `<button class="btn" id="begin">Begin the campaign</button>`}</div>
+      </div>`;
+    const fi = document.getElementById("focus");
+    const plan = () => {
+      const f = fi ? fi.value : focus;
+      document.getElementById("plan").innerHTML = k.days.map((d, i) => {
+        const r = mine && a.done[i];
+        const cls = r ? r.status : mine && i === a.done.length ? "now" : "";
+        return `<li class="${cls}"><span class="dn">Day ${i + 1}${r ? (r.status === "kept" ? " ✓" : " ✗") : ""}</span><span class="dt">${esc(fillTask(k, d.task, f))}</span><span class="dw">“${esc(d.word)}”</span></li>`;
+      }).join("");
+    };
+    plan();
+    if (fi) fi.oninput = plan;
+    const fsave = document.getElementById("focusSave");
+    if (fsave) fsave.onclick = () => { const cur = activeCampaign(); cur.focus = fi.value.trim(); store(CKEY_CAMP, cur); toast("Focus saved."); };
+    const b = document.getElementById("begin");
+    if (b) b.onclick = () => {
+      const f = fi ? fi.value.trim() : "";
+      if (k.focusQ && !f) { fi.focus(); return toast(`Tell ${E.shortName(c)} your focus first.`); }
+      store(CKEY_CAMP, { id: k.id, started: dayKey(), done: [], focus: f });
+      location.hash = "#/oath";
+      setTimeout(() => toast(`${k.title} begins. Day 1 is ready.`), 60);
+    };
   }
 
   // ---------- the oath page ----------
@@ -736,12 +794,13 @@
   // ---------- router ----------
   function route() {
     const h = location.hash.replace(/^#\/?/, "").split("/");
-    const nav = h[0] === "c" ? "hall" : h[0] || "hall";
+    const nav = h[0] === "c" ? "hall" : h[0] === "campaign" ? "oath" : h[0] || "hall";
     document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("on", a.dataset.nav === nav));
     if (h[0] === "c") viewChar(h[1]);
     else if (h[0] === "council") viewCouncil();
     else if (h[0] === "forge") viewForge(h[1]);
     else if (h[0] === "oath") viewOath();
+    else if (h[0] === "campaign") viewCampaign(h[1]);
     else if (h[0] === "saved") viewSaved(h[1]);
     else viewHall();
     window.scrollTo(0, 0);

@@ -286,3 +286,24 @@ html, body { overflow-x: hidden; }
 .days span.now { color: var(--text); border-color: var(--c); }
 .backup { margin-top: 22px; max-width: 860px; }
 @media (max-width: 600px) { .days { grid-template-columns: repeat(7, 1fr); } }
+
+/* ---------- campaign plan page ---------- */
+.camp-page { max-width: 860px; display: flex; flex-direction: column; gap: 16px; }
+.camp-page > .btn { align-self: flex-start; }
+.camp-head { display: flex; gap: 16px; align-items: center; }
+.camp-head .section-title { margin: 2px 0 4px; }
+.camp-head .sub { margin: 0; }
+.camp-head .kind { font-family: var(--head); font-size: 12px; letter-spacing: .14em; color: var(--c); text-transform: uppercase; }
+.camp-page > .msg.char { max-width: 100%; }
+.rules { margin: 6px 0 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 17px; }
+.plan { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.plan li { display: grid; grid-template-columns: 74px 1fr; gap: 2px 12px; background: #0e0e12; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; }
+.plan .dn { font-family: var(--head); font-size: 12px; letter-spacing: .1em; color: var(--c); text-transform: uppercase; grid-row: span 2; padding-top: 3px; }
+.plan .dt { font-size: 17px; }
+.plan .dw { font-size: 14.5px; color: var(--muted); font-style: italic; }
+.plan li.kept { border-color: #2a6b3f; } .plan li.kept .dn { color: #3ecf6e; }
+.plan li.broken { border-color: #5a1a22; } .plan li.broken .dn { color: var(--blood2); }
+.plan li.now { border-color: var(--c); }
+.camp-go { margin-bottom: 30px; }
+#campTask { width: 100%; min-height: 64px; background: #0e0e12; border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; }
+@media (max-width: 600px) { .plan li { grid-template-columns: 1fr; } .plan .dn { grid-row: auto; } .camp-head .sigil.big { display: none; } }
