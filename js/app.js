@@ -34,14 +34,18 @@
   const PKEY = "ironcouncil.profile";
   const profile = () => Object.assign({ name: "", goal: "" }, load(PKEY, {}));
   const saveProfile = (p) => store(PKEY, p);
-  const NAME_RE = [/(?:^|[^\p{L}])(?:my name is|my name's|call me|i am called|i'm called)\s+([\p{L}][\p{L}'-]{1,20})/iu, /(?:^|[^\p{L}])(?:benim adım|benim ismim|ismim|adım)\s+([\p{L}]{2,20})/iu];
+  // "call me" only counts at the start of a sentence ("they call me lazy", "call me later" are not names);
+  // Turkish "adım" also means "step", so "adım X" only counts at the very start or after "benim".
+  const NAME_RE = [/(?:^|[^\p{L}])(?:my name is|my name's|i am called|i'm called)\s+([\p{L}][\p{L}'-]{1,20})/iu,
+    /(?:^|[.!?,]\s*|(?:^|\s)(?:just|please|you can|you may)\s+)call me\s+([\p{L}][\p{L}'-]{1,20})/iu,
+    /(?:^\s*(?:merhaba|selam)?[,\s]*|benim\s+)(?:adım|ismim)\s+([\p{L}]{2,20})/iu];
   const GOAL_RE = [/(?:^|[^\p{L}])(?:my goal is(?: to)?|my dream is(?: to)?|my aim is(?: to)?|my goal:)\s+([^.!?\n]{3,90})/iu, /(?:^|[^\p{L}])(?:hedefim|amacım|hayalim)\s*:?\s+([^.!?\n]{3,90})/iu];
-  const NOT_NAMES = new Set(["adım", "not", "the", "a", "bir", "very", "so", "çok"]);
+  const NOT_NAMES = new Set(["adım", "not", "the", "a", "an", "bir", "very", "so", "çok", "later", "back", "when", "whenever", "tomorrow", "tonight", "now", "soon", "if", "at", "anytime", "maybe", "crazy", "lazy", "weak", "stupid", "dumb", "names", "anything", "whatever", "what", "that", "this", "it"]);
   // Learn a name or goal from what you write. Returns what was learned.
   function learn(text) {
     const p = profile(), got = {};
     for (const re of NAME_RE) { const m = text.match(re); if (m && !NOT_NAMES.has(m[1].toLowerCase())) { got.name = m[1][0].toUpperCase() + m[1].slice(1); break; } }
-    for (const re of GOAL_RE) { const m = text.match(re); if (m) { got.goal = m[1].trim(); break; } }
+    for (const re of GOAL_RE) { const m = text.match(re); if (m && !/^(not|unclear|nothing|none|bilmiyorum|yok)\b/i.test(m[1].trim())) { got.goal = m[1].trim(); break; } }
     if (got.name || got.goal) saveProfile(Object.assign(p, got));
     return got;
   }
@@ -354,6 +358,8 @@
       if (feels.length === 3 && feels[0] !== "general" && feels.every((f) => f === feels[0]) && !log.slice(-6).some((m) => m.complained)) { slot.complained = true; bump(c.id, -1); }
       const bEl = document.querySelector(".dossier .bond"); if (bEl) bEl.outerHTML = bondHTML(c);
       persist();
+      // You left this chat and came back while he was still answering: redraw the open chat so it isn't stuck "typing".
+      if (!logEl.isConnected) { if (location.hash === "#/c/" + id) route(); return; }
       setBusy(false); if (matchMedia("(min-width: 861px)").matches) q.focus();
     }
 
@@ -425,7 +431,9 @@
     }
     // They speak in turn. After the first, each may answer someone who spoke before him.
     async function summon(text, mood) {
-      if (busy || !chosen.size) return; busy = true; cs.disabled = true;
+      if (busy) return;
+      if (!chosen.size) return toast("Choose at least one member above.");
+      busy = true; cs.disabled = true;
       const list = C.filter((c) => chosen.has(c.id));
       session = { question: text || E.MOOD_LABELS[mood], list, said: [] };
       ans.innerHTML = "";
@@ -538,7 +546,7 @@
     const total = t.beliefs.length + t.examples.length + Object.values(t.lines).reduce((a, l) => a + l.length, 0);
     app.innerHTML = `
       <h2 class="section-title">The Forge</h2>
-      <p class="sub">Train a character. Everything you teach here is used in his answers right away. Saved in this browser only — use Export to back it up.</p>
+      <p class="sub">${g(c, "Train a character. Everything you teach here is used in his answers right away.")} Saved in this browser — the Backup on the Saved page includes it.</p>
       <div class="forge-head">
         <select id="fsel">${C.map((x) => `<option value="${x.id}" ${x.id === c.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
         <span class="count">${total} thing${total === 1 ? "" : "s"} taught</span>
@@ -658,7 +666,8 @@
   }
   // Called when an oath is judged: a campaign day is recorded; after day 14 the leader gives his verdict.
   function campaignJudged(o, status) {
-    const a = activeCampaign(); if (!a || o.campaign !== a.id || a.done.some((d) => d.day === o.day)) return "";
+    // (an oath left over from an earlier, abandoned run of the same campaign does not count)
+    const a = activeCampaign(); if (!a || o.campaign !== a.id || o.date < a.started || a.done.some((d) => d.day === o.day)) return "";
     a.done.push({ day: o.day, status });
     const k = CAMPS.find((x) => x.id === a.id);
     if (a.done.length < k.days.length) { store(CKEY_CAMP, a); return ""; }
