@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#0a0a0c"/>
+  <g stroke="#d0283a" stroke-width="5" stroke-linecap="round" fill="none">
+    <!-- blades -->
+    <path d="M14 14 L44 44"/>
+    <path d="M50 14 L20 44"/>
+    <!-- guards -->
+    <path d="M38 50 L50 38"/>
+    <path d="M14 38 L26 50"/>
+    <!-- grips -->
+    <path d="M45 45 L52 52"/>
+    <path d="M19 45 L12 52"/>
+  </g>
+</svg>
