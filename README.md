@@ -26,6 +26,13 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Saved**: save any chat or council, read it later, continue it, or download it as a text file.
 - **Forge**: train any character with your own beliefs, answers and lines (saved only in your browser).
 
+## On your phone
+Open https://furkanork.github.io/iron-council/ on the phone, then:
+- **iPhone (Safari):** Share button → **Add to Home Screen**.
+- **Android (Chrome):** ⋮ menu → **Add to Home screen** / **Install app**.
+
+It gets its own icon, opens full-screen like an app, and works offline after the first visit. Your chats and oaths are kept on that phone; use **Saved → Backup** to move them between devices.
+
 ## How it works
 No AI and no server. Every character has a hand-written dossier of ~250 lines. A small engine reads the feeling, life topic and kind of question in your message and composes a fresh answer instantly. Real quotes are marked **sourced** or **attributed**; everything else is written in the spirit of the figure.
 

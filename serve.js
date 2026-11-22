@@ -2,7 +2,7 @@
 // node serve.js --open  also opens the browser once the server is ready (start.bat uses this).
 const http = require("http"), fs = require("fs"), path = require("path"), { exec } = require("child_process");
 const root = __dirname, port = process.env.PORT || 8080, url = `http://localhost:${port}`;
-const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml" };
+const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webmanifest": "application/manifest+json", ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml" };
 const open = () => {
   if (!process.argv.includes("--open")) return;
   const cmd = process.platform === "win32" ? `start "" "${url}"` : process.platform === "darwin" ? `open "${url}"` : `xdg-open "${url}"`;
