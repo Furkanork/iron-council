@@ -37,7 +37,7 @@
     family: ["father", "mother", "dad", "mom", "mum", "parents", "family", "brother", "sister", "babam", "annem", "baba", "anne", "aile", "kardeş"],
     phone: ["phone", "scroll", "social media", "instagram", "tiktok", "youtube", "gaming", "video game", "games", "screen", "addicted", "addiction", "porn", "netflix", "telefon", "oyun", "sosyal medya", "bağımlı", "dizi"],
     sleep: ["sleep", "insomnia", "wake up", "waking up", "get up", "morning", "alarm", "oversleep", "stay up", "uyku", "uyuyamıyorum", "sabah", "kalkamıyorum", "uyan"],
-    creative: ["writing", "write", "book", "novel", "art", "draw", "paint", "music", "song", "guitar", "code", "coding", "program", "project", "design", "film", "yazmak", "yazı", "kitap", "kitab", "müzik", "proje", "resim", "çizim", "kod"],
+    creative: ["writing", "write", "book", "novel", "art ", "arts", "artist", "artwork", "draw", "paint", "music", "song", "guitar", "code", "coding", "program", "project", "design", "film", "yazmak", "yazı", "kitap", "kitab", "müzik", "proje", "resim", "çizim", "kod"],
     friends: ["friend", "roommate", "betray", "backstab", "fake friend", "arkadaş", "dost", "ihanet", "kanka", "sırtımdan"],
     envy: ["jealous", "than me", "benden daha", "envy", "compare", "comparing", "everyone else", "ahead of me", "better than me", "behind everyone", "others are", "kıskan", "herkes benden", "karşılaştır", "geride kald"],
     time: ["too old", "too late", "wasted years", "wasted my", "my age", "running out of time", "behind in life", "years old", "yaşım", "geç kaldım", "çok geç", "yıllarımı", "yaşındayım"],
@@ -172,6 +172,63 @@
       table[k] = table[k].concat(extra.filter((x) => !table[k].includes(x)));
     }
   }
+  // ---------- wider vocabulary: everyday wording, slang, Turkish (tests/cases-real-*.js) ----------
+  const MORE_MOOD = {
+    tired: ["drain", "wiped", "burned out", "worn down", "brain is mush", "tüken", "bitik", "pestil", "burnt", "eyes open", "been up since", "legs are dead", "i'm dead", "im dead", "dead tired", "i'm beat", "im beat", "so beat", "zombie", "nothing left", "running on empty", "fried", "killing me", "so done", "done with", "can barely", "won't move", "no strength", "sleep deprived", "yorul", "halim yok", "halim kalmadı", "kafam durdu", "perişan", "uykusuz", "bıktım", "usandım", "bezdim", "takatim"],
+    failed: ["didn't get", "didnt get", "cut from", "got cut", "cancelled", "canceled", "blew my", "blew the", "kötü oynadım", "kötü geçti", "çok kötü geçti", "said no", "went under", "bankrupt", "relapse", "broke my diet", "broke my streak", "screwed", "choked", "ruined", "didn't make", "didnt make", "bad grade", "low grade", "low score", "bad mark", "reject", "alamadım", "geçemedim", "düşük aldım", "düşük not", "alınmadım", "işten çıkar", "kaybett", "bozdum", "berbat ettim", "mahvettim", "çuvalladım", "batırdım", "başaramadı"],
+    afraid: ["freaking out", "freak out", "heart races", "heart racing", "utan", "çekin", "shak", "dread", "stress", "scare", "what if i", "terrif", "stresli", "panik", "cesaret edemiyorum", "çekiniyorum", "ödüm kopuyor"],
+    lazy: ["can't get myself", "cant get myself", "make myself", "avoid", "wasting", "never finish", "don't finish", "dont finish", "başlayamıyorum", "get myself to", "putting off", "put off", "keep saying tomorrow", "tomorrow never", "zero drive", "no drive", "doing nothing", "lie in bed", "lying in bed", "stay in bed", "out of bed", "never sit down", "can't be bothered", "cant be bothered", "no discipline", "snooze", "delay", "haven't opened", "havent opened", "çalışmadım", "haven't touched", "havent touched", "don't wanna", "dont wanna", "procrast", "başlayamıyorum", "bir türlü", "yataktan çık", "erteli", "alarmı kapat", "üşen"],
+    alone: ["by myself", "on my own", "don't know anybody", "dont know anybody", "don't know anyone", "except me", "invisible", "doesn't care about me", "don't care about me", "dont care about me", "stopped inviting", "no one to talk", "nobody to talk", "left me for", "kimsem", "dışlan", "anlamıyor", "don't have any friends", "dont have any friends", "arkadaşım yok", "kimseyi tanımıyorum", "aramıyor", "beni bıraktı", "beni terk"],
+    lost: ["what's the point", "whats the point", "no goals", "no goal", "chose the right", "amaç yok", "hedefim yok", "point of anything", "who i am", "drifting", "nothing excites", "feels the same", "same every day", "going through the motions", "what i'm doing with my life", "what im doing with my life", "idk what", "no idea what", "what i want", "don't know who i am", "dont know who i am", "kaybolmuş", "kafam karış", "ne istediğimi", "belli değil", "her gün aynı", "ne yapacağımı", "ne yapacagimi"],
+    angry: ["so mad", "makes me mad", "driving me insane", "driving me crazy", "driving me nuts", "kızdır", "sinir ol", "i'm mad", "im mad", "fed up", "can't stand", "cant stand", "yelled at", "yells at", "took credit", "behind my back", "want to scream", "drives me crazy", "robbed us", "for no reason", "so fake", "deli ediyor", "çıldıracağım", "çıldırıyorum", "kızdım", "kızıyorum", "haksız", "haksız yere", "bağırdı", "arkamdan"],
+    doubt: ["not sure i can", "not good enough", "yetersiz", "yeteneğim yok", "yeteneksiz", "cut out for", "not cut out", "don't believe in myself", "dont believe in myself", "more talented", "talented than", "smarter than me", "yetenekli", "güvenmiyorum", "never make it", "i'll never", "ill never", "believe in myself", "kendime güven", "fraud", "impostor", "imposter", "a failure", "useless", "a loser", "not good at", "good at anything", "ever be good", "too old to", "sanmıyorum", "beceremem", "beceremi", "yeterince", "faydasız", "bırakmak istiyorum", "geçemeyeceğim", "kazanamayacağım"]
+  };
+  const MORE_TOPIC = {
+    study: ["uni ", "major", "semester", "graduat", "assignment", "grades", "teacher", "hoca", "mezun", "bölüm"],
+    work: ["presentation", "shift", "fired", "manager", "sunum", "işe alın"],
+    training: ["the team", "referee", "leg day", "stronger", "strength", "weight loss"],
+    love: ["ask her out", "ask him out", "a girl", "a boy", "this girl", "this guy", "left me for", "kızlar", "kızla ", "find love", "girls", "guys", "my gf", "my bf", "kıza açıl", "ona açıl", "hoşlan", "with her"],
+    family: ["kids", "my son", "my daughter", "children", "husband", "boşan", "divorc"],
+    money: ["crypto", "owe ", "ödeyeme"],
+    grief: ["passed away"],
+    health: ["doktor", "getting sick", "diagnos", "diabetes", "cancer", "doctor", "fıtık", "ağrı", "pain"],
+    faith: ["a god", "believe in god"],
+    habits: ["drink", "smok", "vape", "vaping"],
+    envy: ["earns", "makes more", "double what", "more than me", "happier than", "benden mutlu", "benden daha", "benden iyi", "benden başarılı"],
+    sleep: ["asleep", "snooze", "uykusuz", "staying up", "up late", "up so late"],
+    bully: ["mock", "mock my", "mocking", "make fun"]
+  };
+  for (const k of Object.keys(MORE_MOOD)) MOOD_WORDS[k] = MOOD_WORDS[k].concat(MORE_MOOD[k].filter((w) => !MOOD_WORDS[k].includes(w)));
+  for (const k of Object.keys(MORE_TOPIC)) TOPIC_WORDS[k] = TOPIC_WORDS[k].concat(MORE_TOPIC[k].filter((w) => !TOPIC_WORDS[k].includes(w)));
+  // Idioms that would be read literally ("lose 10 kilos" is not defeat, "quit smoking" is not giving up).
+  const REWRITES = [
+    [/\blos(e|ing) (\d+ ?|some |a few |a lot of )?(kilos?|kg|pounds|lbs|weight|fat|belly)\b/g, "weight loss"],
+    [/\bquit(ting)? (smoking|drinking|vaping|sugar|caffeine|porn|alcohol|cigarettes)\b/g, "stop $2"],
+    [/\bshould i (quit|leave)\b/g, "should i leave"],
+    [/\bsick (and tired )?of\b/g, "fed up with"],
+    [/\b\d+ hours? of sleep\b/g, "sleep deprived"],
+    [/\bmy (\p{L}+) passed\b(?!\s+(the|my|an?|it|her|his|all|every|out|by|me))/gu, "my $1 passed away"],
+    [/\binstead of (\p{L}+)/gu, "procrastinating"],
+    [/\bgot (a |an )?\d{1,2}(%| on| in)/g, "bad grade$2"],
+    [/işe yara/g, "faydasız"],
+    [/\p{L}+(asım|esim|asim) (yok|gelmiyor)/gu, "canım istemiyor"],
+    [/(^|[^\p{L}])ya [^?.!]*(rsam|rsem|mazsam|mezsem)([^\p{L}]|$)/gu, "$1korkuyorum$3"],
+    [/yine (sigaraya|içmeye) başladım/g, "relapse sigara"],
+    [/(sigara|içki|alkol)\p{L}* bırak/gu, "sigara stop"],
+    // "not talented enough", "not ready", "emin değilim": a denied ability is self-doubt, not a cancelled feeling
+    [/(\bnot|n't) (\p{L}+ )?(talented|smart|good|strong|brave|sure|capable|able|ready|clever|skilled)( enough)?\b/gu, "yetersiz, not good enough"],
+    [/(emin|hazır|yeterli|zeki|güçlü|yetenekli|kabiliyetli) değil/g, "yetersiz"],
+    [/\b(phone|battery|laptop|computer|car|plant|plants|motivation) (just |has |have )?died\b/g, "$1 off"],
+    [/\brunning on empty\b/g, "drained"],
+    [/\brunning on\b/g, "on"],
+    [/\blost (all (of )?my |everything|my )?(savings|money|\d+)/g, "lost my savings"],
+    [/\bcan'?t stop (thinking about|crying)/g, "keep $1"]
+  ];
+  const rewrite = (t) => REWRITES.reduce((s, [re, to]) => s.replace(re, to), t);
+  // Turkish typed without Turkish letters ("sinavdan kaldim"): longer words also match their plain-letter form.
+  const fold = (s) => s.replace(/ı/g, "i").replace(/ş/g, "s").replace(/ç/g, "c").replace(/ğ/g, "g").replace(/ö/g, "o").replace(/ü/g, "u");
+  const FOLDED = new Map(); // word -> its plain-letter form, or null when it has none worth matching
+  const folded = (w) => { if (!FOLDED.has(w)) { const f = fold(w); FOLDED.set(w, f !== w && f.length >= 5 ? f : null); } return FOLDED.get(w); };
   inflect(MOOD_WORDS); inflect(TOPIC_WORDS);
   const reCache = new Map();
   function matcher(w) {
@@ -187,22 +244,60 @@
     const start = m.index + m[1].length, end = start + w.length;
     return NEG_BEFORE.test(t.slice(Math.max(0, start - 30), start)) || NEG_AFTER.test(t.slice(end));
   }
-  function best(text, table, keys, checkNeg) {
-    const t = " " + norm(text) + " ";
+  function best(text, table, keys, checkNeg, folding) {
+    const t = " " + norm(text) + " ", ft = fold(t);
     let top = null, topScore = 0;
     for (const k of keys) {
       let s = 0;
-      for (const w of table[k]) if (matcher(w).test(t) && !(checkNeg && negated(t, w))) s += w.length > 12 ? 3 : w.length > 5 ? 2 : 1; // longer phrases are more specific
+      for (const w of table[k]) {
+        let hit = matcher(w).test(t) && !(checkNeg && negated(t, w));
+        if (!hit && folding) { const fw = folded(w); hit = fw !== null && matcher(fw).test(ft) && !(checkNeg && negated(ft, fw)); }
+        if (hit) s += w.length > 12 ? 3 : w.length > 5 ? 2 : 1; // longer phrases are more specific
+      }
       if (s > topScore) { top = k; topScore = s; }
     }
     return top;
   }
+  // ---------- your corrections ("Misread me" in a chat) ----------
+  // Saved in this browser. A message you corrected — or one worded almost the same — is read your way from then on.
+  const FIXKEY = "ironcouncil.misreads";
+  let fixRaw = null, fixList = [];
+  function misreads() {
+    const raw = localStorage.getItem(FIXKEY) || "[]";
+    if (raw !== fixRaw) { fixRaw = raw; try { fixList = JSON.parse(raw); } catch (e) { fixList = []; } if (!Array.isArray(fixList)) fixList = []; }
+    return fixList;
+  }
+  function jaccard(a, b) {
+    const A = new Set(tokens(a)), B = new Set(tokens(b));
+    if (A.size < 2 || B.size < 2) return 0;
+    let n = 0; for (const w of A) if (B.has(w)) n++;
+    return n / (A.size + B.size - n);
+  }
+  function corrected(text) {
+    if (!text) return null;
+    const list = misreads(); if (!list.length) return null;
+    const t = norm(text); let top = null, ts = 0;
+    for (const f of list) { const s = norm(f.q) === t ? 1 : jaccard(f.q, text); if (s > ts) { ts = s; top = f; } }
+    return ts >= 0.75 ? top : null;
+  }
+  function addMisread(q, got, want) {
+    const list = misreads().filter((f) => norm(f.q) !== norm(q));
+    list.push({ q, got, want, date: new Date().toISOString() });
+    localStorage.setItem(FIXKEY, JSON.stringify(list.slice(-500)));
+  }
+  function clearMisreads() { localStorage.removeItem(FIXKEY); }
   // "I lost my mother" is grief, not defeat
-  const detectMood = (text) => { const m = best(text, MOOD_WORDS, MOODS, true) || "general"; return m === "failed" && detectTopic(text) === "grief" ? "general" : m; };
+  const detectMood = (text) => { const fx = corrected(text); if (fx) return fx.want.mood || "general"; const m = best(rewrite(norm(text)), MOOD_WORDS, MOODS, true, true) || "general"; return m === "failed" && detectTopic(text) === "grief" ? "general" : m; };
   const AGE = /(\bi'?m|\bi am)\s+\d{2}\b|\d{2}\s*yaşında/i;
   // "oh my god", "thank god" are exclamations, not faith
   const EXCLAIM = /\b(oh my god|my god|thank god|omg|for god's sake|god knows|god damn|goddamn)\b/g;
-  const detectTopic = (text) => (AGE.test(norm(text)) ? "time" : best(norm(text).replace(EXCLAIM, " "), TOPIC_WORDS, TOPICS));
+  // A death outweighs everything else in the message ("my grandpa died this morning" is grief, not sleep).
+  const detectTopic = (text) => {
+    const fx = corrected(text); if (fx) return fx.want.topic || null;
+    if (AGE.test(norm(text))) return "time";
+    const t = rewrite(norm(text).replace(EXCLAIM, " "));
+    return best(t, TOPIC_WORDS, ["grief"], false, true) || best(t, TOPIC_WORDS, TOPICS, false, true);
+  };
   // "tell me a story", "bir hikaye anlat" — but "your story / your life" is "who are you"
   const STORY = /(^|[^\p{L}])(a story|another story|one more story|story time|tell me a tale|any stories|a memory|an anecdote|stories|bir hikaye|bir hikâye|hikaye anlat|hikâye anlat|başka bir hikaye|bir anını|anı anlat)/u;
   const isStory = (text) => STORY.test(" " + norm(text) + " ") && !/your (life )?story|hikayeni|hayatını/.test(norm(text));
@@ -433,6 +528,6 @@
 
   window.Engine = {
     MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE,
-    forgeReply, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName, isStory, topicLine, temper
+    forgeReply, misreads, addMisread, clearMisreads, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName, isStory, topicLine, temper
   };
 })();

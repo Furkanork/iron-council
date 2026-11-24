@@ -305,8 +305,16 @@
     function msgHTML(m, i) {
       if (m.role === "user") return `<div class="msg user">${esc(m.content)}</div>`;
       const tag = m.taught ? '<span class="tag">· taught</span>' : m.read ? `<span class="tag">· ${esc(m.read)}</span>` : "";
-      const tools = !m.pending && !m.crisis && !m.memory && m.q !== undefined ?`<div class="tools"><button data-again="${i}">↻ Another answer</button><button data-keep="${i}">★ Keep as training</button></div>` : "";
-      return `<div class="msg char${m.crisis ? " crisis" : ""}${m.pending ? " typing" : ""}"><span class="who">${esc(c.name)}${tag}</span><span class="body">${esc(m.content)}</span>${tools}</div>`;
+      const typed = m.q !== undefined && m.q !== E.MOOD_LABELS[m.mood];
+      const tools = !m.pending && !m.crisis && !m.memory && m.q !== undefined ?`<div class="tools"><button data-again="${i}">↻ Another answer</button><button data-keep="${i}">★ Keep as training</button>${typed ? `<button data-fix="${i}">✎ Misread me</button>` : ""}</div>` : "";
+      const opt = (v, label, cur) => `<option value="${v}"${v === (cur || "") ? " selected" : ""}>${esc(label)}</option>`;
+      const fix = m.fixing ? `<div class="fix">
+          <p>${g(c, "What did you mean? He will read it your way from now on.")}</p>
+          <label>Feeling <select data-fixmood>${opt("", "No particular feeling", m.feel === "general" ? "" : m.feel)}${E.MOODS.map((k) => opt(k, E.MOOD_LABELS[k], m.feel)).join("")}</select></label>
+          <label>About <select data-fixtopic>${opt("", "Nothing in particular", m.topic)}${E.TOPICS.map((k) => opt(k, E.TOPIC_LABELS[k], m.topic)).join("")}</select></label>
+          <div class="row"><button class="btn small" data-fixsave="${i}">Save &amp; answer again</button><button class="btn ghost small" data-fixcancel="${i}">Cancel</button></div>
+        </div>` : "";
+      return `<div class="msg char${m.crisis ? " crisis" : ""}${m.pending ? " typing" : ""}"><span class="who">${esc(c.name)}${tag}</span><span class="body">${esc(m.content)}</span>${tools}${fix}</div>`;
     }
     function render(stick = true) {
       if (!log.length) { logEl.innerHTML = `<div class="empty">Write what's weighing on you, or pick a feeling below.<br>${esc(c.name)} will answer from ${g(c, "his")} own position.</div>`; return; }
@@ -371,7 +379,17 @@
     document.getElementById("asks").onclick = (e) => { const t = e.target.dataset.ask; if (t) ask(t, null); };
     document.getElementById("moods").onclick = (e) => { const m = e.target.dataset.m; if (m) ask("", m); };
     logEl.onclick = (e) => {
-      const again = e.target.dataset.again, keep = e.target.dataset.keep;
+      const again = e.target.dataset.again, keep = e.target.dataset.keep, d = e.target.dataset;
+      if (d.fix !== undefined) { log.forEach((m, k) => (m.fixing = k === +d.fix && !m.fixing)); render(false); return; }
+      if (d.fixcancel !== undefined) { log[+d.fixcancel].fixing = false; render(false); return; }
+      if (d.fixsave !== undefined) {
+        const m = log[+d.fixsave], box = e.target.closest(".fix");
+        const want = { mood: box.querySelector("[data-fixmood]").value || "general", topic: box.querySelector("[data-fixtopic]").value || null };
+        E.addMisread(m.q, { mood: m.feel || "general", topic: m.topic || null }, want);
+        m.fixing = false; persist();
+        toast(g(c, `Noted. ${c.name} will read that your way from now on.`));
+        ask(m.q, null); return;
+      }
       if (again !== undefined) { const m = log[+again]; ask(m.q === E.MOOD_LABELS[m.mood] ? "" : m.q, m.mood); }
       if (keep !== undefined) {
         const m = log[+keep]; const t = E.getTraining(c.id);
@@ -888,8 +906,26 @@
         <div class="row"><button class="btn small" id="bk">Download backup</button>
         <label class="btn ghost small" style="cursor:pointer">Restore from backup<input type="file" id="rs" accept=".json,application/json" hidden></label></div>
         <p class="help" id="bkInfo"></p>
-      </div>`;
+      </div>
+      <div class="panel backup" id="misPanel"></div>`;
     document.getElementById("bkInfo").textContent = backupSummary();
+    // Messages you marked "Misread me": they already work your way here; the file lets the engine learn them for everyone.
+    const mis = () => {
+      const list = E.misreads(), el = document.getElementById("misPanel");
+      const lbl = (r) => [r.mood && r.mood !== "general" ? E.MOOD_LABELS[r.mood] : "no feeling", r.topic ? E.TOPIC_LABELS[r.topic] : "no topic"].join(" · ");
+      el.innerHTML = `<div class="label">Misread messages · ${list.length}</div>
+        <p class="help">When a member misreads you, press <b>✎ Misread me</b> under the answer and say what you meant. From then on, that message (and ones worded almost the same) is read your way in this browser. Download the list to send it in, so the engine learns it for everyone.</p>
+        ${list.length ? `<ul class="mislist">${list.slice(-8).reverse().map((f) => `<li><q>${esc(f.q)}</q><span>read as ${esc(lbl(f.got || {}))} → <b>${esc(lbl(f.want || {}))}</b></span></li>`).join("")}</ul>
+        <div class="row"><button class="btn small" id="misDl">Download list</button><button class="btn ghost small" id="misClr">Clear</button></div>` : ""}`;
+      if (!list.length) return;
+      document.getElementById("misDl").onclick = () => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: "iron-council", kind: "misreads", made: new Date().toISOString(), misreads: list }, null, 1)], { type: "application/json" }));
+        a.download = `iron-council-misreads-${dayKey()}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      };
+      document.getElementById("misClr").onclick = () => { if (!confirm("Clear your corrections? Those messages will be read the default way again.")) return; E.clearMisreads(); mis(); };
+    };
+    mis();
     document.getElementById("bk").onclick = () => {
       const data = backupData();
       const a = document.createElement("a");

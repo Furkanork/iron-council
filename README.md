@@ -24,6 +24,7 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Campaigns** also include Atatürk's Reading Campaign, Rumi's Fourteen Days of Calm and Genghis's Discipline of the Steppe.
 - **Backup** (Saved page): download everything in one file and restore it on another device or browser; restoring merges, nothing is lost.
 - **Saved**: save any chat or council, read it later, continue it, or download it as a text file.
+- **Misread me**: if a member reads your message wrong, press **✎ Misread me** under the answer and pick what you meant (feeling and topic). That message — and ones worded almost the same — is read your way from then on, by every member. The list is on the Saved page; download it to have it trained into the engine for everyone.
 - **Forge**: train any character with your own beliefs, answers and lines (saved only in your browser).
 
 ## On your phone
@@ -44,4 +45,5 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/training-pack-*.js` — additional training
 - `js/engine.js` — reads messages and composes answers
 - `js/app.js` — the interface
-- `eval.html` — accuracy test page (156 labeled messages)
+- `eval.html` — accuracy test page in the browser (175 labeled messages)
+- `tests/` — `node tests/run.js` checks 363 everyday messages (English, Turkish, slang, typos, Turkish without Turkish letters). `tests/holdout/` is a set the engine is never tuned on — the honest measure for wording it hasn't seen. `node tests/run.js iron-council-misreads-….json` tests a downloaded Misread list.
