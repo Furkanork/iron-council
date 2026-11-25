@@ -243,7 +243,7 @@ window.CHARACTERS = [
     quotes: [
       { text: "The truest guide in life is knowledge (science).", source: "Hayatta en hakiki mürşit ilimdir — the usual short form of his Samsun speech to teachers, 22 September 1924 (\"…en hakiki mürşit ilimdir, fendir\")", status: "sourced" },
       { text: "I am not ordering you to attack. I am ordering you to die.", source: "Ben size taarruzu emretmiyorum, ölmeyi emrediyorum — credited to him at Gallipoli, 25 April 1915; the exact wording is not confirmed in a contemporary record", status: "attributed" },
-      { text: "Peace at home, peace in the world.", source: "Yurtta sulh, cihanda sulh — 1931", status: "sourced" }
+      { text: "Peace at home, peace in the world.", source: "Yurtta sulh, cihanda sulh — his motto of peace, used by him from 1931 (the exact first occasion is not pinned down here)", status: "sourced" }
     ],
     openers: [
       "Look at me. In 1919 I set out for Samsun with a nation everyone had already declared dead.",
