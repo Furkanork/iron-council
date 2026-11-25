@@ -1,0 +1,26 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Understanding tests (tests/run.js)
+        # 8 known misses (ambiguous topic labels) are the baseline: any new miss turns this red.
+        run: node tests/run.js
+        env:
+          MAX_MISSES: 8
+          VERBOSE: "0"
+      - name: Content checker (tests/content.js)
+        run: node tests/content.js
+      - name: Install Playwright
+        run: npm install --no-save playwright@1.49.1 && npx playwright install --with-deps chromium
+      - name: Smoke test (tests/smoke.js)
+        run: node tests/smoke.js

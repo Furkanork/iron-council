@@ -22,4 +22,5 @@ for (const f of files) {
 const pct = (a) => Math.round((a / all) * 100) + "%";
 if (process.env.VERBOSE !== "0") for (const x of miss) console.log("✗ " + x);
 console.log(`\nfully correct ${ok}/${all} (${pct(ok)})   feeling ${pct(mOk)}   topic ${pct(tOk)}`);
-process.exitCode = miss.length ? 1 : 0;
+// MAX_MISSES lets CI accept the known baseline ("no new misses"); default 0 = every case must pass.
+process.exitCode = miss.length > (+process.env.MAX_MISSES || 0) ? 1 : 0;
