@@ -102,6 +102,7 @@ const ok = (c, where, what) => { checks++; if (!c) fail(where, what); };
   const camps = await page.evaluate(() => [...document.querySelectorAll('a[href^="#/campaign/"]')].map((a) => a.getAttribute("href")));
   ok(camps.length >= 8, "oath", "expected >= 8 campaign links, found " + camps.length);
   for (const h of [...new Set(camps)]) { await go(h); await checkPage(h); }
+  await go("#/mood"); await checkPage("mood");
   await go("#/journal"); await checkPage("journal");
   await go("#/saved"); await checkPage("saved");
   await go("#/forge"); await checkPage("forge");

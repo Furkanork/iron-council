@@ -24,6 +24,7 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **They ask you back**: sometimes a member ends with a question ("What exactly scares you about it?") and takes your next message as the answer.
 - **Campaigns** (Oath page): 14-day programs led by one member — Musashi (discipline), Napoleon (exam study), Leonidas (body), Marcus (mind), Tesla (finish a project). Each day's task becomes that day's oath.
 - **Council debate**: switch the Council to Debate, ask a yes-or-no choice; they split into for and against, argue, answer the other side, and each gives a verdict. The count is shown at the end.
+- **Mood calendar** (Mood page): a month grid coloured by the feeling you brought most each day (from chats, plus Journal entries read back through the engine), with ✓/✗ for oaths kept or broken, your oath streak, and a tap-a-day summary. The log (`ironcouncil.moods`) starts when you update; it is only on your device.
 - **Journal**: write about your day; the member you choose reads it and answers.
 - **Campaigns** also include Atatürk's Reading Campaign, Rumi's Fourteen Days of Calm and Genghis's Discipline of the Steppe.
 - **Backup** (Saved page): download everything in one file and restore it on another device or browser; restoring merges, nothing is lost.

@@ -92,6 +92,17 @@
     return n;
   }
 
+  // ---------- mood log (for the calendar) ----------
+  // Each chat message that carries a feeling adds one to that day's count. Journal entries (which have dates) are read
+  // back through the engine, so the calendar is not empty on day one.
+  const MKEY = "ironcouncil.moods";
+  function logMood(mood) {
+    if (!mood || mood === "general") return;
+    const m = load(MKEY, {}), d = dayKey(); m[d] = m[d] || {}; m[d][mood] = (m[d][mood] || 0) + 1;
+    const keys = Object.keys(m).sort(); if (keys.length > 800) for (const k of keys.slice(0, keys.length - 800)) delete m[k];
+    store(MKEY, m);
+  }
+
   // ---------- saved conversations ----------
   const SKEY = "ironcouncil.saved";
   const savedList = () => load(SKEY, []);
@@ -370,7 +381,7 @@
       const answered = !!(text && prev && prev.asked);
       await answer(c, question, mood, { lastTopic, last: prev && !prev.crisis && !prev.pending && (prev.feel || prev.topic) ? { mood: prev.feel, topic: prev.topic, lang: prev.lang } : null, prefix, tone, bond: bondLevel(bond(c.id).score), canAsk: !answered, answered }, (t, done, meta) => {
         slot.content = t; Object.assign(slot, { taught: meta.taught, crisis: meta.crisis, followup: meta.followup, lang: meta.lang, topic: meta.topic, feel: meta.mood, intent: meta.intent, asked: meta.asked, read: g(c, [E.describe(meta), meta.asked ? "asks you" : ""].filter(Boolean).join(" · ")) });
-        if (done) { slot.pending = false; render(nearBottom()); } else paint(t);
+        if (done) { slot.pending = false; if (!meta.crisis) logMood(meta.mood); render(nearBottom()); } else paint(t);
       });
       if (slot.pending) { slot.pending = false; render(); }
       // Bond: thanks (once a day) raises it; the same complaint three times in a row lowers it.
@@ -965,6 +976,55 @@
     app.querySelectorAll("[data-dl]").forEach((b) => b.onclick = () => { const s = list.find((x) => x.sid === b.dataset.dl); download(fileName(s), asText(s)); });
   }
 
+  // ---------- mood calendar ----------
+  const MOOD_COLOR = { tired: "#7a8fb5", failed: "#a86b6b", afraid: "#b59a4a", lazy: "#8d7bb5", alone: "#4a9bb5", lost: "#6f7f8f", angry: "#c0504d", doubt: "#b5794a" };
+  let moodView = null; // {y, m, sel}
+  function moodsByDay() {
+    const out = {};
+    const add = (d, mood, n = 1) => { if (!mood || mood === "general") return; out[d] = out[d] || {}; out[d][mood] = (out[d][mood] || 0) + n; };
+    const logged = load(MKEY, {}); for (const d of Object.keys(logged)) for (const [mo, n] of Object.entries(logged[d])) add(d, mo, n);
+    for (const e of load(JKEY, [])) { if (!e.at || E.isCrisis(e.text || "")) continue; const d = dayKey(new Date(e.at)); add(d, E.detectMood(e.text || ""), 1); }
+    return out;
+  }
+  function viewMood() {
+    const now = new Date(); if (!moodView) moodView = { y: now.getFullYear(), m: now.getMonth(), sel: dayKey(now) };
+    const { y, m } = moodView, data = moodsByDay(), os = oaths(), journal = load(JKEY, []);
+    const oathOn = (d) => os.find((o) => o.date === d);
+    const first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate(), lead = (first.getDay() + 6) % 7; // Monday first
+    const monthName = first.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+    const dominant = (mo) => { const e = Object.entries(mo || {}).sort((a, b) => b[1] - a[1]); return e.length ? e[0][0] : null; };
+    let cells = "";
+    for (let i = 0; i < lead; i++) cells += '<span class="mc empty"></span>';
+    const totals = {};
+    for (let d = 1; d <= days; d++) {
+      const k = dayKey(new Date(y, m, d)), mo = data[k], dom = dominant(mo), o = oathOn(k);
+      for (const [a, n] of Object.entries(mo || {})) totals[a] = (totals[a] || 0) + n;
+      const mark = o ? (o.status === "kept" ? "✓" : o.status === "broken" ? "✗" : "•") : "";
+      cells += `<button class="mc${k === moodView.sel ? " sel" : ""}${k === dayKey(now) ? " today" : ""}" data-d="${k}" style="${dom ? `--mc:${MOOD_COLOR[dom]}` : ""}" aria-label="${k}${dom ? ", mostly " + E.MOOD_SHORT_NAMES[dom] : ""}${o ? ", oath " + o.status : ""}"><i>${d}</i>${dom ? '<b class="dot"></b>' : ""}<em>${mark}</em></button>`;
+    }
+    const sel = moodView.sel, selMo = data[sel] || {}, selOath = oathOn(sel), selJ = journal.filter((e) => e.at && dayKey(new Date(e.at)) === sel).length;
+    const line = Object.entries(selMo).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<span class="chip on" style="--c:${MOOD_COLOR[k]}">${esc(E.MOOD_SHORT_NAMES[k])} ×${n}</span>`).join(" ");
+    const sum = Object.entries(totals).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<li><span class="mdot" style="background:${MOOD_COLOR[k]}"></span>${esc(E.MOOD_SHORT_NAMES[k])}<b>${n}</b></li>`).join("");
+    const kept = os.filter((o) => o.status === "kept").length;
+    app.innerHTML = `
+      <h2 class="section-title">Mood calendar</h2>
+      <p class="sub">How you have felt, day by day, from what you told them and wrote in the Journal. Everything stays on this device.</p>
+      <div class="panel mood-head"><div class="stats"><div><b>${streak()}</b><span>oath streak</span></div><div><b>${kept}</b><span>oaths kept</span></div><div><b>${Object.keys(data).length}</b><span>days with a feeling</span></div></div></div>
+      <div class="panel">
+        <div class="row mood-nav"><button class="btn ghost small" id="mPrev" aria-label="Previous month">‹</button><h3 style="margin:0;flex:1;text-align:center">${esc(monthName)}</h3><button class="btn ghost small" id="mNext" aria-label="Next month">›</button></div>
+        <div class="mgrid"><span class="mh">Mo</span><span class="mh">Tu</span><span class="mh">We</span><span class="mh">Th</span><span class="mh">Fr</span><span class="mh">Sa</span><span class="mh">Su</span>${cells}</div>
+        <p class="help">Colour = the feeling you brought most that day. ✓ oath kept, ✗ broken, • sworn but not judged yet.</p>
+      </div>
+      <div class="panel"><div class="label">${esc(prettyDay(sel))}</div>
+        <p>${line || "No feeling recorded."}</p>
+        <p class="help">${selOath ? `Oath: “${esc(selOath.text)}” — ${selOath.status}.` : "No oath."} ${selJ ? `${selJ} journal ${selJ === 1 ? "entry" : "entries"}.` : ""}</p>
+      </div>
+      ${sum ? `<div class="panel"><div class="label">This month</div><ul class="mlist">${sum}</ul></div>` : ""}`;
+    document.getElementById("mPrev").onclick = () => { const d = new Date(y, m - 1, 1); moodView.y = d.getFullYear(); moodView.m = d.getMonth(); viewMood(); };
+    document.getElementById("mNext").onclick = () => { const d = new Date(y, m + 1, 1); moodView.y = d.getFullYear(); moodView.m = d.getMonth(); viewMood(); };
+    app.querySelectorAll(".mc[data-d]").forEach((b) => b.onclick = () => { moodView.sel = b.dataset.d; viewMood(); });
+  }
+
   // ---------- router ----------
   function route() {
     const h = location.hash.replace(/^#\/?/, "").split("/");
@@ -977,6 +1037,7 @@
     else if (h[0] === "journal") viewJournal();
     else if (h[0] === "campaign") viewCampaign(h[1]);
     else if (h[0] === "saved") viewSaved(h[1]);
+    else if (h[0] === "mood") viewMood();
     else viewHall();
     window.scrollTo(0, 0);
   }

@@ -354,3 +354,19 @@ html, body { overflow-x: hidden; }
 /* Emblems: drawn symbols in the member's colour. */
 .sigil .emb { width: 66%; height: 66%; display: block; }
 .chip .emb { vertical-align: -3px; margin-right: 2px; }
+
+/* Mood calendar */
+.mgrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 12px 0 6px; }
+.mh { text-align: center; font-size: 12px; color: #8d8a84; letter-spacing: .08em; }
+.mc { position: relative; aspect-ratio: 1; min-height: 40px; border: 1px solid #2a2a30; border-radius: 8px; background: #141418; color: #e8e4dc; font: inherit; padding: 2px; cursor: pointer; display: grid; place-items: center; }
+.mc.empty { border: 0; background: none; cursor: default; }
+.mc i { font-style: normal; font-size: 14px; }
+.mc .dot { position: absolute; inset: auto 0 5px 0; margin: auto; width: 10px; height: 10px; border-radius: 50%; background: var(--mc); }
+.mc em { position: absolute; top: 1px; right: 4px; font-style: normal; font-size: 11px; color: #c9c5bb; }
+.mc.today { border-color: #c9a227; }
+.mc.sel { outline: 2px solid #e8e4dc; outline-offset: 1px; }
+.mc[style*="--mc"] { background: color-mix(in srgb, var(--mc) 22%, #141418); }
+.mood-nav { align-items: center; gap: 8px; }
+.mlist { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.mlist li { display: flex; align-items: center; gap: 8px; } .mlist b { margin-left: auto; }
+.mdot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }

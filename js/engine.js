@@ -849,7 +849,7 @@
   const full3 = (pool) => { const f = pool.filter((l) => l.split(/\s+/).length > 2); return f.length >= 3 ? f : pool; };
 
   window.Engine = {
-    MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE, CRISIS_MESSAGE_TR, crisisMessage, detectLang, detectFollowup, detectIntensity,
+    MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE, CRISIS_MESSAGE_TR, MOOD_SHORT_NAMES: MOOD_SHORT, crisisMessage, detectLang, detectFollowup, detectIntensity,
     forgeReply, misreads, addMisread, clearMisreads, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName, isStory, topicLine, temper
   };
 })();

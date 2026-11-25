@@ -72,7 +72,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
 
 ## Phase 3 — New features
 
-- [ ] **3.1 Mood calendar** (M). A page showing how you've felt day by day (from chats and the journal), with your oath streak alongside. All on your device.
+- [x] **3.1 Mood calendar** (M). A page showing how you've felt day by day (from chats and the journal), with your oath streak alongside. All on your device. (2026-11-25)
+  - New Mood page (#/mood, in the nav): month grid, colour per day = most frequent feeling, ✓/✗/• for oaths, streak + oaths kept, tap-a-day detail, monthly totals. Chat messages now log their feeling per day (old chats had no dates, so history starts today; Journal entries are used retroactively). Checked at 375px (no overflow), added to the smoke test.
 - [ ] **3.2 Share an answer as a picture** (M). Turn any answer into a quote card image (member's colour, emblem, the words) to save or send from your phone.
 - [ ] 🔒 **3.3 Read aloud** (S). A ▶ button that reads an answer aloud with the phone's built-in voice, so nothing extra is needed. **Do you want this?**
 - [ ] **3.4 Settings page** (M). Default tone, text size, reduce animations, language, and a "delete everything" button, all in one place.
@@ -146,3 +147,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 2.3 done: sourced quotes re-checked (none downgraded this time).
 - 2026-11-25 — 2.4 done: 12 new Council pairs.
 - 2026-11-25 — 2.5 done: drawn emblems replace monograms.
+- 2026-11-25 — 3.1 done: mood calendar page.
