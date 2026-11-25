@@ -128,3 +128,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 1.5 done: Turkish personal answers + opinions for all 18.
 - 2026-11-25 — 1.6 done: follow-up messages understood in chat.
 - 2026-11-25 — 1.7 done: strength of feeling changes the answer.
+- 2026-11-25 — Fixed a real bug found by the smoke test: leaving the Council page while members were still answering threw an error when the Save/Download buttons were wired (now looked up inside the council view, not the page).

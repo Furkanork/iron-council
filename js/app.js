@@ -442,10 +442,11 @@
       return `<div class="council-tools"><button class="btn small" id="argue">Let them answer each other</button><button class="btn ghost small" id="csave">Save this council</button><button class="btn ghost small" id="cdl">Download</button></div>`;
     }
     function wireTools() {
-      document.getElementById("argue").onclick = argue;
+      const qa = (sel) => ans.querySelector(sel) || {}; // the view may already be gone (you left while they were answering)
+      qa("#argue").onclick = argue;
       const msgs = () => [{ who: "You", text: session.question }].concat(session.said.map((s) => ({ who: s.c.name, text: s.text })));
-      document.getElementById("csave").onclick = () => saveConversation("council", session.list.map((c) => c.id), msgs());
-      document.getElementById("cdl").onclick = () => { const s = { ids: session.list.map((c) => c.id), kind: "council", date: new Date().toISOString(), messages: msgs() }; download(fileName(s), asText(s)); };
+      qa("#csave").onclick = () => saveConversation("council", session.list.map((c) => c.id), msgs());
+      qa("#cdl").onclick = () => { const s = { ids: session.list.map((c) => c.id), kind: "council", date: new Date().toISOString(), messages: msgs() }; download(fileName(s), asText(s)); };
     }
     // They speak in turn. After the first, each may answer someone who spoke before him.
     async function summon(text, mood) {
@@ -547,9 +548,10 @@
       ans.insertAdjacentHTML("beforeend", `<div class="tally"><b>${votes.pro}</b> do it · <b>${votes.con}</b> not yet<p>${esc(summary)}</p></div>`);
       session.said.push({ c: { name: "The Council" }, text: summary });
       ans.insertAdjacentHTML("beforeend", `<div class="council-tools"><button class="btn ghost small" id="csave">Save this debate</button><button class="btn ghost small" id="cdl">Download</button></div>`);
+      const qa = (sel) => ans.querySelector(sel) || {};
       const msgs = () => [{ who: "You", text: "Debate: " + session.question }].concat(session.said.map((s) => ({ who: s.c.name, text: s.text })));
-      document.getElementById("csave").onclick = () => saveConversation("council", session.list.map((c) => c.id), msgs());
-      document.getElementById("cdl").onclick = () => { const s = { ids: session.list.map((c) => c.id), kind: "council", date: new Date().toISOString(), messages: msgs() }; download(fileName(s), asText(s)); };
+      qa("#csave").onclick = () => saveConversation("council", session.list.map((c) => c.id), msgs());
+      qa("#cdl").onclick = () => { const s = { ids: session.list.map((c) => c.id), kind: "council", date: new Date().toISOString(), messages: msgs() }; download(fileName(s), asText(s)); };
       busy = false; cs.disabled = false;
     }
     cs.onclick = () => { const t = cq.value.trim(); if (!t) return; if (mode === "debate") debate(t); else summon(t, null); };
