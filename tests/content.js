@@ -9,8 +9,8 @@ const root = path.join(__dirname, "..");
 const store = {};
 const ctx = { console, performance, localStorage: { getItem: (k) => store[k] ?? null, setItem: (k, v) => (store[k] = String(v)), removeItem: (k) => delete store[k] } };
 ctx.window = ctx; vm.createContext(ctx);
-const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-for (const m of html.matchAll(/src="(js\/[^"?]+)/g)) if (!/app\.js$/.test(m[1])) vm.runInContext(fs.readFileSync(path.join(root, m[1]), "utf8"), ctx, { filename: m[1] });
+// Load the source files (not the bundle) in the same order tools/bundle.js uses.
+for (const f of require("../tools/bundle.js").sources()) vm.runInContext(fs.readFileSync(path.join(root, "js", f), "utf8"), ctx, { filename: f });
 const E = ctx.Engine, CH = ctx.CHARACTERS, TP = ctx.TRAINING_PACK;
 
 const problems = [];

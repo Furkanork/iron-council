@@ -12,6 +12,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Bundle is up to date (js/bundle.js)
+        run: node tools/bundle.js && git diff --exit-code js/bundle.js
       - name: Understanding tests (tests/run.js)
         # 8 known misses (ambiguous topic labels) are the baseline: any new miss turns this red.
         run: node tests/run.js

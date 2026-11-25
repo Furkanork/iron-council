@@ -1,15 +1,4 @@
-// Re-writes the per-character training <script> tags (js/train-<id>.js) in index.html and eval.html.
-// They sit right after the last c-*.js character file. Usage: node tools/wire.js
-const fs = require("fs"), path = require("path");
-const root = path.join(__dirname, "..");
-const files = fs.readdirSync(path.join(root, "js")).filter((f) => /^train-.*\.js$/.test(f)).sort();
-for (const page of ["index.html", "eval.html"]) {
-  const p = path.join(root, page);
-  let h = fs.readFileSync(p, "utf8");
-  const v = (h.match(/train-[a-z]+\.js\?v=(\d+)/) || [])[1] || "1";
-  h = h.replace(/\n\s*<script src="js\/train-[^"]+"><\/script>/g, "");
-  const tags = files.map((f) => `\n  <script src="js/${f}?v=${v}"></script>`).join("");
-  h = h.replace(/(<script src="js\/c-tesla\.js[^"]*"><\/script>)/, `$1${tags}`);
-  fs.writeFileSync(p, h);
-}
-console.log("wired:", files.join(", "));
+// Obsolete: the page now loads one generated file, js/bundle.js. Run `node tools/bundle.js` instead.
+// (The list of source files is built automatically: new js/train-<id>.js files are picked up.)
+require("./bundle.js").build();
+console.log("tools/wire.js is no longer needed; ran tools/bundle.js instead.");

@@ -41,9 +41,10 @@ No AI and no server. Every character has a hand-written dossier of ~250 lines. A
 Open `index.html` in a browser, or run `node serve.js` and visit http://localhost:8080.
 
 ## Files
+- `js/bundle.js` — GENERATED single file (all of the files below except app.js) that the page loads. After changing any of them run `node tools/bundle.js` (also run by CI check: a stale bundle fails it). Cache version in index.html/eval.html is bumped with `?v=`.
 - `js/characters.js`, `js/c-*.js` — character dossiers
 - `js/training-pack*.js` — first training rounds
-- `js/train-<id>.js` — one merged training file per character (rounds 3–7 and council opinions); `node tools/wire.js` re-writes their `<script>` tags
+- `js/train-<id>.js` — one merged training file per character (rounds 3–7 and council opinions); new files are picked up by `node tools/bundle.js` automatically
 - `js/engine.js` — reads messages and composes answers
 - `js/app.js` — the interface
 - `eval.html` — accuracy test page in the browser (279 labeled messages)
