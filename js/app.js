@@ -17,6 +17,19 @@
     };
   }
 
+  // Anything you write that sounds like serious distress is never used as an oath, goal, focus or name:
+  // it is answered with the real-support message instead (in Turkish if it was written in Turkish).
+  function crisisGuard(...texts) {
+    const t = texts.filter(Boolean).find((x) => E.isCrisis(x));
+    if (!t) return false;
+    const old = document.getElementById("crisisPanel"); if (old) old.remove();
+    const d = document.createElement("div");
+    d.id = "crisisPanel"; d.className = "panel crisis-panel"; d.setAttribute("role", "alert");
+    d.innerHTML = `<p>${esc(E.crisisMessage(t))}</p><div class="row"><button class="btn small" id="crisisOk">OK</button></div>`;
+    app.prepend(d); window.scrollTo(0, 0);
+    document.getElementById("crisisOk").onclick = () => d.remove();
+    return true;
+  }
   function toast(msg) {
     const t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
     document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
@@ -44,6 +57,7 @@
   // Learn a name or goal from what you write. Returns what was learned.
   function learn(text) {
     const p = profile(), got = {};
+    if (E.isCrisis(text)) return got;   // never store anything from a message like that
     for (const re of NAME_RE) { const m = text.match(re); if (m && !NOT_NAMES.has(m[1].toLowerCase())) { got.name = m[1][0].toUpperCase() + m[1].slice(1); break; } }
     for (const re of GOAL_RE) { const m = text.match(re); if (m && !/^(not|unclear|nothing|none|bilmiyorum|yok)\b/i.test(m[1].trim())) { got.goal = m[1].trim(); break; } }
     if (got.name || got.goal) saveProfile(Object.assign(p, got));
@@ -678,6 +692,7 @@
     if (sw) sw.onclick = () => {
       const a = activeCampaign(), k = CAMPS.find((x) => x.id === a.id), n = a.done.length + 1;
       const text = (document.getElementById("campTask").value || "").trim() || fillTask(k, k.days[n - 1].task, a.focus);
+      if (crisisGuard(text)) return;
       const all = oaths(); all.push({ date: dayKey(), id: k.leader, text, status: "pending", reply: k.days[n - 1].word, campaign: k.id, day: n }); saveOaths(all);
       viewOath();
     };
@@ -780,10 +795,11 @@
     plan();
     if (fi) fi.oninput = plan;
     const fsave = document.getElementById("focusSave");
-    if (fsave) fsave.onclick = () => { const cur = activeCampaign(); cur.focus = fi.value.trim(); store(CKEY_CAMP, cur); toast("Focus saved."); };
+    if (fsave) fsave.onclick = () => { if (crisisGuard(fi.value)) return; const cur = activeCampaign(); cur.focus = fi.value.trim(); store(CKEY_CAMP, cur); toast("Focus saved."); };
     const b = document.getElementById("begin");
     if (b) b.onclick = () => {
       const f = fi ? fi.value.trim() : "";
+      if (crisisGuard(f)) return;
       if (k.focusQ && !f) { fi.focus(); return toast(`Tell ${E.shortName(c)} your focus first.`); }
       store(CKEY_CAMP, { id: k.id, started: dayKey(), done: [], focus: f });
       location.hash = "#/oath";
@@ -840,6 +856,7 @@
     const sw = document.getElementById("swear");
     if (sw) sw.onclick = () => {
       const text = document.getElementById("oText").value.trim(); if (!text) return toast("Name the task first.");
+      if (crisisGuard(text)) return;
       const c = byId(document.getElementById("oWho").value);
       const reply = E.say(c, "oathTake", { oath: text });
       const all = oaths(); all.push({ date: dayKey(), id: c.id, text, status: "pending", reply }); saveOaths(all);
@@ -861,7 +878,7 @@
       if (date !== dayKey() || finale) document.getElementById("verdict").innerHTML = `<div class="panel" style="--c:${c.color}">${date !== dayKey() ? say(c, o.verdict) : ""}${finale ? say(c, finale) : ""}</div>`;
     });
     wireCampaign();
-    document.getElementById("pSave").onclick = () => { saveProfile({ name: document.getElementById("pName").value.trim(), goal: document.getElementById("pGoal").value.trim() }); toast("They will remember."); };
+    document.getElementById("pSave").onclick = () => { if (crisisGuard(document.getElementById("pName").value, document.getElementById("pGoal").value)) return; saveProfile({ name: document.getElementById("pName").value.trim(), goal: document.getElementById("pGoal").value.trim() }); toast("They will remember."); };
     document.getElementById("pForget").onclick = () => { saveProfile({ name: "", goal: "" }); viewOath(); toast("Forgotten."); };
   }
 

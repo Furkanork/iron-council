@@ -66,6 +66,23 @@ const ok = (c, where, what) => { checks++; if (!c) fail(where, what); };
     await checkPage("chat " + id);
   }
 
+  // safety: a worrying message gets the support message (English and Turkish), and is never used as an oath
+  for (const msg of ["I want to die", "ölmek istiyorum"]) {
+    await go("#/c/" + ids[0]);
+    await page.waitForSelector("#q");
+    await page.fill("#q", msg); await page.click("#send");
+    await page.waitForSelector("#log .msg.char.crisis", { timeout: 8000 }).catch(() => fail("safety", "no support message for: " + msg));
+    const txt = await page.evaluate(() => { const a = document.querySelectorAll("#log .msg.char.crisis .body"); return a.length ? a[a.length - 1].innerText : ""; });
+    ok(/112/.test(txt), "safety", "support message must name 112 for: " + msg);
+  }
+  await go("#/oath");
+  await page.waitForSelector("#oText");
+  const oathsBefore = await page.evaluate(() => (localStorage.getItem("ironcouncil.oaths") || "[]"));
+  await page.fill("#oText", "I will end my life tonight"); await page.click("#swear");
+  await page.waitForSelector("#crisisPanel", { timeout: 3000 }).catch(() => fail("safety", "no support panel for a worrying oath"));
+  const oathsAfter = await page.evaluate(() => (localStorage.getItem("ironcouncil.oaths") || "[]"));
+  ok(oathsBefore === oathsAfter, "safety", "a worrying text must not be saved as an oath");
+
   // council, counsel mode
   await go("#/council"); await page.waitForSelector("#cq").catch(() => fail("council", "no box"));
   await page.fill("#cq", "I keep procrastinating and I am scared of failing");

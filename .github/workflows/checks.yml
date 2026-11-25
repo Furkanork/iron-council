@@ -26,6 +26,8 @@ jobs:
         run: node tests/followup.js
       - name: Strength of feeling (tests/intensity.js)
         run: node tests/intensity.js
+      - name: Safety messages (tests/safety.js)
+        run: node tests/safety.js
       - name: Content checker (tests/content.js)
         run: node tests/content.js
       - name: Install Playwright

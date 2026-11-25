@@ -346,3 +346,7 @@ html, body { overflow-x: hidden; }
 .mislist li { display: grid; gap: 2px; border-left: 2px solid var(--line); padding-left: 10px; }
 .mislist q { font-style: italic; }
 .mislist span { color: var(--muted); font-size: 14px; }
+
+/* Real-support message shown instead of using a worrying text as an oath, goal or focus. */
+.crisis-panel { border: 1px solid #c0504d; background: rgba(192, 80, 77, .12); }
+.crisis-panel p { margin: 0 0 .6em; line-height: 1.5; }

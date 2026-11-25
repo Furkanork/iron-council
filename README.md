@@ -14,6 +14,7 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Follow-ups**: short replies that only make sense after his last answer ("why?", "how?", "I tried that", "it didn't work", "yes", "no", "tell me more"; "neden?", "nasıl?", "denedim", "olmadı", "evet", "hayır", "devam et") are answered as follow-ups, in his voice, about the same feeling and topic, instead of being read as a new message.
 - **How strong**: "a bit tired" gets a short, light nudge; "I can't go on" (or shouting, "!!!", "dayanamıyorum") gets the steadier gentle voice and no battle-cry closer. Shown as "heavy" / "light" under the answer.
 - **Feeling + topic lines**: for the 20 most common pairs (afraid + study, tired + work, failed + love, lazy + training, alone + friends…) every member has a line written for exactly that pair, used most of the time instead of joining a feeling line to a topic line. Shown under the answer as the usual "read as" label.
+- **Safety**: messages that sound like suicide or self-harm (English or Türkçe, with typos, slang or without Turkish letters) get a plain support message instead of a character's answer, with the help lines for Türkiye (112), the US (988), the UK/Ireland (Samaritans 116 123) and findahelpline.com elsewhere. This also applies in the Council, Debate, Journal, and to oaths, goals, names and campaign focus, which are never saved or echoed back when they sound like that.
 - **Memory**: tell any of them "my name is …" or "my goal is …". They use your name, and on a new day they bring up what you last talked about or ask about your goal.
 - **Oath**: swear one task a day before one member. Next time they ask whether you kept it, react to the answer, and keep your streak.
 - **Stories**: ask any of them for a story ("tell me a story", "bir hikaye anlat") and they tell one from their life.
@@ -58,6 +59,7 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/app.js` — the interface
 - `eval.html` — accuracy test page in the browser (279 labeled messages)
 - `tests/smoke.js` — Playwright smoke test of every page at phone width (`node tests/smoke.js`)
+- `tests/safety.js` — checks that every worrying message (132 EN/TR cases) is caught and 77 ordinary ones (idioms like "dying to see you", "gülmekten öldüm") are not (`node tests/safety.js`)
 - `tests/intensity.js` — checks light / normal / heavy detection (`node tests/intensity.js`)
 - `tests/followup.js` — checks follow-up detection and replies (`node tests/followup.js`)
 - `tests/lang.js` — checks language detection (Turkish vs English) and the Turkish-answer fallback (`node tests/lang.js`)

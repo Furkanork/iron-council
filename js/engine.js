@@ -104,9 +104,9 @@
   const ASKS = /\?|^\s*(what|how|do|did|are|were|have|has|who|why|when|where|which|is|was|tell|can|could|would|ne|nasıl|neden|niye|kim|hiç|hangi|anlat)([^\p{L}]|$)|(^|[^\p{L}])m[ıiuü](s[ıiuü]n|yd[ıiuü]n|d[ıiuü]r)?([^\p{L}]|$)/iu;
   const OPINION = /think|opinion|feel about|view of|like?|what('s| is| was) .+ like|düşün|hakkında|fikrin|nasıl biri|sever mi/i;
 
-  const CRISIS_WORDS = ["kill myself", "suicide", "suicidal", "end my life", "want to die", "self harm", "self-harm", "hurt myself", "no reason to live", "intihar", "kendimi öldür", "ölmek istiyorum", "yaşamak istemiyorum"];
-  const CRISIS_MESSAGE_TR = "Bir an rolden çıkıyorum: yazdığın şey ciddi görünüyor ve bir söze değil, gerçek bir desteğe ihtiyacın var. Lütfen bugün biriyle konuş: bir arkadaşınla, ailenden biriyle ya da bir uzmanla. Türkiye'deysen 112'yi arayabilirsin; başka bir ülkedeysen findahelpline.com orada ücretsiz ve gizli yardım hatlarını listeler. Bunu tek başına taşımak zorunda değilsin.";
-  const CRISIS_MESSAGE = "Stepping out of character for a moment: what you wrote sounds serious, and you deserve real support, not a quote. Please talk to someone today — a friend, family member, or a professional. In Türkiye you can call 112; elsewhere, findahelpline.com lists free, confidential lines in your country. You don't have to carry this alone.";
+  // (serious-distress detection: see isCrisis below)
+  const CRISIS_MESSAGE_TR = "Bir an rolden çıkıyorum: yazdığın şey ciddi görünüyor ve bir söze değil, gerçek bir desteğe ihtiyacın var. Lütfen bugün biriyle konuş: bir arkadaşınla, ailenden biriyle ya da bir uzmanla. Türkiye'deysen 112'yi arayabilirsin; başka bir ülkedeysen findahelpline.com orada ücretsiz ve gizli yardım hatlarını listeler. Şu an tehlikedeysen hemen 112'yi ara ya da yanındaki birine haber ver. Bunu tek başına taşımak zorunda değilsin.";
+  const CRISIS_MESSAGE = "Stepping out of character for a moment: what you wrote sounds serious, and you deserve real support, not a quote. Please talk to someone today — a friend, family member, or a professional. In Türkiye call 112 (emergency); in the US call or text 988; in the UK and Ireland call Samaritans on 116 123; elsewhere, findahelpline.com lists free, confidential lines in your country. If you are in danger right now, call your local emergency number. You don't have to carry this alone.";
 
   // Pools a Turkish line set may hold (all optional).
   const TR_LIST_POOLS = ["openers", "principles", "closers", "again", "pivots", "gentle", "hard", "heard", "bondWarm", "bondCold"];
@@ -539,8 +539,77 @@
     }
     return tr >= 1.5 && tr > en * 2 ? "tr" : "en";
   }
-  const crisisMessage = (text) => (detectLang(text) === "tr" ? CRISIS_MESSAGE_TR : CRISIS_MESSAGE);
-  const isCrisis = (text) => { const t = norm(text); return CRISIS_WORDS.some((w) => t.includes(w)); };
+  const crisisMessage = (text) => (crisisKind(text) === "tr" || detectLang(text) === "tr" ? CRISIS_MESSAGE_TR : CRISIS_MESSAGE);
+  // ---------- serious distress ----------
+  // Any message that sounds like thoughts of suicide or self-harm, in English or Turkish (with or without Turkish letters,
+  // typos like "diiie", slang like "kys"), is answered with the real-support message instead of a character's answer.
+  // Safety wins over precision: a few harmless messages may trigger it, but the idioms listed in CRISIS_SAFE do not.
+  const leet = (t) => t.replace(/@/g, "a").replace(/[a-z0-9$]+/g, (w) => (/[a-z]/.test(w) && /[013$]/.test(w) ? w.replace(/0/g, "o").replace(/1/g, "i").replace(/3/g, "e").replace(/\$/g, "s") : w));
+  const crisisFold = (text) => leet(fold(norm(text))).replace(/['’`´]/g, "").replace(/[^a-z0-9\s]/g, " ").replace(/(.)\1{2,}/g, "$1").replace(/\s+/g, " ").trim();
+  const CRISIS_EN = [
+    /\bsuicid/, /\bkys\b/, /\bk y s\b/, /\bunalive\b/, /\bsewer ?slide\b/,
+    /\b(kill|killing|hurt|hurting|harm|harming|cut|cutting|hang|hanging|drown|drowning|shoot|shooting|poison|poisoning|starve|starving|burn|burning|stab|stabbing|strangle|overdose on) (my ?self|me myself)\b/,
+    /\b(end|ending|take|taking|finish|finishing|off|ending it) (my own life|my life|my own|myself|it all|everything)\b/,
+    /\bend it all\b/, /\b(going|gonna|want|wanna|about|plan|planning|ready|decided) (to )?(end it|die)\b/, /\bwant(s)? to (just )?(disappear|vanish)( forever| for good| completely| from (this |the )?(world|life|earth|everyone|everything)|$)/, /\bjust (want to |wanna )?(disappear|vanish) (forever|for good|from (this |the )?(world|life|earth))\b/, /\b(cut|burn|burned|burnt|hurt|harm)(ed|ing)? my ?self on purpose\b/,
+    /\b(want|wanna|wish|wished|wishing|rather|prefer|hope|hoping|need|ready) (to |i was |i were |i could |i would |i might |i ?d )?(just )?(be )?(die|dead|died|dying|death|not alive|not be alive|not wake up|never wake up)\b/,
+    /\bi wish i (was|were|could be|would be) dead\b/, /\bi wish (i )?(would|could|might) (just )?(die|not wake up|never wake up|disappear|vanish)\b/,
+    /\b(better|best) (off )?(dead|without me|if i was gone|if i were gone|if i wasn t here|if i weren t here|if i disappeared)\b/, /\beveryone (would be|is|ll be) better off without me\b/, /\bworld (would be|is) better (off )?without me\b/,
+    /\b(no|not any) (reason|point|purpose|will) (to|in|for) (live|living|go on|going on|life|being alive|be alive|stay alive|staying alive)\b/, /\bnothing (left )?to live for\b/,
+    /\b(don t|dont|do not|no longer|not|never|cant|can t|cannot) (want|wanna|wish) (to )?(live|be alive|be here|exist|go on|wake up|keep going)\b/, /\bdont want to live\b/,
+    /\b(can t|cant|cannot|can not|couldn t|could not|unable to) (go on|keep going|do this|do it|take it|take this|live like this|live this way|carry on)( any ?more| any longer| anymore)?\b.*\b(die|dead|end|kill|live|life)\b/,
+    /\b(life|living|being alive|it all|everything) (is|isn t|isnt|s|not|aint) (not )?(worth (it|living|anything)|pointless|meaningless)\b.*\b(die|dead|end|kill|gone|disappear|off)\b/,
+    /\bnot worth (living|being alive|staying alive)\b/, /\b(life is|life isn t|life isnt) (not )?worth living\b/,
+    /\bi ?m (going|gonna) to? (end|kill|hurt|harm|cut|hang|jump|overdose)\b/, /\bi ?(ll|will) (end|kill|hurt|harm|cut|hang|jump off) (it|my ?self|me)\b/,
+    /\b(jump|jumping|leap|throw myself) (off|from|in front of|out of) (a |the |my )?(bridge|building|roof|balcony|window|train|cliff|tower|car|bus|subway)\b/, /\bthrow myself (off|in front|under)\b/,
+    /\b(take|taking|swallow|swallowing|swallowed) (all )?(of )?(my |the |a bunch of |a lot of |every )?(pills|tablets|meds|medication|sleeping pills|painkillers)\b.*\b(die|end|sleep|all|forever|never)\b/, /\boverdos/, /\bslit (my )?wrists?\b/, /\bcut (my )?wrists?\b/, /\bhang (my ?self)\b/, /\bnoose\b/,
+    /\bself ?harm/, /\bself ?injur/, /\bself ?destruct/, /\b(i|i ve|ive) (been |keep |started |am |m )?(cutting|burning|hurting|harming) (my ?self|me)\b/, /\bi (cut|burn|burnt|hurt|harm) my ?self\b/, /\bcut my ?self\b/,
+    /\b(sleep|rest) forever\b/, /\bnever wake up\b/, /\bdisappear forever\b/, /\bgo to sleep and never\b/, /\bdon t want to wake up\b/, /\bdont want to wake up\b/, /\bnot wake up (tomorrow|again|anymore|any more)\b/,
+    /\b(no one|nobody) would (even )?(notice|care|miss me|mind) if i (died|was gone|were gone|disappeared|killed)\b/, /\bif i (died|was gone|were gone|disappeared|weren t here|wasn t here)\b.*\b(better|relief|easier|nobody|no one)\b/,
+    /\bi (can t|cant) (do|take|live|survive) (this|it) (any ?more|anymore)\b.*\b(die|dead|end it|kill|suicid)\b/,
+    /\b(goodbye|farewell|last|final|suicide) (letter|note|message)\b.*\b(family|everyone|everybody|parents|mum|mom|dad|loved ones|then i m done|before i)\b/, /\b(wrote|writing|write|left|leaving) (my|a|the) (suicide|final|last) (note|letter|message)\b/,
+    /\b(giving|give) (my stuff|my things|everything) away\b.*\b(die|end|gone|goodbye)\b/, /\bsay(ing)? goodbye (forever|to everyone|to everything)\b/,
+  ];
+  const CRISIS_TR = [
+    /\bintihar/, /\bintiharr/, /\bkendimi (oldur|oldurecegim|oldurmek|oldurmeyi|oldurucem|oldurcem|oldurmek istiyorum|bitir|bitirecegim|bitirmek|bitirmeyi|bitircem|asacagim|asmak|asayim|asarim|asacam|atacagim|atmak|atayim|ates|kesecegim|keseyim|kesiyorum|kestim|yaktim|yakiyorum|yakacagim|zehirle|zehirleyecegim|ortadan kaldir|yok edecegim|yok etmek)/,
+    /\bkeske (hic )?(dogmasaydim|dogmasam|yasamasaydim|var olmasaydim|var olmasam)\b/, /\b(balkondan|camdan|kopruden|binadan|catidan|tepeden|kayaliktan|ucurumdan) atl/, /\bkendime (zarar|kiyacagim|kiymak|kiyayim|kiyarim|kiymayi|kast)/, /\bkendime ?zarar/, /\bkendimi (cezalandir|incitiyorum|incittim|yaralıyorum|yaraliyorum)/,
+    /\b(olmek|olmeyi|olmeyi|olmem|olsem|olurum|olursem|oleyim|olecegim|olcem|olmek ist|olmek istiyom|olmek istiyorum|olmeyi ist|olmek istiyordum|olmeyi dusunuyorum|olmeyi cok istiyorum)\b.{0,25}\b(istiyorum|istiyom|daha iyi|keske|kimse|ozlemez|fark etmez|dusun|iyi olur|rahat)\b/, /\b(keske|kaske) (olsem|olseydim|olmus olsam|dogmasaydim|uyanmasam|uyumus kalsam|hic uyanmasam|yok olsam|yok olsaydim|oleydim|oleyim)\b/,
+    /\bolmek istiyorum\b/, /\bolmek istiyom\b/, /\bolmek istiyorum\b/, /\bolmeyi istiyorum\b/, /\bolmeyi cok istiyorum\b/, /\bolup gitmek istiyorum\b/, /\bolsem de kimse\b/, /\bolsem kimse\b/, /\bolsem daha iyi\b/, /\bolsem rahat\b/,
+    /\byasamak istemiyorum\b/, /\byasamak istemiyom\b/, /\byasamak istemiyorum artik\b/, /\bartik yasamak istemiyorum\b/, /\byasamayi istemiyorum\b/, /\byasamaktan (bik|yoruld|nefret|vazgec|sikild)/, /\byasamak (anlamsiz|zor geliyor|bir azap|bana ceza)\b.*\b(olmek|bitir|son|kendimi)\b/,
+    /\b(hayatima|hayatimi) (son|bitir|sonlandir|nokta)/, /\bhayatima son ver/, /\bhayatimi sonlandir/, /\bhayatimi bitir/, /\bhayatimi sonlandirmak\b/,
+    /\bher seyi bitir(mek|sem|eyim|ecegim|cem|mek istiyorum)\b/, /\bbitirmek istiyorum (her seyi|hayatimi|bunu hepsini|hepsini)\b/, /\bbitsin istiyorum\b.*\b(hayat|her sey)\b/,
+    /\b(bensiz|ben olmayinca|ben yokken|ben olmasam) (herkes )?(daha )?(iyi|rahat|mutlu|huzurlu)/, /\bherkes bensiz (daha )?(iyi|rahat|mutlu|huzurlu)\b/, /\bben olmasam (herkes|kimse|aile|annem|babam)\b/, /\bkimse ozlemez\b.*\b(olsem|olurum|gitsem|yok olsam)\b/,
+    /\b(yok olmak|yok olup gitmek|kaybolup gitmek|ortadan kaybolmak|gitmek) istiyorum\b.*\b(sonsuza|bir daha|hic|dunya)\b/, /\byok olmak istiyorum\b/, /\byok olsam\b/, /\byok olup gitsem\b/,
+    /\b(bir daha|hic) (uyanmak istemiyorum|uyanmasam|uyanmayayim|uyanmak istemem)\b/, /\buyuyup (kalmak|kalsam|kalmayi|bir daha uyanmasam)\b/, /\buyuyup hic uyanma/, /\bsonsuza dek uyu/, /\buykuda olmek\b/,
+    /\bbileklerimi (kes|kesecegim|kesmek|keseyim|keserim|keserdim|kesiyorum)/, /\bbilegimi kes/, /\bbilek kes/, /\bkendimi (balkondan|camdan|koprunden|koprude|binadan|catidan|trenin|trenden|denize|nehire|golden|golde|kuyuya) (at|atacagim|atmak|atayim|atsam|atarim)/, /\b(balkondan|camdan|koprunden|binadan|catidan|tepeden) atl(ayacagim|amak|ayim|asam|arim|ayayim)\b/, /\b(balkondan|camdan|binadan|koprunden|catidan) atlamak istiyorum\b/,
+    /\b(butun|tum|bir kutu|bir avuc|cok|fazla) (hap|ilac)(lari)? (ic|icecegim|icip|icmek|icsem|ictim|yutacagim|yutmak|yutsam)/, /\bhap(lari)? (icip|yutup) (olmek|olecegim|uyuyacagim|bitir|kurtul)/, /\bilac(lari)? (icip|yutup) (olmek|olecegim|uyuyacagim|bitir|kurtul)/, /\basiri doz\b/, /\bilac icip (olmek|olsem|uyuyup)/,
+    /\bveda (mektubu|notu)\b/, /\bintihar notu\b/, /\bson (mektubum|notum|mesajim)\b/, /\bhayatimin sonu\b.*\b(geldi|yaklasti|olmak|olsun|kendim)\b/, /\bsonlandirmak istiyorum\b/, /\bsona erdirmek istiyorum\b/,
+    /\bdaha fazla dayanamiyorum\b.*\b(olmek|bitir|son|kendim|yasamak)\b/, /\bdayanamiyorum\b.*\b(olmek|bitirmek|yasamak istemiyorum|kendimi)\b/, /\b(yasamanin|hayatin) (bir anlami|anlami) (kalmadi|yok)\b.*\b(olmek|bitir|kendim|son)\b/,
+    /\bolum (istiyorum|dusunceleri|fikri|planlari)\b/, /\bolmeyi dusunuyorum\b/, /\bolmeyi hayal\b/, /\bhep olmeyi\b/, /\bintihari dusun/, /\bkendimi oldurmeyi dusun/,
+    /\bkendimi kesiyorum\b/, /\bkendimi yaral/, /\bkendime zarar veriyorum\b/, /\bkendimi yakiyorum\b/,
+  ];
+  // Harmless idioms that would otherwise match ("dying to see you", "to die for", "I hurt myself at the gym").
+  const CRISIS_SAFE = [
+    /\bhurt my ?self (while|when|at|in|on|during|playing|lifting|running|cooking|skiing|skating|training|exercising|falling|badly|yesterday|today|last|again at|trying)\b/, /\bcut my ?self (shaving|while|when|cooking|slicing|chopping|on)\b/, /\bburn(ed|t)? my ?self (cooking|while|on the|on a|with the|in the)\b/,
+    /\b(goodbye|farewell) (letter|note|message) (to|for) (my |a )?(coworker|colleague|teacher|boss|class|classmates|school|team|neighbou?r)\b/, /\bkill (some |the |more )?time\b/, /\bto die for\b/, /\bdying (to|for a|laughing|of laughter|of boredom|of embarrassment|of cringe|inside)\b/, /\b(died|die) (laughing|of laughter|of embarrassment|of boredom)\b/, /\bkill (my ?self|me) (laughing|with laughter)\b/, /\bhang my ?self (up|out) (a|the)? ?(coat|jacket|towel|picture|painting|clothes)\b/,
+    /\bnot suicid/, /\bsuicide (squad|prevention|hotline|awareness|bomber|mission|rate|statistics|note in the movie)\b/, /\bsuicide (is|was) (a |an )?(topic|subject|assignment|essay|book)\b/, /\bwatch(ed|ing)? (a |the |some )?(show|movie|film|documentary|series) about suicide\b/,
+    /\b(olmek|olum) (icin|ya da|veya) (yaratilmadim)\b/, /\bgulmekten (olecegim|oldum|olmek)\b/, /\bsikintidan (olecegim|olmek|oldum)\b/, /\bmerakimdan (olecegim|olmek|oldum)\b/, /\bacliktan (olecegim|oluyorum|olmek)\b/, /\bsicaktan (olecegim|oluyorum|olmek)\b/, /\bsoguktan (olecegim|oluyorum|olmek)\b/, /\buykusuzluktan (olecegim|oluyorum|olmek)\b/, /\byorgunluktan (olecegim|oluyorum|olmek)\b/, /\bheyecandan (olecegim|oluyorum|olmek)\b/, /\bolesiye (sevi|ozle|korku|yorul|acik|sik)/, /\bolum (dusunceleri|fikri|planlari) (hakkinda|uzerine) (bir )?(kitap|film|makale|odev)\b/,
+  ];
+  function crisisKind(text) {
+    const t = crisisFold(text);
+    if (!t) return null;
+    const unsafe = CRISIS_SAFE.some((re) => re.test(t));
+    const en = CRISIS_EN.some((re) => re.test(t)), tr = CRISIS_TR.some((re) => re.test(t));
+    if (!en && !tr) return null;
+    // an idiom only cancels a match when it is the only reason the message matched
+    if (unsafe) {
+      const rest = t.replace(new RegExp(CRISIS_SAFE.map((re) => re.source).join("|"), "g"), " ");
+      const en2 = CRISIS_EN.some((re) => re.test(rest)), tr2 = CRISIS_TR.some((re) => re.test(rest));
+      if (!en2 && !tr2) return null;
+      return tr2 && !en2 ? "tr" : "en";
+    }
+    return tr && !en ? "tr" : "en";
+  }
+  const isCrisis = (text) => crisisKind(text) !== null;
   function describe(r) {
     if (!r || r.crisis || r.taught) return "";
     if (r.about) return "about himself · " + ABOUT_LABELS[r.about];
