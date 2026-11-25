@@ -62,7 +62,7 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
 
 - [ ] 🔒 **2.1 New members** (L). Add 6 new members with full training (about 250 lines each, every feeling, topic, personal subject and opinion of every other member). Every existing member also gets an opinion of each new one. **You choose who**, from the list of 50 or anyone else.
 - [ ] **2.2 More stories** (L). 10 stories from each member's life (now fewer), grounded in real events, in their own voice.
-  - Progress (2026-11-25): 6 stories per member (3 new each, js/story-<id>.js, 54 new stories) written from recorded events (Polybius/Livy, Herodotus, Priscus, Plutarch, Secret History, Orkhon inscriptions, trial records, etc.), with legends marked as "they say"/"the tale is". The Swordsman's are fictional (original archetype). Next: 4 more per member to reach 10, then tick. No web access here, so facts are from memory: a historian's read-through is worth doing, especially Bilge's Orkhon paraphrases and the Atsız/Atatürk details.
+  - Progress (2026-11-25): 17 of 18 members now have 10 stories; Atsız has 8 (js/story-<id>.js, 4 files per chunk; 72+54 new stories in total). Written from recorded events (Polybius/Livy, Herodotus, Plutarch, Priscus/Jordanes, the Secret History, Orkhon inscriptions, trial records, Nutuk, etc.); legends are marked "they say"/"tradition says"; the Swordsman's are fictional (original archetype). No web access here, so facts are from memory: a historian's read-through is worth doing. Atsız is short because I am not sure enough of further details of his life: see Questions.
 - [ ] **2.3 Source check** (M). Re-check every quote marked **sourced** against its source. Doubtful ones become **attributed**. Add the source line to the "Words" list where it's missing.
 - [ ] **2.4 More rivalries and friendships** (S). More pairs who react to each other in the Council (e.g. Rumi and Nietzsche, Joan and Napoleon, Tesla and the Swordsman).
 - [ ] **2.5 Emblems** (M). Replace the letter-monograms with an original drawn emblem for each member (SVG: a crescent, a sword, a lightning coil…). Symbols only, no faces.
@@ -96,6 +96,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
 ## Questions for the owner (🔒 tasks wait for these)
 
 Claude writes here when a task needs your decision. Answer under the question.
+
+5. **2.2** Atsız has 8 stories, the others 10. I only know the broad outline of his life and don't want to invent details. Do you want (a) two more written "in the spirit" and clearly marked as such, (b) you send me 2 episodes from his life to turn into stories, or (c) leave him at 8?
 
 1. **2.1** Which 6 new members?
 2. **3.3** Read-aloud button: yes or no?
@@ -137,3 +139,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 1.9 in progress: three blind sets written; unseen score ≈ 55–60% (was 62% on an earlier, easier set), tuned vocabulary rounds 5–7. Goal 75% unseen not yet reached.
 - 2026-11-25 — 1.10 done: safety detection and messages reviewed; safety test in CI.
 - 2026-11-25 — 2.2 in progress: 6 stories per member (54 new).
+- 2026-11-25 — 2.2: 10 stories each for 17 members, 8 for Atsız (question 5).
