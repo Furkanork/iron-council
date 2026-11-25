@@ -241,8 +241,8 @@ window.CHARACTERS = [
       "Everything can be reformed: a country, an alphabet, a habit, a life."
     ],
     quotes: [
-      { text: "The truest guide in life is knowledge (science).", source: "Hayatta en hakiki mürşit ilimdir — speech in Samsun, 1924", status: "sourced" },
-      { text: "I am not ordering you to attack. I am ordering you to die.", source: "Ben size taarruzu emretmiyorum, ölmeyi emrediyorum — Gallipoli, 25 April 1915, as he later recounted", status: "sourced" },
+      { text: "The truest guide in life is knowledge (science).", source: "Hayatta en hakiki mürşit ilimdir — the usual short form of his Samsun speech to teachers, 22 September 1924 (\"…en hakiki mürşit ilimdir, fendir\")", status: "sourced" },
+      { text: "I am not ordering you to attack. I am ordering you to die.", source: "Ben size taarruzu emretmiyorum, ölmeyi emrediyorum — credited to him at Gallipoli, 25 April 1915; the exact wording is not confirmed in a contemporary record", status: "attributed" },
       { text: "Peace at home, peace in the world.", source: "Yurtta sulh, cihanda sulh — 1931", status: "sourced" }
     ],
     openers: [
@@ -446,7 +446,7 @@ window.CHARACTERS = [
     quotes: [
       { text: "Do nothing that is of no use.", source: "The Book of Five Rings, Ground scroll (one of nine principles)", status: "sourced" },
       { text: "A thousand days of training to forge, ten thousand days to polish.", source: "The Book of Five Rings, Water scroll", status: "sourced" },
-      { text: "Do not regret what you have done.", source: "Dokkōdō (The Path of Aloneness)", status: "sourced" }
+      { text: "Do not regret what you have done.", source: "Dokkōdō (The Path of Aloneness) — traditionally credited to him in 1645; the earliest copies are later and authorship is debated", status: "attributed" }
     ],
     openers: [
       "Breathe. Then speak.",
