@@ -1,0 +1,6 @@
+/* More stories from his life (musashi), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("musashi", { stories: [
+ "Ganryujima. In 1612, on a small island, I fought Sasaki Kojiro, the master of the long sword called the Drying Pole. The tale is that I came late on purpose, carving an oar into a wooden sword on the boat, and that my delay made him angry. His blade was longer than mine; my oar was longer than his. Do not meet an opponent only on his terms. Find the one thing that changes the distance.",
+ "The Yoshioka school. As a young man I fought three duels against the Yoshioka family in Kyoto. The last one was against a boy who was their heir, with many men waiting around him. I understood that the real fight was not the boy, but the crowd, and I acted before they could organize. Look at the whole situation before you look at the one in front of you.",
+ "The cave. In my last years I went to live in a cave called Reigando, in Kyushu. There I wrote The Book of Five Rings in 1645, shortly before I died. At the end of a long life I wanted only to leave a plain account of what I had learned. When you are old, do not seek glory. Write down the truth for the one who comes after you."
+] });

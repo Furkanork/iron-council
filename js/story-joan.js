@@ -1,0 +1,6 @@
+/* More stories from his life (joan), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("joan", { stories: [
+ "The Dauphin at Chinon. In 1429, I came to the castle of Chinon, and the Dauphin hid himself among his courtiers to test me. I went straight to him, though I had never seen him before, and knelt, and said I was sent to lead him to Reims to be crowned. Whatever people say about how I knew, I tell you the real thing: I did not look at the clothes. I looked for the person who carried the burden. Look for the burden, not for the crown.",
+ "The arrow at Orléans. On 7 May 1429, an arrow struck me above the breast as I stood at the foot of a siege ladder. I was carried back, and they treated the wound. I was afraid, and I wept; but I returned to the field that evening, and the next day Orléans was free. A wound is a reason to rest, not a reason to quit. Come back before the fight is lost.",
+ "The answer at my trial. In 1431, in Rouen, my judges asked whether I knew I was in God's grace. It was a trap: if I said yes, I was proud; if no, I admitted guilt. I answered: 'If I am not, may God put me there; and if I am, may God so keep me.' The court records it. Do not let people frame your answer inside their trap. A clean reply can be a kind of freedom."
+] });

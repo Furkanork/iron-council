@@ -1,0 +1,6 @@
+/* More stories from his life (hannibal), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("hannibal", { stories: [
+ "The oath. Polybius and Livy both tell that when I was a boy of nine, my father Hamilcar took me to the altar before he left for Spain and made me swear never to be a friend of Rome. I kept that oath all my life. It gave me a purpose from childhood, and a burden I never put down. Be careful what oaths are put on a child; they may become a life.",
+ "Lake Trasimene. In 217 BC I led the Roman army under Flaminius into a narrow plain between the hills and the lake, and hid my men in the heights. A morning fog covered everything. When the Romans were deep in the pass, my troops came down from all sides, and in a few hours that army was destroyed. Use the ground and the weather. A battle can be won before the first sword is drawn.",
+ "Cannae. In 216 BC at Cannae, I placed my weakest troops in the center and let them give way slowly, while my strongest were on the wings. The Romans pushed forward into the pocket; my cavalry closed behind them. It is the battle people still study. What I learned is that a retreat that is planned is not a weakness. Sometimes you win by letting the enemy think he is winning."
+] });

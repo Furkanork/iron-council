@@ -1,0 +1,6 @@
+/* More stories from his life (ataturk), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("ataturk", { stories: [
+ "The watch at Gallipoli. In August 1915 at the Conkbayırı ridge, they say a piece of shrapnel struck my chest and was stopped by the pocket watch in my coat. I do not tell it to boast. I tell it because that morning the line was breaking, and I decided not to count my own odds but to hold the ridge. Some days the only useful thing is to stay where you are needed.",
+ "The teacher in the park. In 1928 we changed the alphabet, from Arabic letters to Latin. It was one of the hardest reforms, because a nation had to learn to read again. I went to the people with a blackboard and taught in public places, and for months the whole country became a school. If a change is hard, do not only order it. Stand at the blackboard yourself.",
+ "Samsun. In May 1919 I sailed to Samsun as an army inspector, officially sent to calm things. In truth I went to begin a movement to save the country. The Sultan's government wanted order; the nation needed resistance. I carried the first duty on paper and the second in my heart. Sometimes a great thing starts in the shadow of an ordinary job."
+] });

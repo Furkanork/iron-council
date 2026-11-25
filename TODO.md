@@ -62,6 +62,7 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
 
 - [ ] 🔒 **2.1 New members** (L). Add 6 new members with full training (about 250 lines each, every feeling, topic, personal subject and opinion of every other member). Every existing member also gets an opinion of each new one. **You choose who**, from the list of 50 or anyone else.
 - [ ] **2.2 More stories** (L). 10 stories from each member's life (now fewer), grounded in real events, in their own voice.
+  - Progress (2026-11-25): 6 stories per member (3 new each, js/story-<id>.js, 54 new stories) written from recorded events (Polybius/Livy, Herodotus, Priscus, Plutarch, Secret History, Orkhon inscriptions, trial records, etc.), with legends marked as "they say"/"the tale is". The Swordsman's are fictional (original archetype). Next: 4 more per member to reach 10, then tick. No web access here, so facts are from memory: a historian's read-through is worth doing, especially Bilge's Orkhon paraphrases and the Atsız/Atatürk details.
 - [ ] **2.3 Source check** (M). Re-check every quote marked **sourced** against its source. Doubtful ones become **attributed**. Add the source line to the "Words" list where it's missing.
 - [ ] **2.4 More rivalries and friendships** (S). More pairs who react to each other in the Council (e.g. Rumi and Nietzsche, Joan and Napoleon, Tesla and the Swordsman).
 - [ ] **2.5 Emblems** (M). Replace the letter-monograms with an original drawn emblem for each member (SVG: a crescent, a sword, a lightning coil…). Symbols only, no faces.
@@ -135,3 +136,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 1.8 done: 20 feeling+topic combination lines per member (English; Turkish later).
 - 2026-11-25 — 1.9 in progress: three blind sets written; unseen score ≈ 55–60% (was 62% on an earlier, easier set), tuned vocabulary rounds 5–7. Goal 75% unseen not yet reached.
 - 2026-11-25 — 1.10 done: safety detection and messages reviewed; safety test in CI.
+- 2026-11-25 — 2.2 in progress: 6 stories per member (54 new).

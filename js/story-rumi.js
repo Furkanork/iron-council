@@ -1,0 +1,6 @@
+/* More stories from his life (rumi), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("rumi", { stories: [
+ "The flight from Balkh. I was born in Balkh around 1207. When I was a child, the Mongol armies were coming, and my father gathered the family and left, traveling for years through many lands until we came to Konya. I lost my home early. And yet, later, I learned that the one who walks long roads is the one who understands what a home is. Do not fear being uprooted; the seed travels to find its soil.",
+ "Hüsameddin's request. My friend Hüsameddin Çelebi came to me and asked me to write a book to guide the seekers, like those of Sanai and Attar. I took the first lines, about the reed flute crying for its separation from the reed-bed, and the Masnavi began. Many of my best works began because a friend asked. If someone asks you for a gift you did not know you had, say yes.",
+ "The wedding night. When I died, on the 17th of December 1273, my followers called the day Şeb-i Arûs, the wedding night, because I had told them death was a meeting with the Beloved. Do not be sad for what ends in love. Let the day of your death be called a wedding by someone who knew you."
+] });

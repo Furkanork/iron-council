@@ -1,0 +1,6 @@
+/* More stories from his life (napoleon), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("napoleon", { stories: [
+ "Toulon. In 1793 I was a young artillery captain when the French army was besieging the port of Toulon, held by the English. I studied the map and saw that a single hill, with a fort, controlled the harbor. I proposed to take it, and we did. The English fleet had to withdraw, and I was made a general at twenty-four. Find the hill that controls everything else. Do not scatter your effort.",
+ "The Alps. In May 1800 I led an army through the Great St. Bernard pass in the Alps. People like to paint me on a rearing horse, but I rode a mule, led by a guide. The cannon were dragged in hollowed logs. It took days, and it surprised the Austrians completely. I learned that the way everyone calls impossible is the one the enemy forgot to guard.",
+ "Austerlitz. In December 1805 I made it look as if my army was weak, pulling back from the Pratzen Heights and showing signs of nervousness. The Russians and Austrians saw an opportunity and left the heights to attack my right. Then my army struck the center, where they had been. A feigned weakness is among the oldest tricks, and still works on those who wish to win too much."
+] });

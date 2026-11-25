@@ -49,6 +49,7 @@ for (const c of CH) {
   for (const p of POOLS) check(`pool "${p}"`, t[p], 1);
   for (const k of ["greet", "thanks", "who"]) check(`intent "${k}"`, (t.intents || {})[k], 1);
   check("stories", t.stories, 3);
+  for (const st of t.stories || []) if (typeof st === "string" && (st.length < 120 || st.length > 900)) bad(c.id, `story length ${st.length} looks wrong: "${st.slice(0, 40)}"`);
   if (row.combos < 20) bad(c.id, `only ${row.combos} of the 20 feeling+topic combination lines`);
   for (const k of Object.keys(t.combos || {})) { const [m, x] = k.split("+"); if (!MOODS.includes(m) || !TOPICS.includes(x)) bad(c.id, `combo "${k}" is not feeling+topic`); check(`combo "${k}"`, t.combos[k], 1); }
   // Turkish lines (optional, written member by member): checked for empties and leftover tokens, and counted.

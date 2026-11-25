@@ -1,0 +1,6 @@
+/* More stories from his life (bilge), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("bilge", { stories: [
+ "The stone for my brother. When my brother Kül Tigin died in 731, I wrote his inscription and had it carved on a great stone in the Orkhon valley. A year later I raised mine, to speak to the Turks who come after me. I wrote plainly how we were scattered, how we gathered again, and what ruin follows a people that grows soft. Leave something in stone for those who follow; they will need your warnings.",
+ "Ötüken. I wrote that the land of Ötüken is the place where a people can hold its state. If you stay in the high forest of Ötüken, you will live forever, sending your caravans; if you leave for the sweet voices and fine silks of the Chinese, you will be destroyed. I mean this: a home you know is worth more than comfort bought from others. Guard your own ground.",
+ "Tonyukuk, the old counselor. When I was young the old counselor Tonyukuk served our house and helped rebuild the state. He was wiser than I and not always gentle in his advice. I listened. A ruler who dismisses his elders because they are blunt will soon be ruled by flatterers. Keep the old ones near."
+] });

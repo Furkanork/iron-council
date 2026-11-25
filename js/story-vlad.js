@@ -1,0 +1,6 @@
+/* More stories from his life (vlad), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("vlad", { stories: [
+ "The night attack. In June 1462 the Sultan's army camped near my capital, Târgoviște, and I knew I could not beat it in open battle. So by night I led my men into the Ottoman camp, hoping to reach the Sultan's own tent. We struck hard and caused terror, but the Sultan was not where we aimed, and we withdrew before morning. When you are weaker, do not fight where the enemy is strong. Choose the hour and the place.",
+ "The golden cup. They say that in my time a golden cup stood by a fountain in Târgoviște, free for any thirsty traveler, and that nobody dared to steal it. Whether this is true or tradition, the point holds: order is not just punishment. It is a country where a man can leave a precious thing in the open and sleep without fear.",
+ "The turbans. A tale is told that Ottoman envoys came before me and refused to remove their turbans, saying it was their custom. I am said to have answered that I would make their custom firm, and had the turbans nailed to their heads. Historians doubt it. But it shows what was believed about me: that I would not bow to any foreign custom in my own hall. Be sure where you will not bend, and then do not bend."
+] });

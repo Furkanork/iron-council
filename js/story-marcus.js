@@ -1,0 +1,6 @@
+/* More stories from his life (marcus), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("marcus", { stories: [
+ "The rain among the Quadi. During the war on the Danube, a story spread that my legion, surrounded and parched, was saved when a sudden storm came and rained on us while hailing on the enemy. Soldiers credited prayers, and different peoples told it differently. I cannot say which god sent it. I can say that when your troops are thirsty, the first duty is to be with them.",
+ "The auction. When the plague came and the treasury was empty, they say I sold imperial furnishings, gold cups and silk robes, in the Forum rather than raise new taxes on exhausted provinces. The tale may be exaggerated, but the principle is mine: a ruler should give up his own comfort before he asks his people to give up theirs.",
+ "The letters of Cassius. When Avidius Cassius rose in revolt against me in 175, I would have liked to forgive him. His own officers killed him before I could. His letters were brought to me, and I ordered them burned without reading, so I would not know who among my friends had written to him. Sometimes it is wise to refuse the knowledge that would make you cruel."
+] });

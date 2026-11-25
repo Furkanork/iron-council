@@ -1,0 +1,6 @@
+/* More stories from his life (nietzsche), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("nietzsche", { stories: [
+ "Sils-Maria. In August 1881, while walking in the forest by Lake Silvaplana, in the Swiss Alps, the thought of the eternal recurrence came to me. I wrote on a scrap of paper that it came 'six thousand feet beyond man and time'. The idea: what if you had to live your life again and again, exactly the same? Would you say yes? That question has not left me. Ask it of your own days.",
+ "The young professor. In 1869, at the age of twenty-four, I was made a professor of classical philology at the University of Basel, before I had even finished a doctorate. People thought it a brilliant start. I could not keep to it; my health and my thoughts ran another way. Early success is no promise; and sometimes you must leave the place you were praised for, to do what is yours.",
+ "Turin. They say that in January 1889, in Turin, I saw a coachman beating his horse in the street, ran to it, threw my arms around its neck, and collapsed. After that I wrote strange notes and my friends took me away. Whether it happened exactly so, I cannot tell you; I have been silent for years. But if you want to know what I believed about compassion, the story speaks."
+] });

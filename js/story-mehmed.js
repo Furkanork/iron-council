@@ -1,0 +1,6 @@
+/* More stories from his life (mehmed), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("mehmed", { stories: [
+ "The great gun. A Hungarian founder named Urban first offered his skill to the Byzantines, who could not pay him. He came to me, and in Edirne he cast a bronze cannon so large it took dozens of oxen and hundreds of men to drag toward the city. It was slow and could fire only a few times a day, but every shot cracked the old walls a little more. A tool that others cannot afford can win you a city, if you have the courage to use it.",
+ "After the city fell. When the walls were broken and the city was mine, I rode in and went first to the Hagia Sophia and ordered that it be spared. I let the Orthodox Church keep its patriarch and called people from many lands to resettle the empty streets. Conquering is only half of a campaign; a city that is not rebuilt is a ruin you have bought at great cost.",
+ "The painter from Venice. Late in my life I asked Venice, my enemy, to send me a painter. They sent Gentile Bellini, and he painted my portrait. I learned what I could from his way of seeing, and I did not mind that he came from a rival city. A ruler should take skill wherever it lives, even from those he fights."
+] });

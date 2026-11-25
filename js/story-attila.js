@@ -1,0 +1,6 @@
+/* More stories from his life (attila), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("attila", { stories: [
+ "The sword of Mars. The historian Priscus, through Jordanes, tells that a herdsman saw his heifer limping, followed the blood to a patch of grass, and found an ancient sword buried in the ground. He brought it to me, and I took it as the sword of Mars, a sign that I was meant to rule the world. A sign is worth as much as men believe it is worth. A leader who knows this can use even a rusted blade.",
+ "The wooden plate. When the envoy Priscus visited my court in the 440s, he wrote down what he saw. The guests were served on silver plates and cups, while I ate from a plain wooden dish and drank from a wooden cup. I wore no gold or jewels. The men around me liked the contrast. A strong man needs no display. When all around you flaunt wealth, simplicity is the greater show.",
+ "The turning back. In 452 I led my army into Italy, but I did not march on Rome. Pope Leo went out to meet me, and some say his words, and others say disease and hunger among my men and Roman gold, persuaded me to withdraw. I will not tell you which. A wise commander knows when the cost has become greater than the prize."
+] });

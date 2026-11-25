@@ -17,6 +17,7 @@ function sources() {
     ...pick(/^train-.*\.js$/),
     ...pick(/^tr-.*\.js$/),          // Turkish lines (one file per member)
     ...pick(/^tr2-.*\.js$/),         // Turkish answers about himself and opinions of the others (extend tr-<id>.js)
+    ...pick(/^story-.*\.js$/),      // more stories from each life
     ...pick(/^combo-.*\.js$/),      // lines written for one feeling + one topic together
     "engine.js", "campaigns.js", "campaigns-2.js",
   ];

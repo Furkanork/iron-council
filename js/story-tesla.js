@@ -1,0 +1,6 @@
+/* More stories from his life (tesla), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("tesla", { stories: [
+ "The park in Budapest. In 1882, in Budapest, I was walking with a friend in a city park at sunset, reciting verses from Goethe's Faust. Suddenly the whole design of the rotating magnetic field appeared in my mind, complete, and I drew it with a stick in the sand. The alternating-current motor was born in a stroll. Rest is also part of work. Sometimes the best idea waits until you stop chasing it.",
+ "The World's Fair. In 1893, the great fair in Chicago was lit by alternating current, with Westinghouse's system and my designs, and visitors marveled at a sea of electric light. Edison had called alternating current dangerous. The public could see for themselves. When you have the better idea, you do not need to win the argument. You need only to turn on the light.",
+ "The fire of 1895. In March 1895, a fire destroyed my laboratory on South Fifth Avenue in New York. Years of apparatus and notes were lost. I stood in the cold and said little. Then I began again. The loss was real, but the ideas had not burned: they were in my head. Keep the real work inside yourself, where no fire can reach it."
+] });

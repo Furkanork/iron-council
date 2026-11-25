@@ -52,6 +52,7 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/bundle.js` — GENERATED single file (all of the files below except app.js) that the page loads. After changing any of them run `node tools/bundle.js` (also run by CI check: a stale bundle fails it). Cache version in index.html/eval.html is bumped with `?v=`.
 - `js/characters.js`, `js/c-*.js` — character dossiers
 - `js/training-pack*.js` — first training rounds
+- `js/story-<id>.js` — more stories from his life (added to the three in the main pack)
 - `js/combo-<id>.js` — his 20 feeling + topic combination lines (`combos` in the pack, keyed `feeling+topic`)
 - `js/tr-<id>.js` — a member's Turkish lines (`tr` key of his pack); written so far for all 18 members (feelings, topics, openers, principles, closers, greetings); `tr2-<id>.js` adds the answers about himself (feelings, fears, regrets, love, death…) and his opinion of each other member
 - `js/train-<id>.js` — one merged training file per character (rounds 3–7 and council opinions); new files are picked up by `node tools/bundle.js` automatically

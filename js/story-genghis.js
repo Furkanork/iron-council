@@ -1,0 +1,6 @@
+/* More stories from his life (genghis), grounded in recorded events or marked as tradition. */
+IRON_TRAIN("genghis", { stories: [
+ "Börte. When I was young, the Merkit tribe raided my camp and carried off my wife, Börte. I went to my father's old friend Toghrul and to my blood-brother Jamukha, and together we gathered an army and took her back. The loss taught me that a man who cannot protect his own family has no right to lead others. It also taught me to choose allies carefully, because the people who help you at your lowest are the ones you must never forget.",
+ "The muddy water. After a defeat in 1203 I was left with only a handful of loyal men at a place called Baljuna, where the only water was a muddy pool. We drank it together and swore to remember each other forever. Many of those men became my most trusted generals. What you share in the worst days binds more tightly than anything you give in the best.",
+ "The monk from China. When I was old, I sent for a Daoist teacher called Changchun, and he traveled for years across mountains and deserts to reach my camp in the west. I asked him how to live long. He told me honestly that there is no medicine for it; only moderation. I respected him for not flattering me. Keep near you the person who will tell you the truth, even when you are the khan."
+] });
