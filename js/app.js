@@ -204,7 +204,7 @@
 
   function card(c) {
     return `<a class="card" href="#/c/${c.id}" style="--c:${c.color}">
-      <div class="sigil" style="--c:${c.color}">${esc(c.monogram)}</div>
+      <div class="sigil" style="--c:${c.color}">${window.emblem(c)}</div>
       <div class="era">${esc(c.era)} · ${esc(c.region)}</div>
       <h3>${esc(c.name)}</h3>
       <div class="ttl">${esc(c.title)}</div>
@@ -276,7 +276,7 @@
     app.innerHTML = `
       <div class="char-layout">
         <aside class="dossier" style="--c:${c.color}">
-          <div class="sigil big" style="--c:${c.color}">${esc(c.monogram)}</div>
+          <div class="sigil big" style="--c:${c.color}">${window.emblem(c)}</div>
           <h2>${esc(c.name)}</h2>
           <div class="ttl">${esc(c.title)}</div>
           <div class="meta">${esc(c.era)} · ${esc(c.region)}</div>
@@ -430,7 +430,7 @@
       <p class="sub">Ask once. Hear several convictions answer the same problem.</p>
       <div class="modes" id="modes"><button class="chip ${mode === "counsel" ? "on" : ""}" data-mode="counsel">Counsel — they advise you</button><button class="chip ${mode === "debate" ? "on" : ""}" data-mode="debate">Debate — they argue for and against</button></div>
       <p class="help mode-help">${mode === "debate" ? "Ask a yes-or-no choice (“Should I take a gap year?”). They split into two sides, argue, answer each other, and each gives a final verdict." : "Tell them what you're facing, or pick a feeling."}</p>
-      <div class="pick" id="pick">${C.map((c) => `<button class="chip ${chosen.has(c.id) ? "on" : ""}" data-id="${c.id}" style="--c:${c.color}">${esc(c.monogram)} ${esc(c.name)}</button>`).join("")}</div>
+      <div class="pick" id="pick">${C.map((c) => `<button class="chip ${chosen.has(c.id) ? "on" : ""}" data-id="${c.id}" style="--c:${c.color}">${window.emblem(c, 16)} ${esc(c.name)}</button>`).join("")}</div>
       <div class="council-box">
         ${mode === "debate" ? "" : `<div class="moods" style="border-top:none" id="cm">${E.MOODS.concat("general").map((m) => `<button class="chip" data-m="${m}">${E.MOOD_LABELS[m]}</button>`).join("")}</div>`}
         <div class="composer"><textarea id="cq" placeholder="${mode === "debate" ? "Should I …? — e.g. Should I quit my job to start a business?" : "What are you facing?"}"></textarea><button class="btn" id="cs">${mode === "debate" ? "Open the debate" : "Summon"}</button></div>
@@ -767,7 +767,7 @@
       <div class="camp-page" style="--c:${c.color}">
         <a class="btn ghost small" href="#/oath">← Oath</a>
         <div class="camp-head">
-          <div class="sigil big" style="--c:${c.color}">${esc(c.monogram)}</div>
+          <div class="sigil big" style="--c:${c.color}">${window.emblem(c)}</div>
           <div><div class="kind">${esc(k.kind)} · 14 days · led by ${esc(c.name)}</div><h2 class="section-title">${esc(k.title)}</h2><p class="sub">${esc(k.about)}</p></div>
         </div>
         <div class="msg char"><span class="who">${esc(c.name)}</span><span class="body">${esc(k.start)}</span></div>

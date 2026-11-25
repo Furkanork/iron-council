@@ -67,7 +67,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
   - Re-checked all 19 quotes marked sourced (Atatürk 2, Musashi 2, Marcus 3, Bilge 3, Rumi 1, Leonidas 1, Hannibal 1, Attila 1, Joan 1, Nietzsche 4) against the works they cite (Nutuk/speeches, Go Rin no Sho, Meditations 10.16/5.20/5.1, Orkhon inscriptions, Masnavi I, Herodotus 7.228, Livy 22.51, Priscus, Joan's trial, Twilight of the Idols, Zarathustra, Gay Science). None needed downgrading (two were downgraded in the earlier pass); the Atatürk peace motto's source line now says honestly that the first occasion isn't pinned down. All 15 attributed quotes already have a source line explaining why they are only attributed, so no source line was missing. I have no web access: the check is from memory of the texts, so a second look by you on the Bilge/Orkhon and Rumi translations is still worth it.
 - [x] **2.4 More rivalries and friendships** (S). More pairs who react to each other in the Council (e.g. Rumi and Nietzsche, Joan and Napoleon, Tesla and the Swordsman). (2026-11-25)
   - 12 new pairs, both directions, 3 lines each (72 lines, js/rivals-<id>.js): Rumi↔Nietzsche, Tesla↔Swordsman, Atatürk↔Napoleon, Marcus↔Hannibal, Leonidas↔Musashi, Genghis↔Napoleon, Bilge↔Genghis, Nietzsche↔Joan, Rumi↔Joan, Tesla↔Nietzsche, Marcus↔Musashi, Marcus↔Attila (Joan↔Napoleon already existed). Now 48 directed pairs instead of 24. content.js checks them. English only; Turkish Council reactions are not written.
-- [ ] **2.5 Emblems** (M). Replace the letter-monograms with an original drawn emblem for each member (SVG: a crescent, a sword, a lightning coil…). Symbols only, no faces.
+- [x] **2.5 Emblems** (M). Replace the letter-monograms with an original drawn emblem for each member (SVG: a crescent, a sword, a lightning coil…). Symbols only, no faces. (2026-11-25)
+  - js/emblems.js: 18 original SVG symbols drawn in each member's colour, used on the Hall cards, dossier, campaign page and Council picker (letter monogram stays as fallback). Checked in a screenshot of the Hall; they are simple line drawings, so swap any you dislike in that one file (e.g. the crescent-over-wall for Mehmed reads a bit like a boat at small size).
 
 ## Phase 3 — New features
 
@@ -144,3 +145,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 2.2: 10 stories each for 17 members, 8 for Atsız (question 5).
 - 2026-11-25 — 2.3 done: sourced quotes re-checked (none downgraded this time).
 - 2026-11-25 — 2.4 done: 12 new Council pairs.
+- 2026-11-25 — 2.5 done: drawn emblems replace monograms.

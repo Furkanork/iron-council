@@ -20,7 +20,7 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Stories**: ask any of them for a story ("tell me a story", "bir hikaye anlat") and they tell one from their life.
 - **Bond**: each of them forms an opinion of you — Cold, Stranger, Respect, Trusted — from your visits, the oaths you keep or break, and whether you keep repeating the same complaint. It shows in how they greet and speak to you.
 - **Tone**: in each chat, set them to Gentle, Normal or Hard.
-- **Rivals and friends**: members with real history or a strong contrast (Mehmed and Vlad, Hannibal and Napoleon, Timur and Genghis, Rumi and Nietzsche, Tesla and the Swordsman, Atatürk and Napoleon, Marcus and Hannibal, Joan and Nietzsche…: 36 pairs) speak to each other about it in the Council.
+- **Rivals and friends**: members with real history or a strong contrast (Mehmed and Vlad, Hannibal and Napoleon, Timur and Genghis, Rumi and Nietzsche, Tesla and the Swordsman, Atatürk and Napoleon, Marcus and Hannibal, Joan and Nietzsche…: 24 pairs) speak to each other about it in the Council.
 - **They ask you back**: sometimes a member ends with a question ("What exactly scares you about it?") and takes your next message as the answer.
 - **Campaigns** (Oath page): 14-day programs led by one member — Musashi (discipline), Napoleon (exam study), Leonidas (body), Marcus (mind), Tesla (finish a project). Each day's task becomes that day's oath.
 - **Council debate**: switch the Council to Debate, ask a yes-or-no choice; they split into for and against, argue, answer the other side, and each gives a verdict. The count is shown at the end.
@@ -49,6 +49,7 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 
 ## Files
 - `fonts/` + `css/fonts.css` — Cinzel and EB Garamond (OFL licence), latin + latin-ext subsets (latin-ext holds the Turkish letters), stored with the site; nothing is loaded from Google
+- `js/emblems.js` — an original drawn SVG emblem per member (crescent over a wall, stake, sun, wolf, crossed swords, column, nine-tailed standard, slab sword, standing stone, spiral, three rings, lambda shield, Punic sign, planted sword, banner, bee, mountain and star, lightning bolt); symbols only, no faces; letter monograms remain as fallback
 - `js/bundle.js` — GENERATED single file (all of the files below except app.js) that the page loads. After changing any of them run `node tools/bundle.js` (also run by CI check: a stale bundle fails it). Cache version in index.html/eval.html is bumped with `?v=`.
 - `js/characters.js`, `js/c-*.js` — character dossiers
 - `js/training-pack*.js` — first training rounds

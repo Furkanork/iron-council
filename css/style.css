@@ -350,3 +350,7 @@ html, body { overflow-x: hidden; }
 /* Real-support message shown instead of using a worrying text as an oath, goal or focus. */
 .crisis-panel { border: 1px solid #c0504d; background: rgba(192, 80, 77, .12); }
 .crisis-panel p { margin: 0 0 .6em; line-height: 1.5; }
+
+/* Emblems: drawn symbols in the member's colour. */
+.sigil .emb { width: 66%; height: 66%; display: block; }
+.chip .emb { vertical-align: -3px; margin-right: 2px; }
