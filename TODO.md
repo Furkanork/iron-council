@@ -41,7 +41,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
   - `Engine.detectLang` (72/73 Turkish and 136/136 English test messages right; English default when unsure). Pack key `tr` mirrors the English pools; forgeReply picks Turkish pools per pool and falls back to English. Safety message has a Turkish version (112 + findahelpline.com). New tests/lang.js (in CI). No real Turkish lines yet: that is 1.2–1.5. Other suites unchanged (run.js 355/363, smoke 227/227, content OK).
 - [x] **1.2 Turkish answers: Mehmed, Atatürk, Atsız, Bilge Kağan, Timur, Rumi** (L). About 70 hand-written Turkish lines each: all 8 feelings, the main topics, greetings and closers. Written in Turkish, not machine-translated. (2026-11-25)
   - js/tr-<id>.js for the six: 74 hand-written Turkish lines each (4 per feeling ×8 + general, 1 per topic ×18, openers, principles, closers, again, pivots, greet/thanks/who). Question-about-him answers (17 subjects) and opinions of the others are in 1.5. Engine now answers a whole reply in one language (Turkish only if the main pool has Turkish, else English). Worth a native read-through for tone. Tests: run.js 355/363, lang OK, smoke 263/263 (adds a Turkish message), content OK (new Turkish column).
-- [ ] **1.3 Turkish answers: Vlad, Genghis, Attila, Musashi, Marcus Aurelius, the Black Swordsman** (L). Same as 1.2.
+- [x] **1.3 Turkish answers: Vlad, Genghis, Attila, Musashi, Marcus Aurelius, the Black Swordsman** (L). Same as 1.2. (2026-11-25)
+  - js/tr-<id>.js for the six, 74 lines each, same layout as 1.2 (the Swordsman's lines are deliberately terse). Worth a native read-through for tone. run.js 355/363, lang OK, smoke OK.
 - [ ] **1.4 Turkish answers: Leonidas, Hannibal, Joan, Napoleon, Nietzsche, Tesla** (L). Same as 1.2.
 - [ ] **1.5 Turkish answers for personal questions** (L). "Korkun var mı?", "Pişman mısın?" and the rest get Turkish answers about themselves, plus opinions of each other in Turkish.
 - [ ] **1.6 Follow-up messages** (M). Understand short replies that only make sense after the last answer, like "why?", "how?", "I tried that", "it didn't work", "yes / no", "neden?", "nasıl?", "denedim". The member answers the follow-up instead of starting over.
@@ -118,3 +119,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 0.5 done: fonts stored locally. Phase 0 complete.
 - 2026-11-25 — 1.1 done: language detection + Turkish pools with English fallback (content comes in 1.2–1.5).
 - 2026-11-25 — 1.2 done: Turkish lines for Mehmed, Atatürk, Atsız, Bilge, Timur, Rumi.
+- 2026-11-25 — 1.3 done: Turkish lines for Vlad, Genghis, Attila, Musashi, Marcus, the Swordsman.
