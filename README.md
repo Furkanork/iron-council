@@ -12,6 +12,7 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Ask about them**: their feelings, fears, regrets, love, death, and what they think of each other.
 - **Council**: ask one question; up to four members answer in turn, react to each other (agree or push back), and can be told to answer each other in a second round.
 - **Follow-ups**: short replies that only make sense after his last answer ("why?", "how?", "I tried that", "it didn't work", "yes", "no", "tell me more"; "neden?", "nasıl?", "denedim", "olmadı", "evet", "hayır", "devam et") are answered as follow-ups, in his voice, about the same feeling and topic, instead of being read as a new message.
+- **How strong**: "a bit tired" gets a short, light nudge; "I can't go on" (or shouting, "!!!", "dayanamıyorum") gets the steadier gentle voice and no battle-cry closer. Shown as "heavy" / "light" under the answer.
 - **Memory**: tell any of them "my name is …" or "my goal is …". They use your name, and on a new day they bring up what you last talked about or ask about your goal.
 - **Oath**: swear one task a day before one member. Next time they ask whether you kept it, react to the answer, and keep your streak.
 - **Stories**: ask any of them for a story ("tell me a story", "bir hikaye anlat") and they tell one from their life.
@@ -55,6 +56,7 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/app.js` — the interface
 - `eval.html` — accuracy test page in the browser (279 labeled messages)
 - `tests/smoke.js` — Playwright smoke test of every page at phone width (`node tests/smoke.js`)
+- `tests/intensity.js` — checks light / normal / heavy detection (`node tests/intensity.js`)
 - `tests/followup.js` — checks follow-up detection and replies (`node tests/followup.js`)
 - `tests/lang.js` — checks language detection (Turkish vs English) and the Turkish-answer fallback (`node tests/lang.js`)
 - `tests/content.js` — checks every member is fully written and prints a coverage table (`node tests/content.js`)

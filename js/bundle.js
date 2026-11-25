@@ -8611,6 +8611,27 @@ window.TRAINING_PACK.vlad.tr.opinions = {
     return subject ? { kind: "about", subject } : { kind: "about", subject: "general" };
   }
   const saysAgain = (text) => { const t = " " + norm(text) + " "; return AGAIN_WORDS.some((w) => matcher(w).test(t)); };
+  // ---------- how strong is the feeling? ("a bit tired" vs "I can't go on") ----------
+  const HEAVY = /(can'?t (go on|take (it|this|any more|anymore)|do (it|this) any ?more|breathe|stop (crying|thinking))|cannot (go on|take)|unbearable|hopeless|worthless|broken|destroyed|devastated|crushed|shattered|empty inside|falling apart|exhausted|drained|numb|completely|totally|absolutely|extremely|so so|never (get|be) (better|better|over)|nothing matters|give up on (everything|life)|hate (myself|my life)|every ?thing is (ruined|wrong)|no (one|body) (cares|loves)|dayanamıyorum|dayanamayacağım|daha fazla dayan|artık yapamıyorum|artık taşıyamıyorum|bittim|tükendim|çöktüm|paramparça|umutsuz|değersiz|yıkıldım|hiçbir şey fark etmiyor|hiçbir anlamı yok|nefret ediyorum kendimden|aşırı|fena halde|çok çok|çok fazla|kahroldum|mahvoldum)/;
+  const LIGHT = /(^|[^\p{L}])(a (little|bit)|a little bit|slightly|kind of|kinda|sort of|somewhat|a tad|bit of|mildly|just a bit|not too|hafif|biraz|azıcık|bi'? ?az|şöyle bir|ufak|küçük bir|pek değil|çok değil)([^\p{L}]|$)/u;
+  function detectIntensity(text) {
+    const raw = String(text || ""), t = norm(raw);
+    if (!t) return "normal";
+    if (isCrisis(raw)) return "heavy";
+    let heavy = 0;
+    if (HEAVY.test(t)) heavy += 2;
+    if (/(^|[^\p{L}])(very|so|really|çok|iyice|gerçekten)([^\p{L}]|$)/u.test(t) && /(!|\?\?)/.test(raw)) heavy += 1;
+    if (/!{2,}/.test(raw)) heavy += 1;
+    const letters = raw.replace(/[^\p{L}]/gu, "");
+    if (letters.length >= 8 && letters === letters.toLocaleUpperCase("tr") && letters !== letters.toLocaleLowerCase("tr")) heavy += 1;  // SHOUTING
+    if (/(.)\1{3,}/.test(t.replace(/[.!?…]/g, ""))) heavy += 1;     // "sooooo tired"
+    if (/(^|[^\p{L}])(always|never|forever|every (single )?(day|night|time)|hep|hiçbir zaman|asla|her gün|her zaman|sürekli)([^\p{L}]|$)/u.test(t) && /(fail|tired|alone|hate|worthless|cry|give up|yoruldum|yalnız|nefret|ağlıyor|vazgeç)/.test(t)) heavy += 1;
+    const light = LIGHT.test(t);
+    if (heavy >= 2 || (heavy >= 1 && !light)) return "heavy";
+    if (light && heavy === 0) return "light";
+    return "normal";
+  }
+
   // ---------- follow-up messages ("why?", "how?", "I tried that", "yes", "neden?", "nasıl?", "denedim"…) ----------
   // Only meaningful straight after an answer, and only when the message is short.
   const FOLLOW = [
@@ -8698,7 +8719,7 @@ window.TRAINING_PACK.vlad.tr.opinions = {
     if (r.intent) return { greet: "greeting", thanks: "thanks", who: "about himself" }[r.intent];
     if (r.story) return "a story";
     if (r.followup) return "follow-up";
-    return [r.again ? "persistence" : null, r.mood && r.mood !== "general" ? MOOD_SHORT[r.mood] : null, r.topic ? TOPIC_LABELS[r.topic] : null].filter(Boolean).join(" · ");
+    return [r.intensity === "heavy" ? "heavy" : r.intensity === "light" ? "light" : null, r.again ? "persistence" : null, r.mood && r.mood !== "general" ? MOOD_SHORT[r.mood] : null, r.topic ? TOPIC_LABELS[r.topic] : null].filter(Boolean).join(" · ");
   }
 
   const STOP = new Set("i me my a an the and or but to of in on at for is am are was were be been it this that with so just really very do does did have has had can't cant don't dont not no".split(" "));
@@ -8822,6 +8843,7 @@ window.TRAINING_PACK.vlad.tr.opinions = {
       saveRecent(char.id);
       return { text: parts.join(" "), mood, topic, intent };
     }
+    const intensity = text && !forcedMood ? detectIntensity(text) : "normal";
     const again = !!text && (saysAgain(text) || (!!topic && !!ctx && ctx.lastTopic === topic));
 
     // 1) An answer you taught for a similar question wins most of the time.
@@ -8843,7 +8865,9 @@ window.TRAINING_PACK.vlad.tr.opinions = {
     const add = (pool) => { const l = pick(char.id, pool, parts); if (l) parts.push(l); };
     // Grief is answered with care: no scolding openers, no "hard" closer, no lines about laziness or defeat.
     const grief = topic === "grief";
-    const gentle = ctx.tone === "gentle" && char.gentle.length, hard = ctx.tone === "hard" && char.hard.length && !grief;
+    // A heavy message gets the steadier voice (gentle opener, no battle-cry closer) unless you asked for "hard"; a light one gets a lighter push.
+    const heavy = intensity === "heavy" && ctx.tone !== "hard", light = intensity === "light";
+    const gentle = (ctx.tone === "gentle" || heavy) && char.gentle.length, hard = ctx.tone === "hard" && char.hard.length && !grief && !heavy;
     // How he feels about you colours the first words now and then.
     const bondPool = ctx.bond === "cold" ? P("bondCold") : (ctx.bond === "respect" || ctx.bond === "trusted") ? P("bondWarm") : [];
     // You are answering a question he asked you: he acknowledges it first.
@@ -8864,15 +8888,17 @@ window.TRAINING_PACK.vlad.tr.opinions = {
     if (!gentle && !grief && (parts.length < 2 || chance(0.35))) add(principlePool);
     if (grief && parts.length < 2) add(topicPool);
     if (parts.length > 4) parts.splice(1, parts.length - 4);
+    // Light: keep it short, a nudge rather than a speech.
+    if (light && parts.length > 2) parts.length = 2;
     // Sometimes he ends with a question back to you instead of a closing line.
     const askKey = mood !== "general" ? mood : topic ? "general" : null;
     const askPool = askKey && ctx.canAsk && !ctx.answered && pickPool(char.askBack[askKey] || [], trg("askBack", askKey));
     let asked = null;
     if (askPool && askPool.length && chance(0.33)) { const qn = pick(char.id, askPool, parts); if (qn) { parts.push(qn); asked = askKey; } }
-    if (!asked && !grief) add(hard ? P("hard") : P("closers")); // no battle-cry ending after a loss
+    if (!asked && !grief && !(light && parts.length >= 2)) add(hard ? P("hard") : P("closers")); // no battle-cry ending after a loss
 
     saveRecent(char.id);
-    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone, asked, lang: T ? "tr" : "en" };
+    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone, asked, intensity, lang: T ? "tr" : "en" };
   }
 
   const SHORT = { ataturk: "Atatürk", atsiz: "Atsız", musashi: "Musashi", swordsman: "the Swordsman", nietzsche: "Nietzsche", rumi: "Rumi", tesla: "Tesla", genghis: "Genghis", hannibal: "Hannibal", napoleon: "Napoleon", bilge: "Bilge" };
@@ -8916,7 +8942,7 @@ window.TRAINING_PACK.vlad.tr.opinions = {
   const full3 = (pool) => { const f = pool.filter((l) => l.split(/\s+/).length > 2); return f.length >= 3 ? f : pool; };
 
   window.Engine = {
-    MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE, CRISIS_MESSAGE_TR, crisisMessage, detectLang, detectFollowup,
+    MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE, CRISIS_MESSAGE_TR, crisisMessage, detectLang, detectFollowup, detectIntensity,
     forgeReply, misreads, addMisread, clearMisreads, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName, isStory, topicLine, temper
   };
 })();
