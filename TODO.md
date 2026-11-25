@@ -24,7 +24,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
 
 ## Phase 0 — Safety net (so nothing breaks while everything changes)
 
-- [ ] **0.1 Smoke test for the whole site** (M). `tests/smoke.js` (Playwright) opens every page (Hall, a chat with every one of the 18 members, Council, Debate, Oath, Campaigns, Journal, Saved, Forge), sends a message where there's a box, and fails on any console error, empty answer, leftover `{placeholder}`, or broken layout at phone width.
+- [x] **0.1 Smoke test for the whole site** (M). `tests/smoke.js` (Playwright) opens every page (Hall, a chat with every one of the 18 members, Council, Debate, Oath, Campaigns, Journal, Saved, Forge), sends a message where there's a box, and fails on any console error, empty answer, leftover `{placeholder}`, or broken layout at phone width. (2026-11-25)
+  - `tests/smoke.js` added: 227 checks at 375px width (all 18 chats ×2 messages, Council, Debate, Oath + every campaign, Journal, Saved, Forge ×18); fails on console errors, empty answers, leftover tokens, overflow. Passes. Run: `node tests/smoke.js` (needs Playwright).
 - [ ] **0.2 Content checker** (S). `tests/content.js` checks every member has all 8 feelings, all 18 topics, all 17 personal subjects, opinions of every other member, stories, and no duplicate lines, empty lines or placeholders. It prints a coverage table.
 - [ ] **0.3 Automatic checks on GitHub** (S). A GitHub Actions workflow runs tests 0.1, 0.2 and `tests/run.js` on every push. A red ✗ on GitHub means something broke.
 - [ ] **0.4 One file instead of 130** (M). The page loads ~130 separate script files. `tools/bundle.js` joins them into one `js/bundle.js` (re-run after each content change), so the site loads much faster on a phone, especially the first time.
@@ -104,3 +105,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 ## Progress log
 
 - 2026-11-25 — Plan written and approved (voice check removed at the owner's request). Replaces the earlier 8-task list; all 8 of its tasks are covered here.
+- 2026-11-25 — 0.1 done: tests/smoke.js (227 checks, all pass); run.js still 355/363.
