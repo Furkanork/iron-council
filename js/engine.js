@@ -64,18 +64,18 @@
     feel: ["feel", "feeling", "sad", "upset", "tired", "angry", "üzgün", "yorgun mu", "how are you", "how're you", "mood", "are you ok", "are you okay", "nasılsın", "hissed", "iyi misin", "keyfin"],
     fear: ["afraid", "fear", "scared", "scare", "terrif", "frighten", "kork"],
     regret: ["regret", "mistake", "pişman", "hatan", "hata"],
-    proud: ["proud", "achievement", "gurur", "başarın"],
+    proud: ["proud", "achievement", "gurur", "başarın", "gurur duy"],
     hardest: ["hardest", "en zor an", "worst", "darkest", "most difficult", "toughest", "en zor", "en kötü"],
     love: ["love", "wife", "married", "romance", "aşk", "aşık", "sevdin", "sevgilin", "eşin", "evlen"],
     family: ["father", "mother", "dad", "mom", "family", "sons", "your son", "children", "kids", "brother", "sister", "parents", "baban", "annen", "ailen", "çocuk", "kardeşin", "oğul", "oğlun"],
     death: ["death", "of death", "afraid to die", "did you die", "you die", "die ", "died", "dying", "dead", "ölüm", "öldün", "ölmek"],
     enemy: ["enemy", "enemies", "betray", "ihanet", "hate", "rival", "düşman", "nefret"],
-    faith: ["god", "religion", "faith", "pray", "allah", "tanrı", "dinin", "din ", "inanç", "dua"],
+    faith: ["god", "religion", "faith", "pray", "allah", "tanrı", "dinin", "din ", "inanç", "dua", "neye inan", "inanıyor"],
     happy: ["happy", "happiness", "joy", "enjoy", "mutlu"],
     lonely: ["lonely", "alone", "loneliness", "yalnız"],
     younger: ["younger", "young self", "advice to your", "if you could go back", "genç"],
     day: ["your day", "daily", "routine", "typical day", "a day in", "günün", "rutin"],
-    weakness: ["weakness", "flaw", "weak", "zayıf", "kusur"],
+    weakness: ["weakness", "flaw", "weak", "zayıf", "kusur", "zaaf"],
     modern: ["today's world", "modern", "nowadays", "our world", "our time", "these days", "internet", "technology", "günümüz", "bugünkü", "zamanımız", "teknoloji"],
     me: ["of me", "about me", "think of me", "beni", "hakkımda"]
   };
@@ -100,7 +100,7 @@
     tesla: ["tesla"]
   };
   const YOU_EN = /(^|[^\p{L}])(you|your|yours|yourself|u|ya)([^\p{L}]|$)/u;
-  const YOU_TR = /(^|[^\p{L}])(sen|senin|sana|seni|sende|senden|kendin)([^\p{L}]|$)|\p{L}{2,}(sın|sin|sun|sün|dın|din|dun|dün|tın|tin|tun|tün)([^\p{L}]|$)|(baban|annen|ailen|eşin|hatan|düşmanın|hayatın|hayatının|korkun|zayıflığın|pişmanlığın|gençliğin|anın|günün)/u;
+  const YOU_TR = /(^|[^\p{L}])(sen|senin|sana|seni|sende|senden|kendin)([^\p{L}]|$)|\p{L}{2,}(sın|sin|sun|sün|dın|din|dun|dün|tın|tin|tun|tün)([^\p{L}]|$)|(baban|annen|ailen|eşin|yönün|duyduğun|zaafın|kusurun|inancın|hatan|düşmanın|hayatın|hayatının|korkun|zayıflığın|pişmanlığın|gençliğin|anın|günün)/u;
   const ASKS = /\?|^\s*(what|how|do|did|are|were|have|has|who|why|when|where|which|is|was|tell|can|could|would|ne|nasıl|neden|niye|kim|hiç|hangi|anlat)([^\p{L}]|$)|(^|[^\p{L}])m[ıiuü](s[ıiuü]n|yd[ıiuü]n|d[ıiuü]r)?([^\p{L}]|$)/iu;
   const OPINION = /think|opinion|feel about|view of|like?|what('s| is| was) .+ like|düşün|hakkında|fikrin|nasıl biri|sever mi/i;
 

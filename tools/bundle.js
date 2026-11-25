@@ -16,6 +16,7 @@ function sources() {
     "c-bilge.js", "c-rumi.js", "c-timur.js", "c-leonidas.js", "c-hannibal.js", "c-attila.js", "c-joan.js", "c-napoleon.js", "c-nietzsche.js", "c-tesla.js",
     ...pick(/^train-.*\.js$/),
     ...pick(/^tr-.*\.js$/),          // Turkish lines (one file per member)
+    ...pick(/^tr2-.*\.js$/),         // Turkish answers about himself and opinions of the others (extend tr-<id>.js)
     "engine.js", "campaigns.js", "campaigns-2.js",
   ];
 }
