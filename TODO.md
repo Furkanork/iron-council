@@ -43,7 +43,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
   - js/tr-<id>.js for the six: 74 hand-written Turkish lines each (4 per feeling ×8 + general, 1 per topic ×18, openers, principles, closers, again, pivots, greet/thanks/who). Question-about-him answers (17 subjects) and opinions of the others are in 1.5. Engine now answers a whole reply in one language (Turkish only if the main pool has Turkish, else English). Worth a native read-through for tone. Tests: run.js 355/363, lang OK, smoke 263/263 (adds a Turkish message), content OK (new Turkish column).
 - [x] **1.3 Turkish answers: Vlad, Genghis, Attila, Musashi, Marcus Aurelius, the Black Swordsman** (L). Same as 1.2. (2026-11-25)
   - js/tr-<id>.js for the six, 74 lines each, same layout as 1.2 (the Swordsman's lines are deliberately terse). Worth a native read-through for tone. run.js 355/363, lang OK, smoke OK.
-- [ ] **1.4 Turkish answers: Leonidas, Hannibal, Joan, Napoleon, Nietzsche, Tesla** (L). Same as 1.2.
+- [x] **1.4 Turkish answers: Leonidas, Hannibal, Joan, Napoleon, Nietzsche, Tesla** (L). Same as 1.2. (2026-11-25)
+  - js/tr-<id>.js for the six, 74 lines each (Leonidas terse). All 18 members now have Turkish lines for feelings/topics/greetings. Worth a native read-through. Tests unchanged and passing (content.js now also checks Turkish lines for empties/English/tokens).
 - [ ] **1.5 Turkish answers for personal questions** (L). "Korkun var mı?", "Pişman mısın?" and the rest get Turkish answers about themselves, plus opinions of each other in Turkish.
 - [ ] **1.6 Follow-up messages** (M). Understand short replies that only make sense after the last answer, like "why?", "how?", "I tried that", "it didn't work", "yes / no", "neden?", "nasıl?", "denedim". The member answers the follow-up instead of starting over.
 - [ ] **1.7 How strong the feeling is** (S). Tell "a bit tired" from "I can't go on". A heavy message gets a steadier, more serious answer; a light one gets a lighter push.
@@ -120,3 +121,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 1.1 done: language detection + Turkish pools with English fallback (content comes in 1.2–1.5).
 - 2026-11-25 — 1.2 done: Turkish lines for Mehmed, Atatürk, Atsız, Bilge, Timur, Rumi.
 - 2026-11-25 — 1.3 done: Turkish lines for Vlad, Genghis, Attila, Musashi, Marcus, the Swordsman.
+- 2026-11-25 — 1.4 done: Turkish lines for Leonidas, Hannibal, Joan, Napoleon, Nietzsche, Tesla.

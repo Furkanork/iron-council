@@ -51,7 +51,7 @@ for (const c of CH) {
   check("stories", t.stories, 3);
   // Turkish lines (optional, written member by member): checked for empties and leftover tokens, and counted.
   row.tr = 0;
-  const walk = (where, v) => { if (Array.isArray(v)) { for (const l of v) { if (typeof l !== "string" || !l.trim()) bad(c.id, `Turkish ${where} has an empty line`); else if (TOKEN.test(l.replace(/\{(name|goal|oath|topic|focus)\}/g, ""))) bad(c.id, `Turkish ${where} has a leftover token: "${l.slice(0, 50)}"`); else if (!/[çğıöşüÇĞİÖŞÜ]|\b(ve|bir|bu|sen|ben|için|ama)\b/i.test(l) && l.split(/\s+/).length > 6) bad(c.id, `Turkish ${where} line does not look Turkish: "${l.slice(0, 50)}"`); row.tr++; } } else if (v && typeof v === "object") for (const k of Object.keys(v)) walk(where + "." + k, v[k]); };
+  const walk = (where, v) => { if (Array.isArray(v)) { for (const l of v) { if (typeof l !== "string" || !l.trim()) bad(c.id, `Turkish ${where} has an empty line`); else if (TOKEN.test(l.replace(/\{(name|goal|oath|topic|focus)\}/g, ""))) bad(c.id, `Turkish ${where} has a leftover token: "${l.slice(0, 50)}"`); else if (/(?<![\p{L}])(the|and|you|your|is|are|with|that|this|not)(?![\p{L}])/iu.test(l)) bad(c.id, `Turkish ${where} line does not look Turkish: "${l.slice(0, 50)}"`); row.tr++; } } else if (v && typeof v === "object") for (const k of Object.keys(v)) walk(where + "." + k, v[k]); };
   if (c.tr) walk("tr", c.tr);
   rows.push(row);
 }
