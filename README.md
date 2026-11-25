@@ -13,6 +13,7 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Council**: ask one question; up to four members answer in turn, react to each other (agree or push back), and can be told to answer each other in a second round.
 - **Follow-ups**: short replies that only make sense after his last answer ("why?", "how?", "I tried that", "it didn't work", "yes", "no", "tell me more"; "neden?", "nasıl?", "denedim", "olmadı", "evet", "hayır", "devam et") are answered as follow-ups, in his voice, about the same feeling and topic, instead of being read as a new message.
 - **How strong**: "a bit tired" gets a short, light nudge; "I can't go on" (or shouting, "!!!", "dayanamıyorum") gets the steadier gentle voice and no battle-cry closer. Shown as "heavy" / "light" under the answer.
+- **Feeling + topic lines**: for the 20 most common pairs (afraid + study, tired + work, failed + love, lazy + training, alone + friends…) every member has a line written for exactly that pair, used most of the time instead of joining a feeling line to a topic line. Shown under the answer as the usual "read as" label.
 - **Memory**: tell any of them "my name is …" or "my goal is …". They use your name, and on a new day they bring up what you last talked about or ask about your goal.
 - **Oath**: swear one task a day before one member. Next time they ask whether you kept it, react to the answer, and keep your streak.
 - **Stories**: ask any of them for a story ("tell me a story", "bir hikaye anlat") and they tell one from their life.
@@ -50,6 +51,7 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/bundle.js` — GENERATED single file (all of the files below except app.js) that the page loads. After changing any of them run `node tools/bundle.js` (also run by CI check: a stale bundle fails it). Cache version in index.html/eval.html is bumped with `?v=`.
 - `js/characters.js`, `js/c-*.js` — character dossiers
 - `js/training-pack*.js` — first training rounds
+- `js/combo-<id>.js` — his 20 feeling + topic combination lines (`combos` in the pack, keyed `feeling+topic`)
 - `js/tr-<id>.js` — a member's Turkish lines (`tr` key of his pack); written so far for all 18 members (feelings, topics, openers, principles, closers, greetings); `tr2-<id>.js` adds the answers about himself (feelings, fears, regrets, love, death…) and his opinion of each other member
 - `js/train-<id>.js` — one merged training file per character (rounds 3–7 and council opinions); new files are picked up by `node tools/bundle.js` automatically
 - `js/engine.js` — reads messages and composes answers

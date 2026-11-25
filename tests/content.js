@@ -25,7 +25,7 @@ const rows = [];
 for (const c of CH) {
   const t = TP[c.id];
   if (!t) { bad(c.id, "no training pack"); continue; }
-  const row = { id: c.id, feel: 0, topic: 0, about: 0, opin: 0, stories: (t.stories || []).length, lines: 0 };
+  const row = { id: c.id, feel: 0, topic: 0, about: 0, opin: 0, stories: (t.stories || []).length, lines: 0, combos: Object.keys(t.combos || {}).length };
 
   const check = (where, arr, min) => {
     if (!Array.isArray(arr) || arr.length < min) { bad(c.id, `${where} has ${Array.isArray(arr) ? arr.length : 0} line(s), needs ${min}`); return false; }
@@ -49,6 +49,8 @@ for (const c of CH) {
   for (const p of POOLS) check(`pool "${p}"`, t[p], 1);
   for (const k of ["greet", "thanks", "who"]) check(`intent "${k}"`, (t.intents || {})[k], 1);
   check("stories", t.stories, 3);
+  if (row.combos < 20) bad(c.id, `only ${row.combos} of the 20 feeling+topic combination lines`);
+  for (const k of Object.keys(t.combos || {})) { const [m, x] = k.split("+"); if (!MOODS.includes(m) || !TOPICS.includes(x)) bad(c.id, `combo "${k}" is not feeling+topic`); check(`combo "${k}"`, t.combos[k], 1); }
   // Turkish lines (optional, written member by member): checked for empties and leftover tokens, and counted.
   row.tr = 0;
   const walk = (where, v) => { if (Array.isArray(v)) { for (const l of v) { if (typeof l !== "string" || !l.trim()) bad(c.id, `Turkish ${where} has an empty line`); else if (TOKEN.test(l.replace(/\{(name|goal|oath|topic|focus)\}/g, ""))) bad(c.id, `Turkish ${where} has a leftover token: "${l.slice(0, 50)}"`); else if (/(?<![\p{L}])(the|and|you|your|is|are|with|that|this|not)(?![\p{L}])/iu.test(l)) bad(c.id, `Turkish ${where} line does not look Turkish: "${l.slice(0, 50)}"`); row.tr++; } } else if (v && typeof v === "object") for (const k of Object.keys(v)) walk(where + "." + k, v[k]); };
@@ -61,8 +63,8 @@ for (const c of CH) {
 }
 
 const pad = (s, n) => String(s).padEnd(n), num = (s, n) => String(s).padStart(n);
-console.log(pad("member", 12) + num(`feelings/${MOODS.length}`, 12) + num(`topics/${TOPICS.length}`, 11) + num(`about/${ABOUT.length}`, 10) + num(`opinions/${CH.length - 1}`, 13) + num("stories", 9) + num("lines", 8) + num("turkish", 9));
-for (const r of rows) console.log(pad(r.id, 12) + num(r.feel, 12) + num(r.topic, 11) + num(r.about, 10) + num(r.opin, 13) + num(r.stories, 9) + num(r.lines, 8) + num(r.tr, 9));
+console.log(pad("member", 12) + num(`feelings/${MOODS.length}`, 12) + num(`topics/${TOPICS.length}`, 11) + num(`about/${ABOUT.length}`, 10) + num(`opinions/${CH.length - 1}`, 13) + num("stories", 9) + num("lines", 8) + num("turkish", 9) + num("combos/20", 10));
+for (const r of rows) console.log(pad(r.id, 12) + num(r.feel, 12) + num(r.topic, 11) + num(r.about, 10) + num(r.opin, 13) + num(r.stories, 9) + num(r.lines, 8) + num(r.tr, 9) + num(r.combos, 10));
 
 const dupTail = warns.length ? `\n${warns.length} duplicate line(s) (warnings${process.argv.includes("--strict") ? ", --strict" : ""}):\n` + warns.slice(0, 15).map((w) => "! " + w).join("\n") + (warns.length > 15 ? `\n… and ${warns.length - 15} more (run with --all to list)` : "") : "";
 if (process.argv.includes("--all")) console.log(warns.map((w) => "! " + w).join("\n"));
