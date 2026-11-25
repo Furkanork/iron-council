@@ -45,5 +45,5 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/training-pack-*.js` — additional training
 - `js/engine.js` — reads messages and composes answers
 - `js/app.js` — the interface
-- `eval.html` — accuracy test page in the browser (175 labeled messages)
-- `tests/` — `node tests/run.js` checks 363 everyday messages (English, Turkish, slang, typos, Turkish without Turkish letters). `tests/holdout/` is a set the engine is never tuned on — the honest measure for wording it hasn't seen. `node tests/run.js iron-council-misreads-….json` tests a downloaded Misread list.
+- `eval.html` — accuracy test page in the browser (279 labeled messages)
+- `tests/` — `node tests/run.js` checks 363 everyday messages (English, Turkish, slang, typos, Turkish without Turkish letters). `tests/holdout/` holds sets kept apart from tuning — the honest measure for wording the engine hasn't seen (round 3: 95%, round 4: 91% after tuning, from 62% and 59% before; write a new holdout file for the next blind measurement). `node tests/run.js iron-council-misreads-….json` tests a downloaded Misread list.

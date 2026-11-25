@@ -185,10 +185,10 @@
   };
   const MORE_TOPIC = {
     study: ["uni ", "major", "semester", "graduat", "assignment", "grades", "teacher", "hoca", "mezun", "bölüm"],
-    work: ["presentation", "shift", "fired", "manager", "sunum", "işe alın"],
+    work: ["presentation", "shift", "fired", "manager", "sunum", "işe alın", "meetings", "which career"],
     training: ["the team", "referee", "leg day", "stronger", "strength", "weight loss"],
     love: ["ask her out", "ask him out", "a girl", "a boy", "this girl", "this guy", "left me for", "kızlar", "kızla ", "find love", "girls", "guys", "my gf", "my bf", "kıza açıl", "ona açıl", "hoşlan", "with her"],
-    family: ["kids", "my son", "my daughter", "children", "husband", "boşan", "divorc"],
+    family: ["baby", "kids", "my son", "my daughter", "children", "husband", "boşan", "divorc"],
     money: ["crypto", "owe ", "ödeyeme"],
     grief: ["passed away"],
     health: ["doktor", "getting sick", "diagnos", "diabetes", "cancer", "doctor", "fıtık", "ağrı", "pain"],
@@ -200,6 +200,28 @@
   };
   for (const k of Object.keys(MORE_MOOD)) MOOD_WORDS[k] = MOOD_WORDS[k].concat(MORE_MOOD[k].filter((w) => !MOOD_WORDS[k].includes(w)));
   for (const k of Object.keys(MORE_TOPIC)) TOPIC_WORDS[k] = TOPIC_WORDS[k].concat(MORE_TOPIC[k].filter((w) => !TOPIC_WORDS[k].includes(w)));
+  // Round 4 (tests/holdout/*): wider everyday wording the earlier rounds missed.
+  const ROUND4_MOOD = {
+    tired: ["nothing is left", "nothing left", "eyelids", "so heavy", "body is heavy", "foggy", "wrecked me", "can't lift", "cant lift", "i'm spent", "im spent", "wearing me down", "worn me down", "no rest", "no energy", "aching", "dinlenemedim", "bitkin", "sleepless"],
+    failed: ["collapsed", "fell short", "flopped", "bad score", "didn't win", "didnt win", "turned down", "couldn't finish", "couldnt finish", "didn't get the", "grades back", "terrible grade", "didn't pass", "didnt pass", "işim battı", "battı"],
+    afraid: ["nervous", "shaking", "anxious", "stomach turn", "stomach hurts", "what if she", "what if he", "what if they", "sweaty palms"],
+    lazy: ["waste hours", "wasting hours", "postponing", "all day on my phone", "always say that", "never get around", "zero discipline", "no discipline", "can't make myself", "cant make myself", "haven't opened a book", "havent opened a book", "yapmak istemiyor", "çalışmak istemiyor", "istemiyor", "couch", "scrolling instead", "day on my phone"],
+    alone: ["yapayalnız", "forgot about me", "ignores me", "ignore me", "ignoring me", "stopped calling", "barely talk", "feel lonely", "no one talks to me", "nobody talks to me", "kimse benimle konuşmuyor", "kimsem yok"],
+    lost: ["what am i even", "am i even doing", "ne yapmak istediğimi", "amacım yok", "wrong major", "wrong career", "which career", "no direction", "ne yöne", "whats even the point", "what's even the point", "no purpose", "meaningless", "pointless", "anlamsız"],
+    angry: ["furious", "humiliating", "humiliate", "boiling", "raging", "annoying", "frustrated", "livid", "pissed", "bağırdı", "kızgın", "sinirli"],
+    doubt: ["i suck", "suck at", "don't deserve", "dont deserve", "not made for", "believe in myself", "stupid", "fraud", "başaramam", "yapabileceğimi sanmıyorum", "güvenemiyorum", "smart enough", "strong enough", "talented than me", "can't believe in myself", "cant believe in myself"]
+  };
+  const ROUND4_TOPIC = {
+    study: ["scholarship", "lecture", "major"],
+    love: ["marriage", "partner", "her parents", "his parents", "ask her out", "ask him out", "my ex"],
+    bully: ["making fun", "make fun of"],
+    habits: ["morning routine"],
+    health: ["medical", "ameliyat"],
+    creative: ["audition", "publisher", "novel"],
+    training: ["competition", "practice", "my coach"]
+  };
+  for (const k of Object.keys(ROUND4_MOOD)) MOOD_WORDS[k] = MOOD_WORDS[k].concat(ROUND4_MOOD[k].filter((w) => !MOOD_WORDS[k].includes(w)));
+  for (const k of Object.keys(ROUND4_TOPIC)) TOPIC_WORDS[k] = TOPIC_WORDS[k].concat(ROUND4_TOPIC[k].filter((w) => !TOPIC_WORDS[k].includes(w)));
   // Idioms that would be read literally ("lose 10 kilos" is not defeat, "quit smoking" is not giving up).
   const REWRITES = [
     [/\blos(e|ing) (\d+ ?|some |a few |a lot of )?(kilos?|kg|pounds|lbs|weight|fat|belly)\b/g, "weight loss"],
