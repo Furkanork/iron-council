@@ -110,7 +110,7 @@
 
   // Pools a Turkish line set may hold (all optional).
   const TR_LIST_POOLS = ["openers", "principles", "closers", "again", "pivots", "gentle", "hard", "heard", "bondWarm", "bondCold"];
-  const TR_GROUP_POOLS = ["counsel", "topics", "about", "opinions", "intents", "askBack"];
+  const TR_GROUP_POOLS = ["counsel", "topics", "about", "opinions", "intents", "askBack", "combos"];
 
   // ---------- merge the training pack into the dossiers ----------
   const PACK = window.TRAINING_PACK || {};
@@ -132,6 +132,8 @@
     // Lines for memory, the daily oath and the council ("{name}", "{topic}", "{goal}", "{oath}" are filled in).
     for (const k of ["recall", "goalAsk", "oathTake", "oathKept", "oathBroken", "agree", "disagree", "stories", "gentle", "hard", "bondWarm", "bondCold", "bondUp", "heard", "pro", "con", "journal"]) c[k] = uniq(p[k] || []);
     c.askBack = p.askBack || {};
+    // Lines written for one feeling + one topic together, keyed "feeling+topic" (e.g. "afraid+study").
+    c.combos = {}; for (const k of Object.keys(p.combos || {})) c.combos[k] = uniq(p.combos[k]);
     // Turkish lines (pack key "tr"), same shape as the English pools. Any pool left out falls back to English.
     const t = p.tr || {};
     const lists = {}; for (const k of TR_LIST_POOLS) lists[k] = uniq(t[k] || []);
@@ -624,7 +626,16 @@
     else if (grief) { if (char.gentle.length && chance(0.5)) add(P("gentle")); }
     else if (again && char.again && char.again.length) add(P("again"));
     else if (chance(0.45)) add(P("openers"));
-    if (topicPool.length) {
+    // A line written for exactly this feeling + topic beats joining a feeling line and a topic line.
+    const comboKey = mood !== "general" && topic ? mood + "+" + topic : null;
+    const comboPool = comboKey ? full(pickPool(char.combos[comboKey] || [], trg("combos", comboKey))) : [];
+    let usedCombo = false;
+    if (comboPool.length && !grief && chance(0.85)) {
+      usedCombo = true;
+      add(comboPool);
+      if (comboPool.length > 2 && chance(0.35)) add(comboPool);
+      else if (chance(0.5)) add(principlePool);
+    } else if (topicPool.length) {
       add(topicPool);
       if (grief && ["lazy", "failed", "doubt", "angry"].includes(mood)) add(topicPool);
       else if (mood !== "general") add(moodPool); else if (chance(0.6)) add(principlePool);
@@ -645,7 +656,7 @@
     if (!asked && !grief && !(light && parts.length >= 2)) add(hard ? P("hard") : P("closers")); // no battle-cry ending after a loss
 
     saveRecent(char.id);
-    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone, asked, intensity, lang: T ? "tr" : "en" };
+    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone, asked, intensity, combo: usedCombo ? comboKey : null, lang: T ? "tr" : "en" };
   }
 
   const SHORT = { ataturk: "Atatürk", atsiz: "Atsız", musashi: "Musashi", swordsman: "the Swordsman", nietzsche: "Nietzsche", rumi: "Rumi", tesla: "Tesla", genghis: "Genghis", hannibal: "Hannibal", napoleon: "Napoleon", bilge: "Bilge" };
