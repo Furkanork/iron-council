@@ -9675,6 +9675,86 @@ IRON_TRAIN("vlad", { combos: {
   };
   for (const k of Object.keys(ROUND4_MOOD)) MOOD_WORDS[k] = MOOD_WORDS[k].concat(ROUND4_MOOD[k].filter((w) => !MOOD_WORDS[k].includes(w)));
   for (const k of Object.keys(ROUND4_TOPIC)) TOPIC_WORDS[k] = TOPIC_WORDS[k].concat(ROUND4_TOPIC[k].filter((w) => !TOPIC_WORDS[k].includes(w)));
+  // Round 5: broader everyday vocabulary (synonyms and phrasings, English + Turkish), written after the first blind measurement.
+  const ROUND5_MOOD = {
+    tired: ["fried", "mush", "jelly", "knackered", "shattered", "running on empty", "running on fumes", "nothing in the tank", "dead on my feet", "dead tired", "bone tired", "can barely keep", "can't keep my eyes", "cant keep my eyes", "eyes open", "derman kalmadı", "derman", "halsiz", "mecalim", "uykusuzluk", "kafam çalışmıyor"],
+    failed: ["bomb", "flunk", "screwed up", "messed up", "mess up", "went bust", "went under", "bankrupt", "turned me down", "rejected me", "not picked", "wasn't picked", "wasnt picked", "didn't make the", "didnt make the", "had to quit", "berbat ettim", "batırdım", "rezil oldum", "düşük aldım", "çuvalladım", "kaldım", "elendim", "seçilmedim", "başaramadım"],
+    afraid: ["dread", "panic", "terrif", "hands shake", "hands are shaking", "can't think about anything else", "cant think about anything else", "freak", "scared", "what if i", "what if", "nervous wreck", "midem bulan", "ödüm kop", "içim içimi", "içim kıpır", "korkudan", "titriyorum", "ürküyorum", "tedirgin", "endişeli"],
+    lazy: ["putting off", "put off", "putting it off", "keep putting", "lying here", "lying in bed", "lying around", "off the couch", "can't be bothered", "cant be bothered", "can't be arsed", "watch tv", "watching tv", "doing nothing", "do nothing", "don't do anything", "dont do anything", "hiçbir şey yapmıyorum", "elimden düşmüyor", "son güne", "son dakikaya", "erteliyorum", "ertele", "tembel", "üşeniyorum", "üşendim", "kıpırdayamıyorum"],
+    alone: ["don't know anyone", "dont know anyone", "don't know a single", "dont know a single", "know nobody", "home alone", "by myself", "on my own", "no one calls", "nobody calls", "nobody texts", "no one texts", "nobody texts me", "no one invites", "nobody invites", "single for years", "still single", "all alone", "so quiet", "aramıyor", "kimse beni", "kimse yok", "tek başımayım", "yalnızım", "yapayalnız", "yalnızlık", "uzak bir şehir"],
+    lost: ["no clue", "no idea", "clueless", "drifting", "which way", "don't know what to do with", "dont know what to do with", "what to do with my", "what's the point", "whats the point", "point of any", "no direction", "kafam karışık", "kafam karisik", "ne yapacağımı bilmiyorum", "ne yapmak istediğimi", "yolumu kaybettim", "yön", "amaçsız", "boşlukta"],
+    angry: ["seething", "could scream", "want to scream", "so mad", "mad at", "can't stand", "cant stand", "sick of", "fed up", "livid", "furious", "took credit", "keeps my deposit", "çıldıracağım", "delirdim", "deli oluyorum", "kızgınım", "öfkeliyim", "sinirliyim", "bağırdı", "çileden", "tepem attı"],
+    doubt: ["second-guess", "second guess", "second-guessing", "cut out for", "smart enough", "good enough", "talented enough", "capable enough", "not sure i can", "not sure if i can", "am i really", "wonder if i", "maybe i'm not", "maybe im not", "başarabilir miyim", "yapabilir miyim", "acaba", "emin değilim", "doğru kararı mı", "yeterli miyim", "yetersiz", "kendimden şüphe"]
+  };
+  const ROUND5_TOPIC = {
+    money: ["tax", "taxes", "deposit", "landlord", "loan", "budget", "budgeting", "mortgage", "invoice", "income", "expenses", "wage", "paycheck", "paycheque", "vergi", "kredi", "faiz", "fatura", "gelir", "harcama", "bütçe"],
+    friends: ["party", "parties", "texts me", "text me", "call me", "invite me", "invited", "don't know a single", "dont know a single", "know anyone", "make friends", "making friends", "social life", "aramıyor", "arıyor", "buluşma", "arkadaş"],
+    love: ["single", "ex ", "new guy", "new girl", "left him", "left her", "leave him", "leave her", "fighting every day", "fighting all the time", "we fight", "my girl", "my guy", "fiancé", "fiancee", "dating", "date ", "sevgili", "sevgilim", "eşim", "ayrıldık", "ayrılık", "flört"],
+    study: ["degree", "homework", "essay", "thesis", "semester", "grades", "gpa", "assignment", "professor", "lecturer", "tutor", "ödev", "tez", "vize", "final", "okul", "bölüm", "ders"],
+    work: ["career", "job offer", "job offers", "offer", "resume", "cv ", "salary negotiation", "new job", "quit my job", "meetings", "deadline", "kariyer", "toplantı", "mülakat", "patron", "maaş zam"],
+    training: ["in shape", "get fit", "get back in", "fitness", "lift", "lifting", "run ", "running", "jog", "weights", "leg day", "squat", "formda", "form tutmak", "kilo vermek", "koşu", "fitness", "idman"],
+    time: ["manage my time", "managing my time", "time management", "waste time", "wasting time", "no time", "zaman yönetimi", "zamanım yok", "vaktim yok", "zaman"],
+    bully: ["rumour", "rumours", "rumor", "rumors", "spreading", "push me around", "pushing me around", "pushes me around", "pushed me", "shoves me", "calls me names", "name calling", "harass", "harassment", "alay ediyor", "dalga geç", "zorbalık", "itip kakı", "lakap"],
+    creative: ["podcast", "channel", "blog", "story", "poem", "poetry", "sketch", "photography", "photo", "paint", "album", "band ", "singing", "dance", "dancing", "start drawing", "youtube channel", "resim yapmak", "şiir", "şarkı", "müzik", "yazmak"],
+    habits: ["junk", "eating junk", "snack", "snacking", "midnight snack", "late night eating", "overeat", "fast food", "quit smoking", "nail biting", "alışkanlık", "atıştır", "abur cubur", "sigara"],
+    health: ["knee", "ankle", "shoulder", "headache", "migraine", "sore knee", "doctor", "dentist", "check-up", "checkup", "biopsy", "test results", "diagnosis", "treatment", "cancer", "diş", "ağrı", "doktor", "tahlil", "tedavi"],
+    decision: ["which way", "wise to", "is it wise", "worth it", "weigh", "pros and cons", "torn between", "karar veremiyorum", "karar vermem", "doğru kararı", "hangisini", "ne yapmalıyım ", "seçmek"],
+    sleep: ["awake", "can't sleep", "cant sleep", "up all night", "3am", "4am", "bed time", "bedtime", "nap", "uyku", "uyuyamıyorum", "uykusuz"],
+    phone: ["screen time", "doomscroll", "notifications", "my phone", "ekran süresi", "telefon"],
+    envy: ["have it together", "kıskan"]
+  };
+  for (const k of Object.keys(ROUND5_MOOD)) MOOD_WORDS[k] = MOOD_WORDS[k].concat(ROUND5_MOOD[k].filter((w) => !MOOD_WORDS[k].includes(w)));
+  for (const k of Object.keys(ROUND5_TOPIC)) TOPIC_WORDS[k] = TOPIC_WORDS[k].concat(ROUND5_TOPIC[k].filter((w) => !TOPIC_WORDS[k].includes(w)));
+  // Round 6: more word families, added after the second blind measurement (holdout 6: 51% before round 5, 54% after).
+  const ROUND6_MOOD = {
+    doubt: ["do i really", "what it takes", "capable", "i question", "question whether", "questioning myself", "my work is garbage", "my work is trash", "my work is bad", "is garbage", "is trash", "am i good", "deserve this", "gücüm yeter", "yeter mi", "layık mıyım", "hak ediyor muyum", "yapabilecek miyim", "becerebilir miyim"],
+    lazy: ["just don't do it", "just dont do it", "don't do it", "dont do it", "never do it", "vakit öldür", "boşa harcadım", "waste the day", "wasted the day", "been meaning to", "meaning to", "keep meaning", "still haven't touched", "still havent touched", "haven't touched", "havent touched", "instead of working", "instead of studying", "instead of doing"],
+    alone: ["invite me", "invites me", "invite anyone", "never invite", "missed me", "miss me", "empty flat", "empty apartment", "empty house", "tanıdığım kimse", "tek başıma", "invisible", "nobody notices", "no one notices", "no one cares", "nobody cares", "kimse yok", "kimsesiz"],
+    lost: ["can't figure", "cant figure", "figure it out", "stay or leave", "stay or go", "going through the motions", "autopilot", "ne yöne", "hangi yöne", "kayboldum", "bocalıyorum"],
+    angry: ["disrespect", "hidden fees", "charged me", "overcharged", "lied to me", "cheated on", "cheated me", "steal my", "stealing my", "aldat", "yalan söyledi", "sick of it", "sick of this"],
+    afraid: ["knot in my stomach", "pit in my stomach", "scared of losing", "afraid of losing", "frightened", "ellerim titr", "yanlış seçim", "yanlış karar"],
+    tired: ["dragging through", "dragging myself", "head is empty", "my head is empty", "killing me", "nothing left", "kapanıyor", "enerjim yok", "gözlerim kapan"]
+  };
+  const ROUND6_TOPIC = {
+    money: ["fees", "bank", "charged", "save money", "saving money", "saving", "tasarruf", "birikim", "invest", "investment", "salary"],
+    time: ["plan my week", "my week", "weekly plan", "schedule", "planning my", "organize my", "planner", "agenda", "haftamı", "programımı"],
+    grief: ["buried", "burial", "my dog died", "my cat died", "pet died", "put down", "passed on", "cenaze", "defnet", "toprağa", "kaybettim babamı", "vefat"],
+    sleep: ["hours of sleep", "hours should i sleep", "uyumalıyım", "kaç saat uyu", "slept badly", "bad sleep", "sleeping badly"],
+    envy: ["bought a house", "bought a car", "feel behind", "geride kaldım", "everyone is ahead", "better than me", "success of"],
+    work: ["promoted", "promotion", "got a raise", "raise", "terfi", "hospital shift", "shifts"],
+    habits: ["nails", "biting", "start waking up", "waking up at", "wake up at", "wake up earlier", "six am", "6am", "5am", "erken kalkmak"],
+    decision: ["stay or leave", "stay or go", "accept the offer", "take the offer", "offer in", "karar ver"],
+    study: ["thesis", "entrance exam", "driving test", "licence test", "license test"],
+    creative: ["guitar", "novel", "publisher", "paint", "learn to code", "learn to paint"],
+    love: ["love her", "love him", "losing her", "losing him", "together", "move in", "argue", "girlfriend", "partner"],
+    training: ["race", "run", "running", "training"]
+  };
+  for (const k of Object.keys(ROUND6_MOOD)) MOOD_WORDS[k] = MOOD_WORDS[k].concat(ROUND6_MOOD[k].filter((w) => !MOOD_WORDS[k].includes(w)));
+  for (const k of Object.keys(ROUND6_TOPIC)) TOPIC_WORDS[k] = TOPIC_WORDS[k].concat(ROUND6_TOPIC[k].filter((w) => !TOPIC_WORDS[k].includes(w)));
+  // Round 7: bare topic nouns and a few more feeling phrases, added after the third blind measurement (holdout 7: 60%).
+  const ROUND7_MOOD = {
+    alone: ["nobody to call", "no one to call", "someone to come home", "come home to", "nobody to talk to", "no one to talk to", "nobody to turn to", "no one to turn to", "no one to love", "lonely at night"],
+    doubt: ["not convinced", "unsure whether", "unsure if", "talent at all", "have any talent", "do i even deserve", "deserve to be happy", "keep up", "kendime güvenim", "güvenim kalmadı", "can't keep up", "cant keep up"],
+    angry: ["people lying", "lying to me", "never pays back", "never pay back", "won't fix", "wont fix", "raging", "boiling", "mocking", "haksızlık", "haksız", "borrowing money", "i'm done with", "im done with", "so annoyed", "annoyed at"],
+    afraid: ["having a panic", "panic about", "panic attack"],
+    lost: ["can't decide", "cant decide", "decide between", "choose between", "directionless", "what even is my", "purpose in life", "supposed to be doing"]
+  };
+  const ROUND7_TOPIC = {
+    faith: ["faith", "god", "prayer", "religion", "spiritual", "allah", "believe in god", "soul", "inanç", "tanrı", "namaz", "ibadet"],
+    health: ["health", "healthy", "sore back", "back pain", "illness", "symptoms", "blood pressure", "heart", "chest pain", "sağlık", "ağrı"],
+    time: ["starting over", "start over", "at my age"],
+    habits: ["routine", "daily routine", "start a daily", "daily habit", "quit smoking", "alışkanlık", "rutin"],
+    bully: ["corners me", "cornered", "mocking", "mock me", "boys at school", "gang", "threatens me", "threaten me", "after school", "alay"],
+    decision: ["decide between", "choose between", "between two", "can't decide", "cant decide", "which university", "which offer", "which one", "karar veremiyorum"],
+    love: ["miss having someone", "someone to come home to", "come home to", "no one to love", "kız arkadaş", "erkek arkadaş", "aşk"],
+    friends: ["nobody to call", "no one to call", "nobody to hang", "roommate", "flatmate", "housemate", "arkadaşlarım"],
+    study: ["school", "course", "class", "okul", "sınav haftası", "final"],
+    creative: ["talent", "novel", "writing a", "started writing", "yetenek"],
+    money: ["money", "pay ", "paid", "owe", "afford", "borrow", "lend", "price", "expensive", "para", "biriktir"],
+    work: ["job", "work", "boss", "manager", "coworker", "işe", "iş "]
+  };
+  for (const k of Object.keys(ROUND7_MOOD)) MOOD_WORDS[k] = MOOD_WORDS[k].concat(ROUND7_MOOD[k].filter((w) => !MOOD_WORDS[k].includes(w)));
+  for (const k of Object.keys(ROUND7_TOPIC)) TOPIC_WORDS[k] = TOPIC_WORDS[k].concat(ROUND7_TOPIC[k].filter((w) => !TOPIC_WORDS[k].includes(w)));
   // Idioms that would be read literally ("lose 10 kilos" is not defeat, "quit smoking" is not giving up).
   const REWRITES = [
     [/\blos(e|ing) (\d+ ?|some |a few |a lot of )?(kilos?|kg|pounds|lbs|weight|fat|belly)\b/g, "weight loss"],
