@@ -1,6 +1,6 @@
 // Offline support. Online: always fetch the newest files (and keep a copy).
 // Offline: serve the last copy, so the app opens with no connection.
-const CACHE = "iron-council-v4";
+const CACHE = "iron-council-v5";
 
 self.addEventListener("install", (e) => {
   e.waitUntil((async () => {
@@ -10,6 +10,8 @@ self.addEventListener("install", (e) => {
     const html = await res.clone().text();
     await cache.put("./", res);
     const urls = [...html.matchAll(/(?:src|href)="([^"#:]+)"/g)].map((m) => m[1]);
+    // fonts named inside css/fonts.css
+    try { const fc = await (await fetch("css/fonts.css", { cache: "no-cache" })).text(); for (const m of fc.matchAll(/url\(\.\.\/([^)]+)\)/g)) urls.push(m[1]); } catch {}
     await Promise.all(["manifest.webmanifest", "favicon.svg", ...urls].map((u) =>
       fetch(u, { cache: "no-cache" }).then((r) => r.ok && cache.put(u, r)).catch(() => {})));
     self.skipWaiting();

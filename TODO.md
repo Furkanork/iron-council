@@ -32,7 +32,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
   - `.github/workflows/checks.yml` runs run.js (baseline of 8 known misses via `MAX_MISSES=8`; new `MAX_MISSES` env var in tests/run.js), content.js and smoke.js on every push/PR. Not yet seen running on GitHub (couldn't trigger from here): check the Actions tab after merging.
 - [x] **0.4 One file instead of 130** (M). The page loads ~130 separate script files. `tools/bundle.js` joins them into one `js/bundle.js` (re-run after each content change), so the site loads much faster on a phone, especially the first time. (2026-11-25)
   - `tools/bundle.js` joins 40 files into `js/bundle.js` (941 KB; page now loads 2 scripts instead of ~41). Verified TRAINING_PACK, CHARACTERS and CAMPAIGNS are identical (JSON hash) before and after. index.html and eval.html use it; tests/content.js uses the same source list; wire.js now just calls bundle.js; CI fails if the bundle is stale; cache bumped to v18 / sw v4. Smoke 227/227, content OK.
-- [ ] **0.5 Fonts stored with the site** (S). Keep the two fonts in the project instead of loading them from Google, so the app looks the same offline and loads faster.
+- [x] **0.5 Fonts stored with the site** (S). Keep the two fonts in the project instead of loading them from Google, so the app looks the same offline and loads faster. (2026-11-25)
+  - 6 woff2 files (≈290 KB, variable fonts so weights share a file) in fonts/, css/fonts.css, Google links removed; the service worker precaches them. Checked in Chromium that the fonts load from disk; smoke 227/227.
 
 ## Phase 1 — Understanding you better
 
@@ -112,3 +113,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 0.2 done: tests/content.js (all 18 members complete; 351 duplicate-line warnings to clean up later).
 - 2026-11-25 — 0.3 done: GitHub Actions workflow added (untested on GitHub itself).
 - 2026-11-25 — 0.4 done: js/bundle.js (remember `node tools/bundle.js` after editing any js file).
+- 2026-11-25 — 0.5 done: fonts stored locally. Phase 0 complete.
