@@ -45,7 +45,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
   - js/tr-<id>.js for the six, 74 lines each, same layout as 1.2 (the Swordsman's lines are deliberately terse). Worth a native read-through for tone. run.js 355/363, lang OK, smoke OK.
 - [x] **1.4 Turkish answers: Leonidas, Hannibal, Joan, Napoleon, Nietzsche, Tesla** (L). Same as 1.2. (2026-11-25)
   - js/tr-<id>.js for the six, 74 lines each (Leonidas terse). All 18 members now have Turkish lines for feelings/topics/greetings. Worth a native read-through. Tests unchanged and passing (content.js now also checks Turkish lines for empties/English/tokens).
-- [ ] **1.5 Turkish answers for personal questions** (L). "Korkun var mı?", "Pişman mısın?" and the rest get Turkish answers about themselves, plus opinions of each other in Turkish.
+- [x] **1.5 Turkish answers for personal questions** (L). "Korkun var mı?", "Pişman mısın?" and the rest get Turkish answers about themselves, plus opinions of each other in Turkish. (2026-11-25)
+  - js/tr2-<id>.js for all 18: one Turkish answer for each of the 17 personal subjects + general, and an opinion of each of the other 17 (612 lines). Engine: Turkish phrasings like "Zayıf yönün ne?", "Gurur duyduğun şey ne?", "Neye inanıyorsun?" are now recognised. One line per slot for now, so Turkish answers repeat sooner than the English ones; more lines per slot can be added to the same files. Needs a native read-through, especially the opinions. content.js now checks Turkish coverage; smoke 335/335.
 - [ ] **1.6 Follow-up messages** (M). Understand short replies that only make sense after the last answer, like "why?", "how?", "I tried that", "it didn't work", "yes / no", "neden?", "nasıl?", "denedim". The member answers the follow-up instead of starting over.
 - [ ] **1.7 How strong the feeling is** (S). Tell "a bit tired" from "I can't go on". A heavy message gets a steadier, more serious answer; a light one gets a lighter push.
 - [ ] **1.8 Feeling + topic answers** (L). Lines written for the 20 most common combinations, like "afraid + exam", "tired + work", "failed + love", "lazy + gym", instead of joining a feeling line and a topic line.
@@ -122,3 +123,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 1.2 done: Turkish lines for Mehmed, Atatürk, Atsız, Bilge, Timur, Rumi.
 - 2026-11-25 — 1.3 done: Turkish lines for Vlad, Genghis, Attila, Musashi, Marcus, the Swordsman.
 - 2026-11-25 — 1.4 done: Turkish lines for Leonidas, Hannibal, Joan, Napoleon, Nietzsche, Tesla.
+- 2026-11-25 — 1.5 done: Turkish personal answers + opinions for all 18.

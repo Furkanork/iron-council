@@ -52,7 +52,11 @@ for (const c of CH) {
   // Turkish lines (optional, written member by member): checked for empties and leftover tokens, and counted.
   row.tr = 0;
   const walk = (where, v) => { if (Array.isArray(v)) { for (const l of v) { if (typeof l !== "string" || !l.trim()) bad(c.id, `Turkish ${where} has an empty line`); else if (TOKEN.test(l.replace(/\{(name|goal|oath|topic|focus)\}/g, ""))) bad(c.id, `Turkish ${where} has a leftover token: "${l.slice(0, 50)}"`); else if (/(?<![\p{L}])(the|and|you|your|is|are|with|that|this|not)(?![\p{L}])/iu.test(l)) bad(c.id, `Turkish ${where} line does not look Turkish: "${l.slice(0, 50)}"`); row.tr++; } } else if (v && typeof v === "object") for (const k of Object.keys(v)) walk(where + "." + k, v[k]); };
-  if (c.tr) walk("tr", c.tr);
+  if (c.tr) {
+    walk("tr", c.tr);
+    for (const a of E.ABOUT_KEYS.concat("general")) if (!((c.tr.about || {})[a] || []).length) bad(c.id, `Turkish about "${a}" missing`);
+    for (const o of CH) if (o.id !== c.id && !((c.tr.opinions || {})[o.id] || []).length) bad(c.id, `Turkish opinion of ${o.id} missing`);
+  }
   rows.push(row);
 }
 

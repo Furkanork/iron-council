@@ -49,7 +49,7 @@ const ok = (c, where, what) => { checks++; if (!c) fail(where, what); };
   where = "hall"; await go("#/"); await checkPage("hall");
 
   // chat with every member
-  const msgs = ["I am afraid I will fail my exam", "I feel tired and lazy, I can't start working", "sınavdan korkuyorum, çok yorgunum"];
+  const msgs = ["I am afraid I will fail my exam", "I feel tired and lazy, I can't start working", "sınavdan korkuyorum, çok yorgunum", "Korkun var mı?", "Napolyon hakkında ne düşünüyorsun?"];
   for (const id of ids) {
     await go("#/c/" + id);
     await page.waitForSelector("#q", { timeout: 5000 }).catch(() => fail("chat " + id, "no message box"));

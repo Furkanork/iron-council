@@ -35,7 +35,7 @@ Open https://furkanork.github.io/iron-council/ on the phone, then:
 It gets its own icon, opens full-screen like an app, and works offline after the first visit. Your chats and oaths are kept on that phone; use **Saved → Backup** to move them between devices.
 
 ## Turkish answers
-The engine detects whether a message is Turkish (`Engine.detectLang`: Turkish letters, common words and endings; English is the default when unsure, and Turkish typed without Turkish letters is recognised too). A member's Turkish lines live in the `tr` key of his training pack, with the same shape as the English pools (`counsel`, `topics`, `about`, `opinions`, `intents`, `askBack`, `openers`, `principles`, `closers`, `again`, `pivots`, `gentle`, `hard`, `heard`, `bondWarm`, `bondCold`). A Turkish message uses a Turkish pool when it has lines and falls back to the English pool when it doesn't, so members can be translated pool by pool. The safety message is also answered in Turkish. Council reactions, oaths, stories and journal replies are still English-only (see TODO 1.2–1.5).
+The engine detects whether a message is Turkish (`Engine.detectLang`: Turkish letters, common words and endings; English is the default when unsure, and Turkish typed without Turkish letters is recognised too). A member's Turkish lines live in the `tr` key of his training pack, with the same shape as the English pools (`counsel`, `topics`, `about`, `opinions`, `intents`, `askBack`, `openers`, `principles`, `closers`, `again`, `pivots`, `gentle`, `hard`, `heard`, `bondWarm`, `bondCold`). A Turkish message uses a Turkish pool when it has lines and falls back to the English pool when it doesn't, so members can be translated pool by pool. The safety message is also answered in Turkish. Council reactions, oaths, stories and journal replies are still English-only.
 
 ## How it works
 No AI and no server. Every character has a hand-written dossier of ~250 lines. A small engine reads the feeling, life topic and kind of question in your message and composes a fresh answer instantly. Real quotes are marked **sourced** or **attributed**; everything else is written in the spirit of the figure.
@@ -48,7 +48,7 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/bundle.js` — GENERATED single file (all of the files below except app.js) that the page loads. After changing any of them run `node tools/bundle.js` (also run by CI check: a stale bundle fails it). Cache version in index.html/eval.html is bumped with `?v=`.
 - `js/characters.js`, `js/c-*.js` — character dossiers
 - `js/training-pack*.js` — first training rounds
-- `js/tr-<id>.js` — a member's Turkish lines (`tr` key of his pack); written so far for all 18 members (feelings, topics, openers, principles, closers, greetings); still English-only: the 'ask about him' answers and opinions of each other (task 1.5)
+- `js/tr-<id>.js` — a member's Turkish lines (`tr` key of his pack); written so far for all 18 members (feelings, topics, openers, principles, closers, greetings); `tr2-<id>.js` adds the answers about himself (feelings, fears, regrets, love, death…) and his opinion of each other member
 - `js/train-<id>.js` — one merged training file per character (rounds 3–7 and council opinions); new files are picked up by `node tools/bundle.js` automatically
 - `js/engine.js` — reads messages and composes answers
 - `js/app.js` — the interface
