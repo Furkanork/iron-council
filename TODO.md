@@ -74,7 +74,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
 
 - [x] **3.1 Mood calendar** (M). A page showing how you've felt day by day (from chats and the journal), with your oath streak alongside. All on your device. (2026-11-25)
   - New Mood page (#/mood, in the nav): month grid, colour per day = most frequent feeling, ✓/✗/• for oaths, streak + oaths kept, tap-a-day detail, monthly totals. Chat messages now log their feeling per day (old chats had no dates, so history starts today; Journal entries are used retroactively). Checked at 375px (no overflow), added to the smoke test.
-- [ ] **3.2 Share an answer as a picture** (M). Turn any answer into a quote card image (member's colour, emblem, the words) to save or send from your phone.
+- [x] **3.2 Share an answer as a picture** (M). Turn any answer into a quote card image (member's colour, emblem, the words) to save or send from your phone. (2026-11-25)
+  - ▣ Picture button in the chat answer tools: canvas card with colour wash, emblem, the answer (text size shrinks to fit), name/title, and a note that it is written in the spirit of the figure. Uses the Web Share API with a file where the phone supports it, otherwise downloads the PNG. Tested the download and looked at the image in Chromium; the share sheet itself could not be tested here. Chat only for now (not Council/Journal).
 - [ ] 🔒 **3.3 Read aloud** (S). A ▶ button that reads an answer aloud with the phone's built-in voice, so nothing extra is needed. **Do you want this?**
 - [ ] **3.4 Settings page** (M). Default tone, text size, reduce animations, language, and a "delete everything" button, all in one place.
 - [ ] **3.5 Search** (S). Search your saved conversations and journal.
@@ -148,3 +149,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 2.4 done: 12 new Council pairs.
 - 2026-11-25 — 2.5 done: drawn emblems replace monograms.
 - 2026-11-25 — 3.1 done: mood calendar page.
+- 2026-11-25 — 3.2 done: share an answer as a quote-card picture.

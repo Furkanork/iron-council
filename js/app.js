@@ -103,6 +103,48 @@
     store(MKEY, m);
   }
 
+  // ---------- share an answer as a picture ----------
+  // Draws a quote card (member's colour, emblem, the words) on a canvas and shares it as a PNG, or downloads it.
+  function wrapLines(ctx2, text, maxW) {
+    const words = text.split(/\s+/), lines = []; let cur = "";
+    for (const w of words) { const t = cur ? cur + " " + w : w; if (ctx2.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+    if (cur) lines.push(cur); return lines;
+  }
+  async function quoteCard(c, text, btn) {
+    try {
+      if (btn) btn.disabled = true;
+      try { await Promise.all([document.fonts.load('700 40px "Cinzel"'), document.fonts.load('italic 400 40px "EB Garamond"'), document.fonts.load('400 40px "EB Garamond"')]); } catch (e) { /* fonts optional */ }
+      const W = 1080, H = 1350, M = 96, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+      const g = cv.getContext("2d");
+      g.fillStyle = "#0b0b0e"; g.fillRect(0, 0, W, H);
+      const grad = g.createRadialGradient(W / 2, 260, 40, W / 2, 260, 900); grad.addColorStop(0, c.color + "40"); grad.addColorStop(1, "#0b0b0e00"); g.fillStyle = grad; g.fillRect(0, 0, W, H);
+      g.fillStyle = c.color; g.fillRect(0, 0, W, 14);
+      const svg = (window.EMBLEMS || {})[c.id];
+      if (svg) {
+        const markup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="160" height="160">${svg}</svg>`.replace(/currentColor/g, c.color);
+        const img = new Image(); await new Promise((res) => { img.onload = res; img.onerror = res; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(markup); });
+        g.drawImage(img, W / 2 - 80, 110, 160, 160);
+      }
+      const clean = text.replace(/\s+/g, " ").trim();
+      let size = 56, lines;
+      for (; size >= 30; size -= 2) { g.font = `italic 400 ${size}px "EB Garamond", Georgia, serif`; lines = wrapLines(g, clean, W - 2 * M); if (lines.length * size * 1.32 <= 700) break; }
+      const lh = size * 1.32, top = 330 + (700 - lines.length * lh) / 2;
+      g.fillStyle = "#efeae0"; g.textAlign = "center"; g.textBaseline = "top";
+      lines.forEach((ln, i) => g.fillText(ln, W / 2, top + i * lh));
+      g.fillStyle = c.color; g.font = '700 46px "Cinzel", Georgia, serif'; g.fillText("— " + c.name.toUpperCase(), W / 2, 1090);
+      g.fillStyle = "#8d8a84"; g.font = '400 30px "EB Garamond", Georgia, serif'; g.fillText(c.title + " · " + c.era, W / 2, 1156);
+      g.fillStyle = "#5d5b57"; g.font = '700 26px "Cinzel", Georgia, serif'; g.fillText("THE IRON COUNCIL", W / 2, 1262);
+      g.fillStyle = "#4a4a50"; g.font = '400 22px "EB Garamond", Georgia, serif'; g.fillText("Written in the spirit of the figure, not a real quote.", W / 2, 1300);
+      const blob = await new Promise((res) => cv.toBlob(res, "image/png"));
+      if (!blob) return toast("Could not make the picture.");
+      const file = new File([blob], "iron-council-" + c.id + ".png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: c.name }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast("Picture saved.");
+    } catch (e) { toast("Could not make the picture."); } finally { if (btn) btn.disabled = false; }
+  }
+  window.__quoteCard = (id, text) => quoteCard(byId(id), text); // used by the smoke test
+
   // ---------- saved conversations ----------
   const SKEY = "ironcouncil.saved";
   const savedList = () => load(SKEY, []);
@@ -331,7 +373,7 @@
       if (m.role === "user") return `<div class="msg user">${esc(m.content)}</div>`;
       const tag = m.taught ? '<span class="tag">· taught</span>' : m.read ? `<span class="tag">· ${esc(m.read)}</span>` : "";
       const typed = m.q !== undefined && m.q !== E.MOOD_LABELS[m.mood];
-      const tools = !m.pending && !m.crisis && !m.memory && m.q !== undefined ?`<div class="tools"><button data-again="${i}">↻ Another answer</button><button data-keep="${i}">★ Keep as training</button>${typed ? `<button data-fix="${i}">✎ Misread me</button>` : ""}</div>` : "";
+      const tools = !m.pending && !m.crisis && !m.memory && m.q !== undefined ?`<div class="tools"><button data-again="${i}">↻ Another answer</button><button data-keep="${i}">★ Keep as training</button><button data-pic="${i}">▣ Picture</button>${typed ? `<button data-fix="${i}">✎ Misread me</button>` : ""}</div>` : "";
       const opt = (v, label, cur) => `<option value="${v}"${v === (cur || "") ? " selected" : ""}>${esc(label)}</option>`;
       const fix = m.fixing ? `<div class="fix">
           <p>${g(c, "What did you mean? He will read it your way from now on.")}</p>
@@ -405,6 +447,7 @@
     document.getElementById("moods").onclick = (e) => { const m = e.target.dataset.m; if (m) ask("", m); };
     logEl.onclick = (e) => {
       const again = e.target.dataset.again, keep = e.target.dataset.keep, d = e.target.dataset;
+      if (d.pic !== undefined) { const m = log[+d.pic]; if (m && m.content) quoteCard(c, m.content, e.target); return; }
       if (d.fix !== undefined) { log.forEach((m, k) => (m.fixing = k === +d.fix && !m.fixing)); render(false); return; }
       if (d.fixcancel !== undefined) { log[+d.fixcancel].fixing = false; render(false); return; }
       if (d.fixsave !== undefined) {
