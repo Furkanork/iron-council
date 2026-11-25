@@ -15,6 +15,7 @@ function sources() {
     // character files: the original loading order (matters for how packs merge)
     "c-bilge.js", "c-rumi.js", "c-timur.js", "c-leonidas.js", "c-hannibal.js", "c-attila.js", "c-joan.js", "c-napoleon.js", "c-nietzsche.js", "c-tesla.js",
     ...pick(/^train-.*\.js$/),
+    ...pick(/^tr-.*\.js$/),          // Turkish lines (one file per member)
     "engine.js", "campaigns.js", "campaigns-2.js",
   ];
 }

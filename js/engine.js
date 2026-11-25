@@ -444,7 +444,7 @@
     if (isCrisis(text)) return { text: crisisMessage(text), mood: "crisis", crisis: true };
     ctx = ctx || {};
     const lang = ctx.lang || (text ? detectLang(text) : "en");
-    const T = lang === "tr" ? char.tr : null;   // Turkish pools, or null for English
+    let T = lang === "tr" ? char.tr : null;   // Turkish pools, or null for English (also set to null below when the main pool has no Turkish yet, so one answer is never half and half)
     // Use the Turkish pool when it has lines, else the English one.
     const pickPool = (en, trp) => (T && trp && trp.length ? trp : en);
     const trg = (group, key) => (T && T[group] && T[group][key]) || null;
@@ -468,6 +468,7 @@
       // a general "you ...?" question that is really about the user's problem goes to the normal path
       const userProblem = general && (mood !== "general" || topic || detectIntent(text));
       if (!userProblem) {
+        if (T && !((ab.kind === "opinion" ? trg("opinions", ab.target) : trg("about", ab.subject)) || []).length) T = null;
         const pool = ab.kind === "opinion"
           ? pickPool((char.opinions[ab.target] || []).concat(tr.lines["opinion:" + ab.target] || []), trg("opinions", ab.target))
           : full(pickPool((char.about[ab.subject] || []).concat(tr.lines["about:" + ab.subject] || []), trg("about", ab.subject)));
@@ -502,6 +503,8 @@
       if (top.s >= 0.5 && chance(0.85)) return { text: top.e.a, mood, topic, taught: true };
     }
 
+    // The answer is Turkish only if its main pool is: the topic's when there is one, else the feeling's.
+    if (T && !(topic ? (trg("topics", topic) || []).length : (trg("counsel", mood) || trg("counsel", "general") || []).length)) T = null;
     const moodPool = full(pickPool((char.counsel[mood] || char.counsel.general), trg("counsel", mood) || trg("counsel", "general")).concat(tr.lines[mood] || []));
     const topicPool = topic ? full(pickPool(char.topics[topic] || [], trg("topics", topic)).concat(tr.lines["topic:" + topic] || [])) : [];
     const principlePool = pickPool(char.principles, T && T.principles).concat(tr.beliefs || []);
@@ -542,7 +545,7 @@
     if (!asked && !grief) add(hard ? P("hard") : P("closers")); // no battle-cry ending after a loss
 
     saveRecent(char.id);
-    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone, asked, lang };
+    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone, asked, lang: T ? "tr" : "en" };
   }
 
   const SHORT = { ataturk: "Atatürk", atsiz: "Atsız", musashi: "Musashi", swordsman: "the Swordsman", nietzsche: "Nietzsche", rumi: "Rumi", tesla: "Tesla", genghis: "Genghis", hannibal: "Hannibal", napoleon: "Napoleon", bilge: "Bilge" };
