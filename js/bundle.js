@@ -8611,9 +8611,67 @@ window.TRAINING_PACK.vlad.tr.opinions = {
     return subject ? { kind: "about", subject } : { kind: "about", subject: "general" };
   }
   const saysAgain = (text) => { const t = " " + norm(text) + " "; return AGAIN_WORDS.some((w) => matcher(w).test(t)); };
+  // ---------- follow-up messages ("why?", "how?", "I tried that", "yes", "neden?", "nasıl?", "denedim"…) ----------
+  // Only meaningful straight after an answer, and only when the message is short.
+  const FOLLOW = [
+    ["notwork", /(^|\s)(didn'?t work|doesn'?t work|did not work|not working|never works|nothing works|still (the same|nothing|bad|hard|stuck)|didn'?t help|no help|işe yaramadı|yaramadı|olmadı|işe yaramıyor|hâlâ aynı|hala aynı|değişmedi|fayda etmedi)(\s|$)/],
+    ["tried", /(^|\s)(i tried( that| it)?|i already tried|already tried|i did( that| it)|i have tried|denedim|zaten denedim|yaptım|bunu yaptım|denemiştim)(\s|$)/],
+    ["why", /^(but |and |so |ok but )?(why|why not|why is that|why though|how come|what do you mean|explain|explain that|neden|niye|ya neden|neden öyle|neden peki|neden ki|ne demek istiyorsun|açıkla)(\s?\?*)$/],
+    ["how", /^(but |and |so |ok but )?(how|how\?*|how do i|how do i do that|how exactly|how should i|how can i|where do i start|where to start|what should i do|what do i do|nasıl|nasıl yapacağım|nasıl yapayım|nasıl yani|peki nasıl|nereden başlayayım|nereden başlamalıyım|ne yapmalıyım|ne yapayım)(\s?\?*)$/],
+    ["more", /^(tell me more|go on|more|continue|and\??|and then\??|devam et|devam|daha fazla anlat|sonra\??|ya sonra\??)(\s?\?*)$/],
+    ["yes", /^(yes|yeah|yep|yup|ok|okay|sure|alright|i will|i'll try|i'll do it|i can try|i'll start|evet|tamam|olur|yaparım|deneyeceğim|başlayacağım|peki|anladım|haklısın)(\s?[.!]*)$/],
+    ["no", /^(no|nope|nah|not really|i can'?t|i cannot|i don'?t know|i won'?t|hayır|yok|olmaz|yapamam|bilmiyorum|istemiyorum|hiç sanmıyorum)(\s?[.!]*)$/],
+  ];
+  function detectFollowup(text) {
+    const t = norm(text).replace(/[“”"]/g, "");
+    if (!t || t.split(/\s+/).length > 7) return null;
+    for (const [kind, re] of FOLLOW) if (re.test(t)) return kind;
+    return null;
+  }
+  // Short lead-ins by temper (iron / calm / fire) so a follow-up still sounds like him.
+  const FU_LEAD = {
+    en: {
+      why: { iron: ["Because it works.", "Because the alternative is worse.", "Because weakness has a price."], calm: ["Look closer.", "Because it keeps you steady.", "Ask what it costs you otherwise."], fire: ["Because it matters.", "Because you can do better than this.", "Because this is your fight."] },
+      how: { iron: ["Simply.", "Start small, then keep going.", "One step, then the next."], calm: ["Slowly.", "Begin with the smallest piece.", "Breathe, then take one step."], fire: ["Start now.", "Pick one thing and do it today.", "With your own hands, today."] },
+      tried: { iron: ["Then try harder, or change the method.", "Once is not enough.", "How many times? Try again, differently."], calm: ["Then look at what you changed.", "Trying is the start; adjusting is the craft.", "Patience: change one thing and try again."], fire: ["Good. Now do it again, better.", "Trying counts. Do not stop there.", "Then you know what does not work. That is progress."] },
+      notwork: { iron: ["Then the plan was weak. Change the plan, not the goal.", "Then change the method. Never the aim.", "A failed method is information."], calm: ["Then it was the wrong tool. Try another.", "Do not blame yourself; adjust.", "Then look at it from another side."], fire: ["Then try a harder road. Do not quit.", "It did not work yet. Change something.", "Then you have learned something. Use it."] },
+      yes: { iron: ["Good. Do it.", "Then it is settled."], calm: ["Good. Begin gently.", "Then take the first step."], fire: ["Good! Go!", "Then do it."] },
+      no: { iron: ["Then tell me what stops you.", "'No' is not a plan."], calm: ["That is alright. What holds you back?", "Then what would be easier?"], fire: ["Why not? Tell me.", "Then what is in the way?"] },
+      more: { iron: ["Listen, then.", "There is more, yes."], calm: ["Gladly.", "Let me say it another way."], fire: ["Gladly.", "There is always more."] },
+    },
+    tr: {
+      why: { iron: ["Çünkü işe yarar.", "Çünkü alternatifi daha kötü.", "Çünkü zayıflığın bir bedeli var."], calm: ["Daha yakından bak.", "Çünkü seni dengede tutar.", "Aksi hâlde neye mal olacağını sor."], fire: ["Çünkü önemli.", "Çünkü bundan iyisini yapabilirsin.", "Çünkü bu senin savaşın."] },
+      how: { iron: ["Basitçe.", "Küçük başla, sonra devam et.", "Bir adım, sonra bir adım daha."], calm: ["Yavaşça.", "En küçük parçayla başla.", "Nefes al, sonra bir adım at."], fire: ["Şimdi başla.", "Bir şey seç ve bugün yap.", "Kendi ellerinle, bugün."] },
+      tried: { iron: ["O hâlde daha çok dene ya da yöntemi değiştir.", "Bir kez yetmez.", "Kaç kez? Yine dene, ama farklı."], calm: ["O hâlde neyi değiştirdiğine bak.", "Denemek başlangıçtır; ayar yapmak ustalık.", "Sabır: bir şeyi değiştir ve yeniden dene."], fire: ["İyi. Şimdi bir daha yap, daha iyi.", "Denemek değerli. Orada durma.", "O hâlde neyin işe yaramadığını biliyorsun. Bu ilerlemedir."] },
+      notwork: { iron: ["O hâlde plan zayıftı. Planı değiştir, hedefi değil.", "Yöntemi değiştir, amacı asla.", "Başarısız bir yöntem bilgidir."], calm: ["O hâlde yanlış araçtı. Başka birini dene.", "Kendini suçlama; ayarla.", "O zaman bir de öbür taraftan bak."], fire: ["O hâlde daha zor bir yol dene. Bırakma.", "Henüz işe yaramadı. Bir şeyi değiştir.", "O hâlde bir şey öğrendin. Onu kullan."] },
+      yes: { iron: ["İyi. Yap.", "O hâlde mesele tamam."], calm: ["İyi. Nazikçe başla.", "O hâlde ilk adımı at."], fire: ["İyi! Hadi!", "O hâlde yap."] },
+      no: { iron: ["O hâlde seni neyin durdurduğunu söyle.", "'Hayır' bir plan değildir."], calm: ["Sorun değil. Seni ne tutuyor?", "O hâlde neyi daha kolay bulursun?"], fire: ["Neden olmasın? Anlat.", "O hâlde yolda ne var?"] },
+      more: { iron: ["O hâlde dinle.", "Evet, daha var."], calm: ["Memnuniyetle.", "Başka bir türlü söyleyeyim."], fire: ["Memnuniyetle.", "Her zaman daha fazlası var."] },
+    },
+  };
+  function followupReply(char, kind, ctx, T, trg, pickPool, full) {
+    const last = ctx.last || {}, mood = last.mood || "general", topic = last.topic || null;
+    const parts = [];
+    const add = (pool) => { const l = pick(char.id, pool, parts); if (l) parts.push(l); };
+    const leads = ((FU_LEAD[T ? "tr" : "en"][kind]) || {})[TEMPER[char.id]] || [];
+    if (leads.length) add(leads);
+    const moodPool = full(pickPool(char.counsel[mood] || char.counsel.general, trg("counsel", mood) || trg("counsel", "general")));
+    const topicPool = topic ? full(pickPool(char.topics[topic] || [], trg("topics", topic))) : [];
+    const principles = pickPool(char.principles, T && T.principles);
+    if (kind === "why") { add(topicPool.length ? topicPool : principles); add(principles); }
+    else if (kind === "how") { add(topicPool.length ? topicPool : moodPool); add(moodPool); }
+    else if (kind === "tried" || kind === "notwork") { if (kind === "tried") add(pickPool(char.again, T && T.again)); add(topicPool.length ? topicPool : moodPool); add(chance(0.5) ? moodPool : principles); }
+    else if (kind === "more") { add(topicPool.length ? topicPool : moodPool); add(principles); }
+    else if (kind === "yes") add(pickPool(char.closers, T && T.closers));
+    else if (kind === "no") { add(pickPool(char.pivots, T && T.pivots)); add(moodPool); }
+    if (parts.length > 4) parts.length = 4;
+    saveRecent(char.id);
+    return { text: parts.join(" "), mood, topic, followup: kind, lang: T ? "tr" : "en" };
+  }
+
   // Which language is the message in? Returns "tr" or "en". English is the default: a message only counts as Turkish
   // when there is clear evidence (Turkish letters, or several very common Turkish words / endings).
-  const TR_WORDS = new Set(("ve bir bu ben sen biz siz çok cok ama için icin değil degil var yok bana sana beni seni benim senin ne nasıl nasil neden niye kim ki da de mi mı mu mü daha en gibi kadar çünkü cunku şey sey her hiç hic hala hâlâ artık artik şimdi simdi yine bile ya hem ise sadece bütün butun bazen belki lazım lazim olarak olan oldu olmuş olmus oluyor yapıyorum yapiyorum yapamıyorum yapamiyorum istiyorum istemiyorum bilmiyorum biliyorum düşünüyorum dusunuyorum hissediyorum yoruldum yorgunum korkuyorum üzgünüm uzgunum mutsuzum kızgınım kizginim yalnızım yalnizim bıktım biktim başaramadım basaramadim başlayamıyorum baslayamiyorum çalışamıyorum calisamiyorum bende sende onun bunu şunu bunun şu o onu ona orada burada çalışmak calismak sınav sinav ders iş is aşk ask arkadaş arkadas aile para uyku merhaba selam teşekkürler tesekkurler sağ sag ol anlat hikaye hikaye nedir misin musun müsün sın değilim degilim değiliz yapmalıyım yapmaliyim gerek gerekiyor kendimi kendime kendim hayat hayatım hayatim").split(/\s+/));
+  const TR_WORDS = new Set(("evet hayır tamam denedim devam olmadı yaramadı peki ve bir bu ben sen biz siz çok cok ama için icin değil degil var yok bana sana beni seni benim senin ne nasıl nasil neden niye kim ki da de mi mı mu mü daha en gibi kadar çünkü cunku şey sey her hiç hic hala hâlâ artık artik şimdi simdi yine bile ya hem ise sadece bütün butun bazen belki lazım lazim olarak olan oldu olmuş olmus oluyor yapıyorum yapiyorum yapamıyorum yapamiyorum istiyorum istemiyorum bilmiyorum biliyorum düşünüyorum dusunuyorum hissediyorum yoruldum yorgunum korkuyorum üzgünüm uzgunum mutsuzum kızgınım kizginim yalnızım yalnizim bıktım biktim başaramadım basaramadim başlayamıyorum baslayamiyorum çalışamıyorum calisamiyorum bende sende onun bunu şunu bunun şu o onu ona orada burada çalışmak calismak sınav sinav ders iş is aşk ask arkadaş arkadas aile para uyku merhaba selam teşekkürler tesekkurler sağ sag ol anlat hikaye hikaye nedir misin musun müsün sın değilim degilim değiliz yapmalıyım yapmaliyim gerek gerekiyor kendimi kendime kendim hayat hayatım hayatim").split(/\s+/));
   const TR_ENDINGS = /(?:\p{L}{2,})(?:ıyorum|iyorum|uyorum|üyorum|ıyor|iyor|uyor|üyor|mıyorum|miyorum|muyorum|müyorum|amıyorum|emiyorum|madım|medim|madım|dım|dim|dum|düm|tım|tim|tum|tüm|lar|ler|imiz|ımız|umuz|ümüz|nız|niz|ması|mesi|mak|mek|tan|ten|dan|den|yım|yim|yum|yüm|sız|siz|suz|süz|lık|lik|luk|lük|ım|im|um|üm|ız|ğım|ğim)$/u;
   const EN_WORDS = new Set("the and is are was were i you he she it we they my your me to of in on for with that this not have has had do does did what how why who when where can could would should will just very so but if or be been am im i'm don't can't won't it's really too much about because feel feeling tired afraid angry help tell me".split(" "));
   function detectLang(text) {
@@ -8639,6 +8697,7 @@ window.TRAINING_PACK.vlad.tr.opinions = {
     if (r.opinion) { const o = window.CHARACTERS.find((c) => c.id === r.opinion); return "on " + (o ? o.name : r.opinion); }
     if (r.intent) return { greet: "greeting", thanks: "thanks", who: "about himself" }[r.intent];
     if (r.story) return "a story";
+    if (r.followup) return "follow-up";
     return [r.again ? "persistence" : null, r.mood && r.mood !== "general" ? MOOD_SHORT[r.mood] : null, r.topic ? TOPIC_LABELS[r.topic] : null].filter(Boolean).join(" · ");
   }
 
@@ -8693,6 +8752,8 @@ window.TRAINING_PACK.vlad.tr.opinions = {
 
   // ---------- composing ----------
   // ctx (optional): { lastTopic, tone: "gentle"|"hard", bond: "cold"|"stranger"|"respect"|"trusted" }
+  // The main lines of an answer carry real content: skip one- or two-word fragments when fuller lines exist (except for the terse voices).
+  const full0 = (char) => (pool) => { if (TERSE.has(char.id)) return pool; const f = pool.filter((l) => l.split(/\s+/).length > 2); return f.length >= 3 ? f : pool; };
   function forgeReply(char, text, forcedMood, ctx) {
     if (isCrisis(text)) return { text: crisisMessage(text), mood: "crisis", crisis: true };
     ctx = ctx || {};
@@ -8701,6 +8762,19 @@ window.TRAINING_PACK.vlad.tr.opinions = {
     // Use the Turkish pool when it has lines, else the English one.
     const pickPool = (en, trp) => (T && trp && trp.length ? trp : en);
     const trg = (group, key) => (T && T[group] && T[group][key]) || null;
+    // A short reply that only makes sense after his last answer ("why?", "how?", "I tried that", "yes"…).
+    if (!forcedMood && text && ctx.last) {
+      const fu = detectFollowup(text);
+      if (fu) {
+        // Turkish only if the pools it draws on have Turkish; otherwise the whole reply stays English.
+        const lm = ctx.last.mood || "general", lt = ctx.last.topic;
+        // One Turkish word ("evet", "denedim") is not enough to detect Turkish, so the language of the last answer carries over.
+        const wantTr = detectLang(text) === "tr" || (ctx.last.lang === "tr" && !/(^|[^\p{L}])(yes|yeah|yep|no|nope|nah|ok|okay|sure|why|how|tried|work|more|go|on|still|same|help|try|that|it|i|really)([^\p{L}]|$)/iu.test(text));
+        const T2 = wantTr ? char.tr : null;
+        const hasTr = T2 && (lt ? ((T2.topics || {})[lt] || []).length : (((T2.counsel || {})[lm] || (T2.counsel || {}).general || []).length));
+        return followupReply(char, fu, ctx, hasTr ? T2 : null, (g, k) => (hasTr && T2[g] && T2[g][k]) || null, (en, trp) => (hasTr && trp && trp.length ? trp : en), full0(char));
+      }
+    }
     const topic = text ? detectTopic(text) : null;
     let mood = forcedMood || detectMood(text);
 
@@ -8842,7 +8916,7 @@ window.TRAINING_PACK.vlad.tr.opinions = {
   const full3 = (pool) => { const f = pool.filter((l) => l.split(/\s+/).length > 2); return f.length >= 3 ? f : pool; };
 
   window.Engine = {
-    MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE, CRISIS_MESSAGE_TR, crisisMessage, detectLang,
+    MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE, CRISIS_MESSAGE_TR, crisisMessage, detectLang, detectFollowup,
     forgeReply, misreads, addMisread, clearMisreads, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName, isStory, topicLine, temper
   };
 })();

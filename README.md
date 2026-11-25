@@ -11,6 +11,7 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Chat** with any member: tell them what you're facing (English or Türkçe) and they answer from their own position.
 - **Ask about them**: their feelings, fears, regrets, love, death, and what they think of each other.
 - **Council**: ask one question; up to four members answer in turn, react to each other (agree or push back), and can be told to answer each other in a second round.
+- **Follow-ups**: short replies that only make sense after his last answer ("why?", "how?", "I tried that", "it didn't work", "yes", "no", "tell me more"; "neden?", "nasıl?", "denedim", "olmadı", "evet", "hayır", "devam et") are answered as follow-ups, in his voice, about the same feeling and topic, instead of being read as a new message.
 - **Memory**: tell any of them "my name is …" or "my goal is …". They use your name, and on a new day they bring up what you last talked about or ask about your goal.
 - **Oath**: swear one task a day before one member. Next time they ask whether you kept it, react to the answer, and keep your streak.
 - **Stories**: ask any of them for a story ("tell me a story", "bir hikaye anlat") and they tell one from their life.
@@ -54,6 +55,7 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/app.js` — the interface
 - `eval.html` — accuracy test page in the browser (279 labeled messages)
 - `tests/smoke.js` — Playwright smoke test of every page at phone width (`node tests/smoke.js`)
+- `tests/followup.js` — checks follow-up detection and replies (`node tests/followup.js`)
 - `tests/lang.js` — checks language detection (Turkish vs English) and the Turkish-answer fallback (`node tests/lang.js`)
 - `tests/content.js` — checks every member is fully written and prints a coverage table (`node tests/content.js`)
 - `tests/` — `node tests/run.js` checks 363 everyday messages (English, Turkish, slang, typos, Turkish without Turkish letters). `tests/holdout/` holds sets kept apart from tuning — the honest measure for wording the engine hasn't seen (round 3: 95%, round 4: 91% after tuning, from 62% and 59% before; write a new holdout file for the next blind measurement). `node tests/run.js iron-council-misreads-….json` tests a downloaded Misread list.

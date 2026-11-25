@@ -22,6 +22,8 @@ jobs:
           VERBOSE: "0"
       - name: Language detection (tests/lang.js)
         run: node tests/lang.js
+      - name: Follow-up messages (tests/followup.js)
+        run: node tests/followup.js
       - name: Content checker (tests/content.js)
         run: node tests/content.js
       - name: Install Playwright

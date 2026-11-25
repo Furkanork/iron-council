@@ -354,8 +354,8 @@
       // Did he ask you something last time? Then this message is your answer.
       const prev = log.filter((m) => m.role === "char" && m !== slot).pop();
       const answered = !!(text && prev && prev.asked);
-      await answer(c, question, mood, { lastTopic, prefix, tone, bond: bondLevel(bond(c.id).score), canAsk: !answered, answered }, (t, done, meta) => {
-        slot.content = t; Object.assign(slot, { taught: meta.taught, crisis: meta.crisis, topic: meta.topic, feel: meta.mood, intent: meta.intent, asked: meta.asked, read: g(c, [E.describe(meta), meta.asked ? "asks you" : ""].filter(Boolean).join(" · ")) });
+      await answer(c, question, mood, { lastTopic, last: prev && !prev.crisis && !prev.pending && (prev.feel || prev.topic) ? { mood: prev.feel, topic: prev.topic, lang: prev.lang } : null, prefix, tone, bond: bondLevel(bond(c.id).score), canAsk: !answered, answered }, (t, done, meta) => {
+        slot.content = t; Object.assign(slot, { taught: meta.taught, crisis: meta.crisis, followup: meta.followup, lang: meta.lang, topic: meta.topic, feel: meta.mood, intent: meta.intent, asked: meta.asked, read: g(c, [E.describe(meta), meta.asked ? "asks you" : ""].filter(Boolean).join(" · ")) });
         if (done) { slot.pending = false; render(nearBottom()); } else paint(t);
       });
       if (slot.pending) { slot.pending = false; render(); }
