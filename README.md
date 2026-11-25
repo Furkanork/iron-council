@@ -42,7 +42,8 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 
 ## Files
 - `js/characters.js`, `js/c-*.js` — character dossiers
-- `js/training-pack-*.js` — additional training
+- `js/training-pack*.js` — first training rounds
+- `js/train-<id>.js` — one merged training file per character (rounds 3–7 and council opinions); `node tools/wire.js` re-writes their `<script>` tags
 - `js/engine.js` — reads messages and composes answers
 - `js/app.js` — the interface
 - `eval.html` — accuracy test page in the browser (279 labeled messages)
