@@ -5478,7 +5478,12 @@ IRON_TRAIN("vlad", {
   const OPINION = /think|opinion|feel about|view of|like?|what('s| is| was) .+ like|düşün|hakkında|fikrin|nasıl biri|sever mi/i;
 
   const CRISIS_WORDS = ["kill myself", "suicide", "suicidal", "end my life", "want to die", "self harm", "self-harm", "hurt myself", "no reason to live", "intihar", "kendimi öldür", "ölmek istiyorum", "yaşamak istemiyorum"];
+  const CRISIS_MESSAGE_TR = "Bir an rolden çıkıyorum: yazdığın şey ciddi görünüyor ve bir söze değil, gerçek bir desteğe ihtiyacın var. Lütfen bugün biriyle konuş: bir arkadaşınla, ailenden biriyle ya da bir uzmanla. Türkiye'deysen 112'yi arayabilirsin; başka bir ülkedeysen findahelpline.com orada ücretsiz ve gizli yardım hatlarını listeler. Bunu tek başına taşımak zorunda değilsin.";
   const CRISIS_MESSAGE = "Stepping out of character for a moment: what you wrote sounds serious, and you deserve real support, not a quote. Please talk to someone today — a friend, family member, or a professional. In Türkiye you can call 112; elsewhere, findahelpline.com lists free, confidential lines in your country. You don't have to carry this alone.";
+
+  // Pools a Turkish line set may hold (all optional).
+  const TR_LIST_POOLS = ["openers", "principles", "closers", "again", "pivots", "gentle", "hard", "heard", "bondWarm", "bondCold"];
+  const TR_GROUP_POOLS = ["counsel", "topics", "about", "opinions", "intents", "askBack"];
 
   // ---------- merge the training pack into the dossiers ----------
   const PACK = window.TRAINING_PACK || {};
@@ -5500,6 +5505,11 @@ IRON_TRAIN("vlad", {
     // Lines for memory, the daily oath and the council ("{name}", "{topic}", "{goal}", "{oath}" are filled in).
     for (const k of ["recall", "goalAsk", "oathTake", "oathKept", "oathBroken", "agree", "disagree", "stories", "gentle", "hard", "bondWarm", "bondCold", "bondUp", "heard", "pro", "con", "journal"]) c[k] = uniq(p[k] || []);
     c.askBack = p.askBack || {};
+    // Turkish lines (pack key "tr"), same shape as the English pools. Any pool left out falls back to English.
+    const t = p.tr || {};
+    const lists = {}; for (const k of TR_LIST_POOLS) lists[k] = uniq(t[k] || []);
+    const groups = {}; for (const k of TR_GROUP_POOLS) { groups[k] = {}; for (const g of Object.keys(t[k] || {})) groups[k][g] = uniq(t[k][g]); }
+    c.tr = Object.assign({}, lists, groups);
     c.rivals = p.rivals || {};
     // Thin one- or two-word lines are replaced by full ones (round 6); keep them only for the terse voices
     // or where a pool would otherwise be too small.
@@ -5721,6 +5731,27 @@ IRON_TRAIN("vlad", {
     return subject ? { kind: "about", subject } : { kind: "about", subject: "general" };
   }
   const saysAgain = (text) => { const t = " " + norm(text) + " "; return AGAIN_WORDS.some((w) => matcher(w).test(t)); };
+  // Which language is the message in? Returns "tr" or "en". English is the default: a message only counts as Turkish
+  // when there is clear evidence (Turkish letters, or several very common Turkish words / endings).
+  const TR_WORDS = new Set(("ve bir bu ben sen biz siz çok cok ama için icin değil degil var yok bana sana beni seni benim senin ne nasıl nasil neden niye kim ki da de mi mı mu mü daha en gibi kadar çünkü cunku şey sey her hiç hic hala hâlâ artık artik şimdi simdi yine bile ya hem ise sadece bütün butun bazen belki lazım lazim olarak olan oldu olmuş olmus oluyor yapıyorum yapiyorum yapamıyorum yapamiyorum istiyorum istemiyorum bilmiyorum biliyorum düşünüyorum dusunuyorum hissediyorum yoruldum yorgunum korkuyorum üzgünüm uzgunum mutsuzum kızgınım kizginim yalnızım yalnizim bıktım biktim başaramadım basaramadim başlayamıyorum baslayamiyorum çalışamıyorum calisamiyorum bende sende onun bunu şunu bunun şu o onu ona orada burada çalışmak calismak sınav sinav ders iş is aşk ask arkadaş arkadas aile para uyku merhaba selam teşekkürler tesekkurler sağ sag ol anlat hikaye hikaye nedir misin musun müsün sın değilim degilim değiliz yapmalıyım yapmaliyim gerek gerekiyor kendimi kendime kendim hayat hayatım hayatim").split(/\s+/));
+  const TR_ENDINGS = /(?:\p{L}{2,})(?:ıyorum|iyorum|uyorum|üyorum|ıyor|iyor|uyor|üyor|mıyorum|miyorum|muyorum|müyorum|amıyorum|emiyorum|madım|medim|madım|dım|dim|dum|düm|tım|tim|tum|tüm|lar|ler|imiz|ımız|umuz|ümüz|nız|niz|ması|mesi|mak|mek|tan|ten|dan|den|yım|yim|yum|yüm|sız|siz|suz|süz|lık|lik|luk|lük|ım|im|um|üm|ız|ğım|ğim)$/u;
+  const EN_WORDS = new Set("the and is are was were i you he she it we they my your me to of in on for with that this not have has had do does did what how why who when where can could would should will just very so but if or be been am im i'm don't can't won't it's really too much about because feel feeling tired afraid angry help tell me".split(" "));
+  function detectLang(text) {
+    const t = norm(text);
+    if (!t) return "en";
+    const words = t.replace(/[^\p{L}\s']/gu, " ").split(/\s+/).filter(Boolean);
+    if (!words.length) return "en";
+    let tr = 0, en = 0;
+    if (/[ğışİ]/.test(text)) tr += 3;                  // letters that only Turkish uses
+    else if (/[çöü]/.test(text)) tr += 1;
+    for (const w of words) {
+      if (TR_WORDS.has(w)) tr += 1.5;
+      else if (w.length >= 5 && TR_ENDINGS.test(w)) tr += 1;
+      if (EN_WORDS.has(w)) en += 1.5;
+    }
+    return tr >= 1.5 && tr > en * 2 ? "tr" : "en";
+  }
+  const crisisMessage = (text) => (detectLang(text) === "tr" ? CRISIS_MESSAGE_TR : CRISIS_MESSAGE);
   const isCrisis = (text) => { const t = norm(text); return CRISIS_WORDS.some((w) => t.includes(w)); };
   function describe(r) {
     if (!r || r.crisis || r.taught) return "";
@@ -5783,8 +5814,13 @@ IRON_TRAIN("vlad", {
   // ---------- composing ----------
   // ctx (optional): { lastTopic, tone: "gentle"|"hard", bond: "cold"|"stranger"|"respect"|"trusted" }
   function forgeReply(char, text, forcedMood, ctx) {
-    if (isCrisis(text)) return { text: CRISIS_MESSAGE, mood: "crisis", crisis: true };
+    if (isCrisis(text)) return { text: crisisMessage(text), mood: "crisis", crisis: true };
     ctx = ctx || {};
+    const lang = ctx.lang || (text ? detectLang(text) : "en");
+    const T = lang === "tr" ? char.tr : null;   // Turkish pools, or null for English
+    // Use the Turkish pool when it has lines, else the English one.
+    const pickPool = (en, trp) => (T && trp && trp.length ? trp : en);
+    const trg = (group, key) => (T && T[group] && T[group][key]) || null;
     const topic = text ? detectTopic(text) : null;
     let mood = forcedMood || detectMood(text);
 
@@ -5806,14 +5842,14 @@ IRON_TRAIN("vlad", {
       const userProblem = general && (mood !== "general" || topic || detectIntent(text));
       if (!userProblem) {
         const pool = ab.kind === "opinion"
-          ? (char.opinions[ab.target] || []).concat(tr.lines["opinion:" + ab.target] || [])
-          : full((char.about[ab.subject] || []).concat(tr.lines["about:" + ab.subject] || []));
-        const fallback = (char.about.general || []).concat(tr.lines["about:general"] || []);
+          ? pickPool((char.opinions[ab.target] || []).concat(tr.lines["opinion:" + ab.target] || []), trg("opinions", ab.target))
+          : full(pickPool((char.about[ab.subject] || []).concat(tr.lines["about:" + ab.subject] || []), trg("about", ab.subject)));
+        const fallback = pickPool((char.about.general || []).concat(tr.lines["about:general"] || []), trg("about", "general"));
         const parts = [];
         const add = (p) => { const l = pick(char.id, p, parts); if (l) parts.push(l); };
         add(pool.length ? pool : fallback);
         if (ab.kind === "about" && pool.length > 1 && chance(0.35)) add(pool);
-        if (chance(0.45)) add(char.pivots);
+        if (chance(0.45)) add(pickPool(char.pivots, T && T.pivots));
         saveRecent(char.id);
         return ab.kind === "opinion" ? { text: parts.join(" "), mood, topic, opinion: ab.target } : { text: parts.join(" "), mood, topic, about: ab.subject };
       }
@@ -5825,9 +5861,9 @@ IRON_TRAIN("vlad", {
     if (intent && char.intents && char.intents[intent]) {
       const parts = [];
       const add = (pool) => { const l = pick(char.id, pool, parts); if (l) parts.push(l); };
-      add(char.intents[intent]);
-      if (intent === "who") parts.push(char.idea);
-      if (intent === "thanks" && chance(0.6)) add(char.closers);
+      add(pickPool(char.intents[intent], trg("intents", intent)));
+      if (intent === "who" && !(T && trg("intents", "who"))) parts.push(char.idea);
+      if (intent === "thanks" && chance(0.6)) add(pickPool(char.closers, T && T.closers));
       saveRecent(char.id);
       return { text: parts.join(" "), mood, topic, intent };
     }
@@ -5839,10 +5875,11 @@ IRON_TRAIN("vlad", {
       if (top.s >= 0.5 && chance(0.85)) return { text: top.e.a, mood, topic, taught: true };
     }
 
-    const moodPool = full((char.counsel[mood] || char.counsel.general).concat(tr.lines[mood] || []));
-    const topicPool = topic ? full((char.topics[topic] || []).concat(tr.lines["topic:" + topic] || [])) : [];
-    const principlePool = char.principles.concat(tr.beliefs || []);
-    const generalPool = full(char.counsel.general.concat(tr.lines.general || []));
+    const moodPool = full(pickPool((char.counsel[mood] || char.counsel.general), trg("counsel", mood) || trg("counsel", "general")).concat(tr.lines[mood] || []));
+    const topicPool = topic ? full(pickPool(char.topics[topic] || [], trg("topics", topic)).concat(tr.lines["topic:" + topic] || [])) : [];
+    const principlePool = pickPool(char.principles, T && T.principles).concat(tr.beliefs || []);
+    const generalPool = full(pickPool(char.counsel.general, trg("counsel", "general")).concat(tr.lines.general || []));
+    const P = (k) => pickPool(char[k], T && T[k]);
 
     // 2) Build the answer: topic take first (it shows he understood), then feeling, then conviction.
     const parts = [];
@@ -5851,14 +5888,14 @@ IRON_TRAIN("vlad", {
     const grief = topic === "grief";
     const gentle = ctx.tone === "gentle" && char.gentle.length, hard = ctx.tone === "hard" && char.hard.length && !grief;
     // How he feels about you colours the first words now and then.
-    const bondPool = ctx.bond === "cold" ? char.bondCold : (ctx.bond === "respect" || ctx.bond === "trusted") ? char.bondWarm : [];
+    const bondPool = ctx.bond === "cold" ? P("bondCold") : (ctx.bond === "respect" || ctx.bond === "trusted") ? P("bondWarm") : [];
     // You are answering a question he asked you: he acknowledges it first.
-    if (ctx.answered && char.heard.length) add(char.heard);
+    if (ctx.answered && char.heard.length) add(P("heard"));
     else if (bondPool.length && chance(ctx.bond === "trusted" ? 0.35 : 0.25)) add(bondPool);
-    else if (gentle) add(char.gentle);
-    else if (grief) { if (char.gentle.length && chance(0.5)) add(char.gentle); }
-    else if (again && char.again && char.again.length) add(char.again);
-    else if (chance(0.45)) add(char.openers);
+    else if (gentle) add(P("gentle"));
+    else if (grief) { if (char.gentle.length && chance(0.5)) add(P("gentle")); }
+    else if (again && char.again && char.again.length) add(P("again"));
+    else if (chance(0.45)) add(P("openers"));
     if (topicPool.length) {
       add(topicPool);
       if (grief && ["lazy", "failed", "doubt", "angry"].includes(mood)) add(topicPool);
@@ -5872,13 +5909,13 @@ IRON_TRAIN("vlad", {
     if (parts.length > 4) parts.splice(1, parts.length - 4);
     // Sometimes he ends with a question back to you instead of a closing line.
     const askKey = mood !== "general" ? mood : topic ? "general" : null;
-    const askPool = askKey && ctx.canAsk && !ctx.answered && (char.askBack[askKey] || []);
+    const askPool = askKey && ctx.canAsk && !ctx.answered && pickPool(char.askBack[askKey] || [], trg("askBack", askKey));
     let asked = null;
     if (askPool && askPool.length && chance(0.33)) { const qn = pick(char.id, askPool, parts); if (qn) { parts.push(qn); asked = askKey; } }
-    if (!asked && !grief) add(hard ? char.hard : char.closers); // no battle-cry ending after a loss
+    if (!asked && !grief) add(hard ? P("hard") : P("closers")); // no battle-cry ending after a loss
 
     saveRecent(char.id);
-    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone, asked };
+    return { text: parts.join(" "), mood, topic, again, tone: ctx.tone, asked, lang };
   }
 
   const SHORT = { ataturk: "Atatürk", atsiz: "Atsız", musashi: "Musashi", swordsman: "the Swordsman", nietzsche: "Nietzsche", rumi: "Rumi", tesla: "Tesla", genghis: "Genghis", hannibal: "Hannibal", napoleon: "Napoleon", bilge: "Bilge" };
@@ -5922,7 +5959,7 @@ IRON_TRAIN("vlad", {
   const full3 = (pool) => { const f = pool.filter((l) => l.split(/\s+/).length > 2); return f.length >= 3 ? f : pool; };
 
   window.Engine = {
-    MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE,
+    MOODS, TOPICS, MOOD_LABELS, TOPIC_LABELS, ABOUT_KEYS, ABOUT_LABELS, detectMood, detectTopic, detectIntent, detectAbout, describe, norm, isCrisis, CRISIS_MESSAGE, CRISIS_MESSAGE_TR, crisisMessage, detectLang,
     forgeReply, misreads, addMisread, clearMisreads, getTraining, saveTraining, exportAll, importAll, say, react, rebut, shortName, isStory, topicLine, temper
   };
 })();

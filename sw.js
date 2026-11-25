@@ -1,6 +1,6 @@
 // Offline support. Online: always fetch the newest files (and keep a copy).
 // Offline: serve the last copy, so the app opens with no connection.
-const CACHE = "iron-council-v5";
+const CACHE = "iron-council-v6";
 
 self.addEventListener("install", (e) => {
   e.waitUntil((async () => {

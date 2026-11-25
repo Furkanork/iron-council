@@ -471,7 +471,7 @@
         await speak(i, body, c);
         if (r.crisis) break;
       }
-      if (list.length > 1 && !session.said.some((s) => s.text === E.CRISIS_MESSAGE)) { ans.insertAdjacentHTML("beforeend", tools()); wireTools(); }
+      if (list.length > 1 && !session.said.some((s) => s.text === E.CRISIS_MESSAGE || s.text === E.CRISIS_MESSAGE_TR)) { ans.insertAdjacentHTML("beforeend", tools()); wireTools(); }
       busy = false; cs.disabled = false;
     }
     // Round two: each answers the one who spoke before him (the first answers the last).
@@ -495,7 +495,7 @@
       if (busy) return;
       const list = C.filter((c) => chosen.has(c.id));
       if (list.length < 2) return toast("Choose at least two members for a debate.");
-      if (E.isCrisis(text)) { ans.innerHTML = `<div class="answer crisis"><div>${esc(E.CRISIS_MESSAGE)}</div></div>`; return; }
+      if (E.isCrisis(text)) { ans.innerHTML = `<div class="answer crisis"><div>${esc(E.crisisMessage(text))}</div></div>`; return; }
       busy = true; cs.disabled = true;
       // Bold tempers lean "do it", calm ones lean "not yet" — with chance, and never all on one side.
       const lean = { iron: 0.62, fire: 0.55, calm: 0.35 };
@@ -721,7 +721,7 @@
       const text = jt.value.trim(); if (!text) return toast("Write something first.");
       const c = byId(document.getElementById("jWho").value);
       let reply;
-      if (E.isCrisis(text)) reply = E.CRISIS_MESSAGE;
+      if (E.isCrisis(text)) reply = E.crisisMessage(text);
       else {
         learn(text);
         const r = E.forgeReply(c, text, null, { tone: localStorage.getItem("ironcouncil.tone." + c.id) || "", bond: bondLevel(bond(c.id).score) });

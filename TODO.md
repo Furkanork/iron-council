@@ -37,7 +37,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
 
 ## Phase 1 — Understanding you better
 
-- [ ] **1.1 Turkish answers: the engine** (M). Detect whether a message is Turkish. Let every pool hold Turkish lines next to the English ones. Turkish messages get Turkish answers, and English stays as it is. Falls back to English where a Turkish line doesn't exist yet.
+- [x] **1.1 Turkish answers: the engine** (M). Detect whether a message is Turkish. Let every pool hold Turkish lines next to the English ones. Turkish messages get Turkish answers, and English stays as it is. Falls back to English where a Turkish line doesn't exist yet. (2026-11-25)
+  - `Engine.detectLang` (72/73 Turkish and 136/136 English test messages right; English default when unsure). Pack key `tr` mirrors the English pools; forgeReply picks Turkish pools per pool and falls back to English. Safety message has a Turkish version (112 + findahelpline.com). New tests/lang.js (in CI). No real Turkish lines yet: that is 1.2–1.5. Other suites unchanged (run.js 355/363, smoke 227/227, content OK).
 - [ ] **1.2 Turkish answers: Mehmed, Atatürk, Atsız, Bilge Kağan, Timur, Rumi** (L). About 70 hand-written Turkish lines each: all 8 feelings, the main topics, greetings and closers. Written in Turkish, not machine-translated.
 - [ ] **1.3 Turkish answers: Vlad, Genghis, Attila, Musashi, Marcus Aurelius, the Black Swordsman** (L). Same as 1.2.
 - [ ] **1.4 Turkish answers: Leonidas, Hannibal, Joan, Napoleon, Nietzsche, Tesla** (L). Same as 1.2.
@@ -114,3 +115,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 0.3 done: GitHub Actions workflow added (untested on GitHub itself).
 - 2026-11-25 — 0.4 done: js/bundle.js (remember `node tools/bundle.js` after editing any js file).
 - 2026-11-25 — 0.5 done: fonts stored locally. Phase 0 complete.
+- 2026-11-25 — 1.1 done: language detection + Turkish pools with English fallback (content comes in 1.2–1.5).

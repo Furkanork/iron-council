@@ -20,6 +20,8 @@ jobs:
         env:
           MAX_MISSES: 8
           VERBOSE: "0"
+      - name: Language detection (tests/lang.js)
+        run: node tests/lang.js
       - name: Content checker (tests/content.js)
         run: node tests/content.js
       - name: Install Playwright

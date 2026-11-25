@@ -34,6 +34,9 @@ Open https://furkanork.github.io/iron-council/ on the phone, then:
 
 It gets its own icon, opens full-screen like an app, and works offline after the first visit. Your chats and oaths are kept on that phone; use **Saved → Backup** to move them between devices.
 
+## Turkish answers
+The engine detects whether a message is Turkish (`Engine.detectLang`: Turkish letters, common words and endings; English is the default when unsure, and Turkish typed without Turkish letters is recognised too). A member's Turkish lines live in the `tr` key of his training pack, with the same shape as the English pools (`counsel`, `topics`, `about`, `opinions`, `intents`, `askBack`, `openers`, `principles`, `closers`, `again`, `pivots`, `gentle`, `hard`, `heard`, `bondWarm`, `bondCold`). A Turkish message uses a Turkish pool when it has lines and falls back to the English pool when it doesn't, so members can be translated pool by pool. The safety message is also answered in Turkish. Council reactions, oaths, stories and journal replies are still English-only (see TODO 1.2–1.5).
+
 ## How it works
 No AI and no server. Every character has a hand-written dossier of ~250 lines. A small engine reads the feeling, life topic and kind of question in your message and composes a fresh answer instantly. Real quotes are marked **sourced** or **attributed**; everything else is written in the spirit of the figure.
 
@@ -50,5 +53,6 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/app.js` — the interface
 - `eval.html` — accuracy test page in the browser (279 labeled messages)
 - `tests/smoke.js` — Playwright smoke test of every page at phone width (`node tests/smoke.js`)
+- `tests/lang.js` — checks language detection (Turkish vs English) and the Turkish-answer fallback (`node tests/lang.js`)
 - `tests/content.js` — checks every member is fully written and prints a coverage table (`node tests/content.js`)
 - `tests/` — `node tests/run.js` checks 363 everyday messages (English, Turkish, slang, typos, Turkish without Turkish letters). `tests/holdout/` holds sets kept apart from tuning — the honest measure for wording the engine hasn't seen (round 3: 95%, round 4: 91% after tuning, from 62% and 59% before; write a new holdout file for the next blind measurement). `node tests/run.js iron-council-misreads-….json` tests a downloaded Misread list.
