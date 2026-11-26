@@ -103,6 +103,10 @@ const ok = (c, where, what) => { checks++; if (!c) fail(where, what); };
   ok(camps.length >= 8, "oath", "expected >= 8 campaign links, found " + camps.length);
   for (const h of [...new Set(camps)]) { await go(h); await checkPage(h); }
   await go("#/mood"); await checkPage("mood");
+  await go("#/weekly"); await checkPage("weekly");
+  await page.click("#wGo"); await page.waitForTimeout(150);
+  ok(await page.evaluate(() => document.querySelectorAll(".journal-list .msg .body").length > 0 && document.querySelector(".journal-list .msg .body").innerText.length > 30), "weekly", "no weekly review written");
+  await checkPage("weekly (after review)");
   await go("#/search"); await checkPage("search");
   await page.fill("#sq", "exam"); await page.waitForTimeout(400);
   ok(await page.evaluate(() => document.querySelectorAll("#sres .sres li").length > 0), "search", "no results for a word that is in the chats");

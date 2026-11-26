@@ -1158,6 +1158,55 @@
     box.focus();
   }
 
+  // ---------- weekly review ----------
+  const WKEY = "ironcouncil.weekly";
+  function weekStats() {
+    const days = []; const d = new Date(); for (let i = 0; i < 7; i++) { days.push(dayKey(d)); d.setDate(d.getDate() - 1); }
+    const set = new Set(days), md = moodsByDay(), feel = {};
+    for (const k of days) for (const [m, n] of Object.entries(md[k] || {})) feel[m] = (feel[m] || 0) + n;
+    const os = oaths().filter((o) => set.has(o.date));
+    const j = load(JKEY, []).filter((e) => e.at && set.has(dayKey(new Date(e.at))));
+    const top = Object.entries(feel).sort((a, b) => b[1] - a[1]);
+    return { from: days[6], to: days[0], feel, top, activeDays: days.filter((k) => md[k]).length, kept: os.filter((o) => o.status === "kept").length, broken: os.filter((o) => o.status === "broken").length, pending: os.filter((o) => o.status === "pending").length, journal: j.length, streak: streak() };
+  }
+  function weeklyReply(c, st) {
+    const lang = forcedLang(), opts = { tone: toneFor(c.id), lang, bond: bondLevel(bond(c.id).score) };
+    const parts = [];
+    const name = profile().name;
+    parts.push(name ? `${name}.` : "");
+    if (st.kept + st.broken > 0) parts.push(E.say(c, st.kept >= st.broken ? "oathKept" : "oathBroken", { oath: "this week's oaths" }));
+    else parts.push(`No oath sworn this week. A word not given cannot be kept.`);
+    if (st.top.length) {
+      const r = E.forgeReply(c, "", st.top[0][0], opts); if (r && r.text) parts.push(r.text);
+    } else parts.push(`You told me nothing of your days. Come back and speak.`);
+    parts.push(E.say(c, "closers"));
+    return parts.filter(Boolean).join(" ");
+  }
+  function viewWeekly() {
+    const st = weekStats(), past = load(WKEY, []);
+    const who = localStorage.getItem("ironcouncil.weekly.who") || (past[0] || {}).who || "marcus";
+    const lab = (m) => E.MOOD_LABELS[m] || m;
+    const nice = (k) => new Date(k + "T12:00:00").toLocaleDateString(undefined, { day: "numeric", month: "short" });
+    app.innerHTML = `
+      <h2 class="section-title">Weekly review</h2>
+      <p class="sub">Once a week, one of them looks back at your last seven days (${esc(nice(st.from))} – ${esc(nice(st.to))}): what you felt, the oaths you kept, what you wrote. All from this device.</p>
+      <div class="panel mood-head"><div class="stats"><div><b>${st.kept}</b><span>oaths kept</span></div><div><b>${st.broken}</b><span>broken</span></div><div><b>${st.streak}</b><span>streak</span></div><div><b>${st.journal}</b><span>journal entries</span></div><div><b>${st.activeDays}</b><span>days you spoke</span></div></div>
+        <p class="help">${st.top.length ? "Feelings this week: " + st.top.slice(0, 4).map(([m, n]) => `${esc(lab(m))} ×${n}`).join(" · ") : "No feelings recorded in the last seven days."}${st.pending ? ` ${st.pending} oath${st.pending === 1 ? " is" : "s are"} still unjudged.` : ""}</p></div>
+      <div class="panel"><div class="field"><select id="wWho" aria-label="Who looks back at your week">${C.map((c) => `<option value="${c.id}" ${c.id === who ? "selected" : ""}>${esc(c.name)}</option>`).join("")}</select></div>
+        <div class="row"><button class="btn" id="wGo">Look back at my week</button></div></div>
+      <div class="journal-list">${past.map((e) => { const c = byId(e.who) || C[0]; return `<div class="entry" style="--c:${c.color}">
+        <div class="entry-head"><span>${esc(nice(e.from))} – ${esc(nice(e.to))}</span></div>
+        <div class="msg char"><span class="who">${esc(c.name)}</span><span class="body">${esc(e.text)}</span></div></div>`; }).join("")}</div>`;
+    document.getElementById("wWho").onchange = (e) => localStorage.setItem("ironcouncil.weekly.who", e.target.value);
+    document.getElementById("wGo").onclick = () => {
+      const c = byId(document.getElementById("wWho").value);
+      localStorage.setItem("ironcouncil.weekly.who", c.id);
+      const text = weeklyReply(c, st);
+      store(WKEY, [{ at: new Date().toISOString(), who: c.id, from: st.from, to: st.to, text }, ...load(WKEY, [])].slice(0, 30));
+      viewWeekly();
+    };
+  }
+
   // ---------- router ----------
   function route() {
     const h = location.hash.replace(/^#\/?/, "").split("/");
@@ -1173,6 +1222,7 @@
     else if (h[0] === "mood") viewMood();
     else if (h[0] === "settings") viewSettings();
     else if (h[0] === "search") viewSearch();
+    else if (h[0] === "weekly") viewWeekly();
     else viewHall();
     window.scrollTo(0, 0);
   }
