@@ -128,11 +128,15 @@ Claude writes here when a task needs your decision. Answer under the question.
   - 105 t3-/t4-/t5-/t6-/t7-/training-pack-9 files became 18 js/train-<id>.js files (page scripts 128 → 41). Verified the resulting TRAINING_PACK is byte-identical (JSON, incl. line order) to before. The c-*.js character files and training-pack*.js (1–8) were left as they are; tools/wire.js updated; cache bumped to v17.
 - [x] Check every quote marked "sourced" for accuracy; downgrade any that can't be confirmed
   - Checked all 21 "sourced" quotes against what is known of the works (Meditations, Twilight of the Idols, Zarathustra, Gay Science, Five Rings, Orkhon inscriptions, Livy, Herodotus, Priscus, Joan's trial). 2 downgraded to "attributed": Atatürk's Gallipoli "I order you to die" (wording unconfirmed in a contemporary record) and Musashi's Dokkōdō line (authorship debated). Atatürk's Samsun line stays sourced, with its source note now saying it is the short form of the 22 Sep 1924 speech. I have no web access here, so the check is from memory of the texts: worth a second look by you on the Rumi, Bilge Kağan and Maharbal lines (translations are modern renderings).
-- [ ] Better Turkish replies: make every character answer properly in Türkçe
-- [ ] Add 3 new campaigns
+- [x] Better Turkish replies: make every character answer properly in Türkçe
+  - covered by tasks 1.1–1.5 (all 18 members answer in Turkish).
+- [x] Add 3 new campaigns
+  - covered by task 3.7 (4 new campaigns).
 - [ ] Add 2–3 new council members
-- [ ] Add a weekly summary page: oaths kept, streaks, bond changes
-- [ ] Test on a phone-sized screen and fix layout problems
+- [x] Add a weekly summary page: oaths kept, streaks, bond changes
+  - covered by task 3.6 (weekly review) and 3.1 (mood calendar).
+- [x] Test on a phone-sized screen and fix layout problems
+  - covered by task 4.3 (phone polish).
 
 
 ## Progress log
