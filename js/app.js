@@ -1114,6 +1114,50 @@
     };
   }
 
+  // ---------- search ----------
+  function viewSearch() {
+    const fold = (t) => String(t || "").toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ı/g, "i");
+    app.innerHTML = `
+      <h2 class="section-title">Search</h2>
+      <p class="sub">Look through your saved conversations, current chats and journal. Nothing leaves this device.</p>
+      <div class="panel"><input type="search" id="sq" class="search-box" placeholder="Search for a word or phrase…" aria-label="Search your conversations and journal" autocomplete="off" maxlength="100"></div>
+      <div id="sres"></div>`;
+    const box = document.getElementById("sq"), out = document.getElementById("sres");
+    const snippet = (text, q) => {
+      const raw = String(text), i = fold(raw).indexOf(q);
+      const from = Math.max(0, i - 50), to = Math.min(raw.length, i + q.length + 90);
+      const a = esc(raw.slice(from, Math.max(from, i))), b = esc(raw.slice(Math.max(from, i), i + q.length)), z = esc(raw.slice(i + q.length, to));
+      return (from > 0 ? "…" : "") + a + "<mark>" + b + "</mark>" + z + (to < raw.length ? "…" : "");
+    };
+    function run() {
+      const q = fold(box.value.trim());
+      if (q.length < 2) { out.innerHTML = q ? `<div class="note">Type at least two letters.</div>` : ""; return; }
+      const groups = [];
+      const hit = (t) => fold(t).includes(q);
+      // saved conversations
+      const sv = [];
+      for (const sItem of savedList()) for (const m of sItem.messages) if (hit(m.text)) { sv.push({ href: "#/saved/" + sItem.sid, head: `${esc(sItem.title)} · ${esc(new Date(sItem.date).toLocaleDateString())}`, who: m.who, text: m.text }); }
+      groups.push(["Saved", sv]);
+      // current chats
+      const ch = [];
+      for (const c of C) for (const m of load("ironcouncil.chat." + c.id, [])) if (m.content && hit(m.content)) ch.push({ href: "#/c/" + c.id, head: `Chat with ${esc(c.name)}`, who: m.role === "user" ? "You" : c.name, text: m.content });
+      groups.push(["Chats", ch]);
+      // journal
+      const jr = [];
+      for (const e of load(JKEY, [])) {
+        const c = byId(e.who) || C[0], when = esc(new Date(e.at).toLocaleDateString());
+        if (hit(e.text)) jr.push({ href: "#/journal", head: `Journal · ${when}`, who: "You", text: e.text });
+        if (hit(e.reply)) jr.push({ href: "#/journal", head: `Journal · ${when}`, who: c.name, text: e.reply });
+      }
+      groups.push(["Journal", jr]);
+      const total = groups.reduce((n, g) => n + g[1].length, 0);
+      out.innerHTML = total ? groups.filter((g) => g[1].length).map(([name, rows]) => `<div class="panel"><div class="label">${name} · ${rows.length}${rows.length > 20 ? " (first 20)" : ""}</div><ul class="sres">${rows.slice(0, 20).map((r) => `<li><a href="${r.href}"><small>${r.head}</small><span><b>${esc(r.who)}:</b> ${snippet(r.text, q)}</span></a></li>`).join("")}</ul></div>`).join("")
+        : `<div class="note">Nothing found for “${esc(box.value.trim())}”.</div>`;
+    }
+    let t; box.oninput = () => { clearTimeout(t); t = setTimeout(run, 150); };
+    box.focus();
+  }
+
   // ---------- router ----------
   function route() {
     const h = location.hash.replace(/^#\/?/, "").split("/");
@@ -1128,6 +1172,7 @@
     else if (h[0] === "saved") viewSaved(h[1]);
     else if (h[0] === "mood") viewMood();
     else if (h[0] === "settings") viewSettings();
+    else if (h[0] === "search") viewSearch();
     else viewHall();
     window.scrollTo(0, 0);
   }

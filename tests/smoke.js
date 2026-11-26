@@ -103,6 +103,11 @@ const ok = (c, where, what) => { checks++; if (!c) fail(where, what); };
   ok(camps.length >= 8, "oath", "expected >= 8 campaign links, found " + camps.length);
   for (const h of [...new Set(camps)]) { await go(h); await checkPage(h); }
   await go("#/mood"); await checkPage("mood");
+  await go("#/search"); await checkPage("search");
+  await page.fill("#sq", "exam"); await page.waitForTimeout(400);
+  ok(await page.evaluate(() => document.querySelectorAll("#sres .sres li").length > 0), "search", "no results for a word that is in the chats");
+  await page.fill("#sq", "zzqqxx"); await page.waitForTimeout(400);
+  ok(await page.evaluate(() => /Nothing found/.test(document.getElementById("sres").innerText)), "search", "no empty-result message");
   await go("#/settings"); await checkPage("settings");
   await page.selectOption("#sSize", "large");
   ok(await page.evaluate(() => document.documentElement.style.fontSize === "112%"), "settings", "text size not applied");

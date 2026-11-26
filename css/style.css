@@ -381,3 +381,12 @@ html, body { overflow-x: hidden; }
 main > .panel { max-width: 860px; }
 .calm *, .calm *::before, .calm *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 @media (max-width: 600px) { .set-row { flex-direction: column; align-items: flex-start; } .set-row select { width: 100%; min-height: 44px; } }
+
+/* ---------- search ---------- */
+.search-box { width: 100%; background: var(--bg2); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; font-size: 18px; }
+.sres { list-style: none; margin: 0; padding: 0; }
+.sres li { border-bottom: 1px solid var(--line); }
+.sres li:last-child { border-bottom: 0; }
+.sres a { display: block; padding: 10px 0; }
+.sres small { display: block; color: var(--muted); font-size: 14px; }
+.sres mark { background: rgba(201, 162, 39, .3); color: var(--text); border-radius: 3px; padding: 0 2px; }

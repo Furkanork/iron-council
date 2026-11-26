@@ -27,6 +27,7 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Mood calendar** (Mood page): a month grid coloured by the feeling you brought most each day (from chats, plus Journal entries read back through the engine), with ✓/✗ for oaths kept or broken, your oath streak, and a tap-a-day summary. The log (`ironcouncil.moods`) starts when you update; it is only on your device.
 - **Share as a picture**: the **▣ Picture** button under any chat answer makes a 1080×1350 quote card (member's colour, emblem, the words, name) and shares it through the phone's share sheet, or downloads a PNG.
 - **Settings** (Settings page): default tone (a member's own tone still wins), text size, reduce animations, answer language (automatic / always English / always Türkçe), and a **Delete everything** button (two confirmations). Saved as `ironcouncil.settings`, only on your device.
+- **Search** (Search page): find a word in your saved conversations, current chats and journal (ignores case and Turkish accents, shows the matching line with the word marked, links to the place).
 - **Journal**: write about your day; the member you choose reads it and answers.
 - **Campaigns** also include Atatürk's Reading Campaign, Rumi's Fourteen Days of Calm and Genghis's Discipline of the Steppe.
 - **Backup** (Saved page): download everything in one file and restore it on another device or browser; restoring merges, nothing is lost.
