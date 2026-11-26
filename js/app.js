@@ -31,7 +31,7 @@
     return true;
   }
   function toast(msg) {
-    const t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
+    const t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); t.textContent = msg;
     document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
   }
 
@@ -368,7 +368,7 @@
               <option value="gentle">Gentle</option><option value="">Normal</option><option value="hard">Hard</option></select></label>
             <button class="btn ghost small" id="clearChat">Clear chat</button>
           </div>
-          <div class="log" id="log"></div>
+          <div class="log" id="log" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation"></div>
           <div class="moods" id="moods">${E.MOODS.concat("general").map((m) => `<button class="chip" data-m="${m}">${E.MOOD_LABELS[m]}</button>`).join("")}</div>
           <div class="moods asks" id="asks"><span class="asks-label">${g(c, "Ask him:")}</span>${ASKS.map((x) => `<button class="chip ghost-chip" data-ask="${esc(x)}">${esc(x)}</button>`).join("")}</div>
           <div class="composer">
@@ -494,9 +494,9 @@
     app.innerHTML = `
       <h2 class="section-title">The Council</h2>
       <p class="sub">Ask once. Hear several convictions answer the same problem.</p>
-      <div class="modes" id="modes"><button class="chip ${mode === "counsel" ? "on" : ""}" data-mode="counsel">Counsel — they advise you</button><button class="chip ${mode === "debate" ? "on" : ""}" data-mode="debate">Debate — they argue for and against</button></div>
+      <div class="modes" id="modes"><button class="chip ${mode === "counsel" ? "on" : ""}" aria-pressed="${mode === "counsel"}" data-mode="counsel">Counsel — they advise you</button><button class="chip ${mode === "debate" ? "on" : ""}" aria-pressed="${mode === "debate"}" data-mode="debate">Debate — they argue for and against</button></div>
       <p class="help mode-help">${mode === "debate" ? "Ask a yes-or-no choice (“Should I take a gap year?”). They split into two sides, argue, answer each other, and each gives a final verdict." : "Tell them what you're facing, or pick a feeling."}</p>
-      <div class="pick" id="pick">${C.map((c) => `<button class="chip ${chosen.has(c.id) ? "on" : ""}" data-id="${c.id}" style="--c:${c.color}">${window.emblem(c, 16)} ${esc(c.name)}</button>`).join("")}</div>
+      <div class="pick" id="pick" role="group" aria-label="Who answers">${C.map((c) => `<button class="chip ${chosen.has(c.id) ? "on" : ""}" aria-pressed="${chosen.has(c.id)}" data-id="${c.id}" style="--c:${c.color}">${window.emblem(c, 16)} ${esc(c.name)}</button>`).join("")}</div>
       <div class="council-box">
         ${mode === "debate" ? "" : `<div class="moods" style="border-top:none" id="cm">${E.MOODS.concat("general").map((m) => `<button class="chip" data-m="${m}">${E.MOOD_LABELS[m]}</button>`).join("")}</div>`}
         <div class="composer"><textarea id="cq" placeholder="${mode === "debate" ? "Should I …? — e.g. Should I quit my job to start a business?" : "What are you facing?"}"></textarea><button class="btn" id="cs">${mode === "debate" ? "Open the debate" : "Summon"}</button></div>
@@ -506,7 +506,7 @@
       const b = e.target.closest(".chip"); if (!b) return;
       const id = b.dataset.id;
       if (chosen.has(id)) chosen.delete(id); else { if (chosen.size >= 4) return toast("Up to four voices at once."); chosen.add(id); }
-      b.classList.toggle("on", chosen.has(id));
+      b.classList.toggle("on", chosen.has(id)); b.setAttribute("aria-pressed", String(chosen.has(id)));
       localStorage.setItem("ironcouncil.council", JSON.stringify([...chosen]));
     };
     const ans = document.getElementById("ans"), cq = document.getElementById("cq"), cs = document.getElementById("cs");
@@ -648,7 +648,7 @@
       <h2 class="section-title">The Forge</h2>
       <p class="sub">${g(c, "Train a character. Everything you teach here is used in his answers right away.")} Saved in this browser — the Backup on the Saved page includes it.</p>
       <div class="forge-head">
-        <select id="fsel">${C.map((x) => `<option value="${x.id}" ${x.id === c.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
+        <select id="fsel" aria-label="Member to train">${C.map((x) => `<option value="${x.id}" ${x.id === c.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
         <span class="count">${total} thing${total === 1 ? "" : "s"} taught</span>
         <span style="flex:1"></span>
         <a class="btn ghost small" href="#/c/${c.id}">Talk to ${esc(c.name.split(" ")[0])}</a>
@@ -674,7 +674,7 @@
           <h3>${g(c, "Lines for a feeling, topic, or about him")}</h3>
           <p class="help">Extra lines for when you feel a certain way, talk about a part of life, ${g(c, "ask about his own life, or ask his opinion of another member.")}</p>
           <div class="field">
-            <select id="lM"><optgroup label="Feeling">${E.MOODS.concat("general").map((m) => `<option value="${m}">${E.MOOD_LABELS[m]}</option>`).join("")}</optgroup><optgroup label="Topic">${E.TOPICS.map((t) => `<option value="topic:${t}">About ${E.TOPIC_LABELS[t]}</option>`).join("")}</optgroup><optgroup label="${g(c, "When you ask about him")}">${E.ABOUT_KEYS.concat("general").map((k) => `<option value="about:${k}">${g(c, "His " + E.ABOUT_LABELS[k])}</option>`).join("")}</optgroup><optgroup label="${g(c, "His opinion of…")}">${C.filter((x) => x.id !== c.id).map((x) => `<option value="opinion:${x.id}">${esc(x.name)}</option>`).join("")}</optgroup></select>
+            <select id="lM" aria-label="Feeling or topic this line answers"><optgroup label="Feeling">${E.MOODS.concat("general").map((m) => `<option value="${m}">${E.MOOD_LABELS[m]}</option>`).join("")}</optgroup><optgroup label="Topic">${E.TOPICS.map((t) => `<option value="topic:${t}">About ${E.TOPIC_LABELS[t]}</option>`).join("")}</optgroup><optgroup label="${g(c, "When you ask about him")}">${E.ABOUT_KEYS.concat("general").map((k) => `<option value="about:${k}">${g(c, "His " + E.ABOUT_LABELS[k])}</option>`).join("")}</optgroup><optgroup label="${g(c, "His opinion of…")}">${C.filter((x) => x.id !== c.id).map((x) => `<option value="opinion:${x.id}">${esc(x.name)}</option>`).join("")}</optgroup></select>
             <textarea id="lT" placeholder="${g(c, "A line in his voice.")}"></textarea>
           </div>
           <button class="btn small" id="lAdd">Add line</button>
@@ -789,7 +789,7 @@
       <h2 class="section-title">Journal</h2>
       <p class="sub">${p.name ? esc(p.name) + ", write" : "Write"} about your day — what happened, what you did, what is weighing on you. One of them reads it and answers. It stays in this browser.</p>
       <div class="panel journal-new">
-        <div class="field"><select id="jWho">${C.map((c) => `<option value="${c.id}" ${c.id === lastWho ? "selected" : ""}>${esc(c.name)} reads it</option>`).join("")}</select>
+        <div class="field"><select id="jWho" aria-label="Who reads it">${C.map((c) => `<option value="${c.id}" ${c.id === lastWho ? "selected" : ""}>${esc(c.name)} reads it</option>`).join("")}</select>
         <textarea id="jText" maxlength="3000" placeholder="Today I…"></textarea></div>
         <div class="row"><button class="btn" id="jWrite">Write it</button>${list.length ? `<span style="flex:1"></span><button class="btn ghost small" id="jDl">Download journal</button>` : ""}</div>
       </div>
@@ -901,7 +901,7 @@
       todayHTML = `<div class="panel">
         <div class="label">Today's oath</div>
         <p class="help">One task you will do today. Say it plainly. Tomorrow the one you swore to will ask whether you kept it.</p>
-        <div class="field"><select id="oWho">${C.map((c) => `<option value="${c.id}" ${c.id === lastId ? "selected" : ""}>${esc(c.name)}</option>`).join("")}</select>
+        <div class="field"><select id="oWho" aria-label="Who you swear before">${C.map((c) => `<option value="${c.id}" ${c.id === lastId ? "selected" : ""}>${esc(c.name)}</option>`).join("")}</select>
         <input id="oText" maxlength="140" placeholder="e.g. Study chemistry for two hours without my phone."></div>
         <button class="btn" id="swear">Swear it</button>
       </div>`;
@@ -1214,7 +1214,7 @@
   function route() {
     const h = location.hash.replace(/^#\/?/, "").split("/");
     const nav = h[0] === "c" ? "hall" : h[0] === "campaign" ? "oath" : h[0] || "hall";
-    document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("on", a.dataset.nav === nav));
+    document.querySelectorAll("[data-nav]").forEach((a) => { const on = a.dataset.nav === nav; a.classList.toggle("on", on); if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     if (h[0] === "c") viewChar(h[1]);
     else if (h[0] === "council") viewCouncil();
     else if (h[0] === "forge") viewForge(h[1]);
@@ -1228,7 +1228,17 @@
     else if (h[0] === "weekly") viewWeekly();
     else viewHall();
     window.scrollTo(0, 0);
+    // Screen readers: say which page this is, and start reading from the top of it (not on the first load).
+    const h2 = app.querySelector("h2");
+    const pageName = h[0] === "c" ? (byId(h[1]) || {}).name : h2 && h2.textContent;
+    document.title = pageName ? pageName + " · The Iron Council" : "The Iron Council";
+    if (routed) app.focus({ preventScroll: true });
+    routed = true;
   }
+  let routed = false;
+  // Fields that only have a placeholder get it as their accessible name (the views re-render often, so watch the page).
+  const labelFields = () => app.querySelectorAll("input:not([aria-label]), textarea:not([aria-label])").forEach((el) => { if (el.placeholder && !(el.labels && el.labels.length)) el.setAttribute("aria-label", el.placeholder); });
+  new MutationObserver(labelFields).observe(app, { childList: true, subtree: true });
   window.addEventListener("hashchange", route);
   route();
 })();

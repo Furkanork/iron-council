@@ -49,6 +49,6 @@
   // The emblem as an <svg>, or the letter monogram if a member has none.
   window.emblem = (c, size) => {
     const e = window.EMBLEMS[c.id];
-    return e ? `<svg class="emb" viewBox="0 0 48 48" role="img" aria-label="${c.name} emblem"${size ? ` width="${size}" height="${size}"` : ""}>${e}</svg>` : (c.monogram || "");
+    return e ? `<svg class="emb" viewBox="0 0 48 48" aria-hidden="true" focusable="false"${size ? ` width="${size}" height="${size}"` : ""}>${e}</svg>` : (c.monogram || "");
   };
 })();

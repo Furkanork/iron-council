@@ -12,13 +12,14 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Iron Council">
-  <link rel="stylesheet" href="css/fonts.css?v=40">
-  <link rel="stylesheet" href="css/style.css?v=40">
+  <link rel="stylesheet" href="css/fonts.css?v=41">
+  <link rel="stylesheet" href="css/style.css?v=41">
 </head>
 <body>
+  <a class="skip" href="#app" id="skip">Skip to content</a>
   <header class="top">
     <a class="brand" href="#/"><span class="brand-mark">⚔</span> The Iron Council</a>
-    <nav>
+    <nav aria-label="Main">
       <a href="#/" data-nav="hall">Hall</a>
       <a href="#/council" data-nav="council">Council</a>
       <a href="#/oath" data-nav="oath">Oath</a>
@@ -32,10 +33,10 @@
     </nav>
   </header>
 
-  <main id="app"></main>
+  <main id="app" tabindex="-1"></main>
 
-  <script src="js/bundle.js?v=40"></script>
-  <script src="js/app.js?v=40"></script>
+  <script src="js/bundle.js?v=41"></script>
+  <script src="js/app.js?v=41"></script>
   <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js"));</script>
 </body>
 </html>

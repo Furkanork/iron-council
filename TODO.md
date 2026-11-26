@@ -89,7 +89,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
 ## Phase 4 — Design, speed and polish
 
 - [ ] 🔒 **4.1 Whole interface in Turkish** (L). A TR/EN switch for every button, label and page text (not the characters' answers, which are Phase 1). **Do you want this?**
-- [ ] **4.2 Accessibility** (M). Works with the keyboard alone, clear focus outlines, labels for screen readers, enough contrast everywhere, and answers read correctly by screen readers.
+- [x] **4.2 Accessibility** (M). Works with the keyboard alone, clear focus outlines, labels for screen readers, enough contrast everywhere, and answers read correctly by screen readers. (2026-11-26)
+  - Skip link, focus-visible outline, aria-live chat log, aria-pressed on toggle chips, aria-current in nav, page titles + focus on route change, names for all placeholder-only fields/selects, decorative emblems hidden from readers, lighter red for small text (contrast 3.8 → 5.6), prefers-reduced-motion. Smoke test now checks control names, titles, skip link and focus outline (495 checks pass). Not tested with a real screen reader (VoiceOver/TalkBack/NVDA); that is worth doing by hand.
 - [ ] **4.3 Phone polish** (M). Go through every page on a small phone: tap sizes, spacing, the keyboard not covering the text box, iPhone notch and bottom bar.
 - [ ] **4.4 Speed** (S). Measure with Lighthouse on mobile. Target 90+ on performance, accessibility and best practices, and fix what it finds.
 - [ ] **4.5 "How it works" page** (S). A short page explaining that there is no AI and no server, how the members were written, what **sourced** and **attributed** mean, and that everything stays on your device.
@@ -157,3 +158,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-26 — 3.5 done: Search page.
 - 2026-11-26 — 3.6 done: weekly review page.
 - 2026-11-26 — 3.7 done: 4 new campaigns + progress view.
+- 2026-11-26 — 4.2 done: accessibility pass.

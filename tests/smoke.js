@@ -37,6 +37,20 @@ const ok = (c, where, what) => { checks++; if (!c) fail(where, what); };
     ok(t.trim().length > 20, name, "page is empty");
     const m = t.match(BAD);
     ok(!m, name, "leftover token in page text: " + (m && m[0]));
+    // accessibility: every control has a name, every field a label, the page has a title
+    const unnamed = await page.evaluate(() => {
+      const bad = [];
+      document.querySelectorAll("#app button, #app a[href], #app input, #app select, #app textarea, header a").forEach((el) => {
+        if (el.type === "hidden" || el.hidden) return;
+        const name = (el.getAttribute("aria-label") || el.innerText || el.textContent || el.title || el.placeholder || "").trim();
+        const labelled = el.labels && el.labels.length;
+        if (!name && !labelled) bad.push(el.tagName + "#" + (el.id || "") + "." + el.className);
+        else if (/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName) && el.type !== "checkbox" && !el.getAttribute("aria-label") && !labelled && !el.closest("label")) bad.push("unlabelled " + el.tagName + "#" + el.id);
+      });
+      return bad;
+    });
+    ok(!unnamed.length, name, "controls without an accessible name: " + unnamed.slice(0, 3).join(", "));
+    ok(await page.evaluate(() => document.title.length > 3), name, "empty page title");
     const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     ok(over <= 1, name, "horizontal overflow of " + over + "px at phone width");
   };
@@ -47,6 +61,12 @@ const ok = (c, where, what) => { checks++; if (!c) fail(where, what); };
   ok(ids.length === 18, "characters", "expected 18 members, found " + ids.length);
 
   where = "hall"; await go("#/"); await checkPage("hall");
+  // keyboard: the first Tab stop is the skip link, and a focused control has a visible outline
+  ok(await page.evaluate(() => document.querySelector("a, button, input, select, textarea") === document.getElementById("skip")), "keyboard", "the skip link is not the first focusable element");
+  await page.focus("#skip");
+  ok(await page.evaluate(() => document.getElementById("skip").getBoundingClientRect().top >= 0), "keyboard", "skip link is not visible when focused");
+  await page.keyboard.press("Tab");
+  ok(await page.evaluate(() => { const st = getComputedStyle(document.activeElement); return st.outlineStyle !== "none" && parseFloat(st.outlineWidth) >= 2; }), "keyboard", "focused control has no visible outline");
 
   // chat with every member
   const msgs = ["I am afraid I will fail my exam", "I feel tired and lazy, I can't start working", "sınavdan korkuyorum, çok yorgunum", "Korkun var mı?", "Napolyon hakkında ne düşünüyorsun?"];
