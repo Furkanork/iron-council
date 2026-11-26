@@ -1095,7 +1095,7 @@
           <select id="sTone">${opt("", "Normal", st.tone)}${opt("gentle", "Gentle", st.tone)}${opt("hard", "Hard", st.tone)}</select></label>
         <label class="set-row" for="sSize"><span><b>Text size</b><small>Makes everything on the site bigger or smaller.</small></span>
           <select id="sSize">${opt("", "Normal", st.size)}${opt("large", "Large", st.size)}${opt("xlarge", "Extra large", st.size)}</select></label>
-        <label class="set-row" for="sCalm"><span><b>Reduce animations</b><small>Stops the blinking cursor, sliding and fading.</small></span>
+        <label class="set-row set-check" for="sCalm"><span><b>Reduce animations</b><small>Stops the blinking cursor, sliding and fading.</small></span>
           <input type="checkbox" id="sCalm"${st.calm ? " checked" : ""}></label>
         <label class="set-row" for="sLang"><span><b>Answer language</b><small>Automatic follows the language you write in. Or make every answer English or Türkçe.</small></span>
           <select id="sLang">${opt("", "Automatic", st.lang)}${opt("en", "Always English", st.lang)}${opt("tr", "Always Türkçe", st.lang)}</select></label>
@@ -1158,7 +1158,7 @@
         : `<div class="note">Nothing found for “${esc(box.value.trim())}”.</div>`;
     }
     let t; box.oninput = () => { clearTimeout(t); t = setTimeout(run, 150); };
-    box.focus();
+    if (matchMedia("(min-width: 861px)").matches) box.focus();
   }
 
   // ---------- weekly review ----------
@@ -1214,7 +1214,7 @@
   function route() {
     const h = location.hash.replace(/^#\/?/, "").split("/");
     const nav = h[0] === "c" ? "hall" : h[0] === "campaign" ? "oath" : h[0] || "hall";
-    document.querySelectorAll("[data-nav]").forEach((a) => { const on = a.dataset.nav === nav; a.classList.toggle("on", on); if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    document.querySelectorAll("[data-nav]").forEach((a) => { const on = a.dataset.nav === nav; a.classList.toggle("on", on); if (on) { a.setAttribute("aria-current", "page"); const n = a.parentElement; if (n.scrollWidth > n.clientWidth) n.scrollTo({ left: Math.max(0, a.offsetLeft - n.clientWidth / 2 + a.offsetWidth / 2), behavior: "auto" }); } else a.removeAttribute("aria-current"); });
     if (h[0] === "c") viewChar(h[1]);
     else if (h[0] === "council") viewCouncil();
     else if (h[0] === "forge") viewForge(h[1]);
@@ -1235,6 +1235,10 @@
     if (routed) app.focus({ preventScroll: true });
     routed = true;
   }
+  // On phones the keyboard can cover the box you are typing in: when a field gets focus (or the visible area shrinks), scroll it into view.
+  const showField = () => { const el = document.activeElement; if (el && /^(TEXTAREA|INPUT|SELECT)$/.test(el.tagName) && app.contains(el)) setTimeout(() => el.scrollIntoView({ block: "center", behavior: "smooth" }), 250); };
+  document.addEventListener("focusin", (e) => { if (matchMedia("(pointer: coarse)").matches && /^(TEXTAREA|INPUT)$/.test(e.target.tagName)) showField(); });
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", () => { if (matchMedia("(pointer: coarse)").matches) showField(); });
   let routed = false;
   // Fields that only have a placeholder get it as their accessible name (the views re-render often, so watch the page).
   const labelFields = () => app.querySelectorAll("input:not([aria-label]), textarea:not([aria-label])").forEach((el) => { if (el.placeholder && !(el.labels && el.labels.length)) el.setAttribute("aria-label", el.placeholder); });

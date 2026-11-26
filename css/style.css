@@ -23,6 +23,7 @@ body {
   font-size: 19px;
   line-height: 1.5;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -252,7 +253,7 @@ html, body { overflow-x: hidden; }
   main { padding: 16px 10px 60px; }
   .hero h1 { font-size: 30px; }
   .oath blockquote { font-size: 21px; }
-  .log { padding: 14px; max-height: 60vh; }
+  .log { padding: 14px; max-height: 60vh; max-height: 60dvh; }
   .msg { max-width: 94%; }
   .msg.char { font-size: 18px; }
   .moods { padding: 10px 12px 0; gap: 6px; }
@@ -404,3 +405,29 @@ main > .panel { max-width: 860px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #app:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* ---------- phone polish ---------- */
+/* Notch / home bar: the page runs edge to edge (viewport-fit=cover), so keep content out of the unsafe areas. */
+.top { padding-top: max(14px, env(safe-area-inset-top)); padding-left: max(28px, env(safe-area-inset-left)); padding-right: max(28px, env(safe-area-inset-right)); }
+main { padding-bottom: max(60px, calc(env(safe-area-inset-bottom) + 40px)); }
+.toast { bottom: max(22px, calc(env(safe-area-inset-bottom) + 12px)); max-width: calc(100vw - 24px); }
+@media (max-width: 600px) {
+  .top { padding-top: max(10px, env(safe-area-inset-top)); padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+  main { padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); }
+}
+/* Fingers: at least 44px to tap on touch screens. */
+@media (pointer: coarse) {
+  .btn, .chip, select, .mc, .tools button, .entry-head button, .items li button { min-height: 44px; }
+  .btn.small { padding-top: 10px; padding-bottom: 10px; }
+  .chip { display: inline-flex; align-items: center; padding-left: 14px; padding-right: 14px; }
+  .top nav a { padding: 12px 4px; }
+  .top nav { row-gap: 0; }
+  .brand { display: inline-block; padding: 6px 0; }
+  .msg .tools button { padding: 12px 8px 12px 0; min-height: 44px; }
+  .set-row input[type=checkbox] { width: 32px; height: 32px; }
+  .set-row { min-height: 56px; }
+  .sres a { padding: 14px 0; }
+  cite a { display: inline-block; padding: 12px 0; }
+  .mood-nav .btn { min-width: 44px; }
+}
+@media (max-width: 600px) { .set-row.set-check { flex-direction: row; align-items: center; } }
