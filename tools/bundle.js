@@ -21,7 +21,7 @@ function sources() {
     ...pick(/^story-.*\.js$/),      // more stories from each life
     ...pick(/^combo-.*\.js$/),      // lines written for one feeling + one topic together
     "emblems.js",
-    "engine.js", "campaigns.js", "campaigns-2.js",
+    "engine.js", "campaigns.js", "campaigns-2.js", "campaigns-3.js",
   ];
 }
 

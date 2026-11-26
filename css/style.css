@@ -390,3 +390,7 @@ main > .panel { max-width: 860px; }
 .sres a { display: block; padding: 10px 0; }
 .sres small { display: block; color: var(--muted); font-size: 14px; }
 .sres mark { background: rgba(201, 162, 39, .3); color: var(--text); border-radius: 3px; padding: 0 2px; }
+
+/* campaign progress */
+.pbar { height: 10px; background: var(--bg2); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin: 6px 0 10px; }
+.pbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--blood), var(--gold)); }

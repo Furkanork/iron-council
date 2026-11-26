@@ -83,8 +83,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
   - New Search page (#/search, in the nav): searches saved conversations, current chats and journal entries + replies; case- and accent-insensitive (İ/ı/ş/ğ…), highlighted snippets, links back. Smoke test covers it (353 checks pass).
 - [x] **3.6 Weekly review** (M). Once a week, a member you choose looks back at your week (feelings, oaths kept, journal) and answers it in their voice. (2026-11-26)
   - New Week page (#/weekly): seven-day stats + a review in the chosen member's voice built from his oath-kept/broken and feeling lines; reviews are saved and listed. Not a hard once-a-week lock: you can ask any time (the window is always the last 7 days). Smoke test covers it (360 checks). Reads a bit like stitched lines, as the engine does elsewhere; no week-specific lines per member yet.
-- [ ] **3.7 Campaigns, more of them** (L). 4 more 14-day campaigns (e.g. Joan: courage, Tesla: deep work, Leonidas: endurance, Rumi: patience), and a progress view for each.
-- [ ] 🔒 **3.8 Daily reminder** (M). A daily nudge to swear your oath. This only works reliably on Android with the app installed; on iPhone it's limited. **Do you want this?**
+- [ ] **3.7 Campaigns, more of them** (L). 4 more 14-day campaigns (e.g. Joan: courage, Tesla: deep work, Leonidas: endurance, Rumi: patience), and a progress view for each. (2026-11-26)
+  - js/campaigns-3.js: Joan's The Standard (courage), Tesla's The Quiet Laboratory (deep work), Leonidas's The Hot Gates (endurance), Rumi's The Patient Garden (patience), each with rules, focus question, 14 days and verdicts, written in the spirit of the figure. Every campaign page now shows a progress bar + kept/missed/to-go for the run in progress and a list of past runs. Smoke test: 372 checks pass; 12 campaign links expected.- [ ] 🔒 **3.8 Daily reminder** (M). A daily nudge to swear your oath. This only works reliably on Android with the app installed; on iPhone it's limited. **Do you want this?**
 
 ## Phase 4 — Design, speed and polish
 
@@ -156,3 +156,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-26 — 3.4 done: Settings page.
 - 2026-11-26 — 3.5 done: Search page.
 - 2026-11-26 — 3.6 done: weekly review page.
+- 2026-11-26 — 3.7 done: 4 new campaigns + progress view.

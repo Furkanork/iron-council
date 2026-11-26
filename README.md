@@ -30,7 +30,7 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Search** (Search page): find a word in your saved conversations, current chats and journal (ignores case and Turkish accents, shows the matching line with the word marked, links to the place).
 - **Weekly review** (Week page): pick a member and he looks back at your last seven days — oaths kept/broken, streak, journal entries, the feelings you brought most — and answers in his own voice (an oath-verdict line, a line for your main feeling, a closer; respects your tone and language settings). Past reviews are kept on the page (`ironcouncil.weekly`).
 - **Journal**: write about your day; the member you choose reads it and answers.
-- **Campaigns** also include Atatürk's Reading Campaign, Rumi's Fourteen Days of Calm and Genghis's Discipline of the Steppe.
+- **Campaigns** also include Joan's The Standard (courage), Tesla's The Quiet Laboratory (deep work), Leonidas's The Hot Gates (endurance) and Rumi's The Patient Garden (patience); every campaign page now has a progress bar for the run in progress and a list of past runs. Before that:  Atatürk's Reading Campaign, Rumi's Fourteen Days of Calm and Genghis's Discipline of the Steppe.
 - **Backup** (Saved page): download everything in one file and restore it on another device or browser; restoring merges, nothing is lost.
 - **Saved**: save any chat or council, read it later, continue it, or download it as a text file.
 - **Misread me**: if a member reads your message wrong, press **✎ Misread me** under the answer and pick what you meant (feeling and topic). That message — and ones worded almost the same — is read your way from then on, by every member. The list is on the Saved page; download it to have it trained into the engine for everyone.
@@ -58,6 +58,7 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/bundle.js` — GENERATED single file (all of the files below except app.js) that the page loads. After changing any of them run `node tools/bundle.js` (also run by CI check: a stale bundle fails it). Cache version in index.html/eval.html is bumped with `?v=`.
 - `js/characters.js`, `js/c-*.js` — character dossiers
 - `js/training-pack*.js` — first training rounds
+- `js/campaigns*.js` — the 12 campaigns (`campaigns-3.js` holds courage, deep work, endurance, patience)
 - `js/rivals-<id>.js` — more pairs who speak to each other in the Council (`rivals` in the pack)
 - `js/story-<id>.js` — more stories from his life (added to the three in the main pack)
 - `js/combo-<id>.js` — his 20 feeling + topic combination lines (`combos` in the pack, keyed `feeling+topic`)

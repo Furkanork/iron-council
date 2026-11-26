@@ -841,10 +841,13 @@
         <div class="panel"><div class="label">${esc(E.shortName(c))}'s rules for this campaign</div><ul class="rules">${(k.rules || []).map((r) => `<li>${esc(r)}</li>`).join("")}</ul></div>
         ${k.focusQ ? `<div class="panel"><div class="label">Your focus</div><p class="help">${esc(k.focusQ)} The plan below fills it in for you.</p>
           <div class="field"><input id="focus" maxlength="80" placeholder="${esc(k.focusHint || "")}" value="${esc(focus)}"></div>${mine ? `<button class="btn ghost small" id="focusSave">Save focus</button>` : ""}</div>` : ""}
+        ${mine ? (() => { const kept = a.done.filter((d) => d.status === "kept").length, miss = a.done.length - kept; return `<div class="panel camp-progress"><div class="label">Your progress</div>
+          <div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="14" aria-valuenow="${a.done.length}" aria-label="Campaign days finished"><i style="width:${Math.round(a.done.length / 14 * 100)}%"></i></div>
+          <p class="help">Day ${Math.min(a.done.length + 1, 14)} of 14 · ${kept} kept · ${miss} missed · ${14 - a.done.length} to go. ${kept + miss ? `You need ${Math.max(0, 12 - kept)} more kept for the highest verdict.` : ""}</p></div>`; })() : ""}
         <div class="panel"><div class="label">The plan · day by day</div><ol class="plan" id="plan"></ol></div>
         <div class="panel"><div class="label">The verdict at the end</div><ul class="rules">
           <li><b>12–14 kept:</b> ${esc(k.finish.great)}</li><li><b>8–11 kept:</b> ${esc(k.finish.good)}</li><li><b>Fewer:</b> ${esc(k.finish.poor)}</li></ul></div>
-        ${hist.length ? `<p class="camp-done">Completed ${hist.length}× · best ${Math.max(...hist.map((h) => h.kept))}/14 kept</p>` : ""}
+        ${hist.length ? `<div class="panel"><div class="label">Past runs</div><ul class="rules">${hist.slice().reverse().map((h) => `<li>${esc(h.finished || "")}: ${h.kept}/14 kept</li>`).join("")}</ul><p class="camp-done">Completed ${hist.length}× · best ${Math.max(...hist.map((h) => h.kept))}/14 kept</p></div>` : ""}
         <div class="row camp-go">${mine ? `<a class="btn" href="#/oath">Go to today's task</a>`
           : other ? `<p class="help">You are already in <b>${esc(other.title)}</b>. Finish or abandon it on the Oath page to begin this one.</p>`
           : `<button class="btn" id="begin">Begin the campaign</button>`}</div>
