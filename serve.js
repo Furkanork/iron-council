@@ -1,6 +1,6 @@
 // Tiny static server, no dependencies:  node serve.js   →  http://localhost:8080
 // node serve.js --open  also opens the browser once the server is ready (start.bat uses this).
-const http = require("http"), fs = require("fs"), path = require("path"), { exec } = require("child_process");
+const zlib = require("zlib"), http = require("http"), fs = require("fs"), path = require("path"), { exec } = require("child_process");
 const root = __dirname, port = process.env.PORT || 8080, url = `http://localhost:${port}`;
 const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webmanifest": "application/manifest+json", ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml" };
 const open = () => {
@@ -16,7 +16,10 @@ const server = http.createServer((req, res) => {
   fs.readFile(file, (err, data) => {
     if (err) { res.writeHead(404); return res.end("Not found"); }
     // no-cache: after an update you always get the new files
-    res.writeHead(200, { "Content-Type": (types[path.extname(file)] || "application/octet-stream") + "; charset=utf-8", "Cache-Control": "no-cache" });
+    const head = { "Content-Type": (types[path.extname(file)] || "application/octet-stream") + "; charset=utf-8", "Cache-Control": "no-cache" };
+    // gzip text files, like the live site does (the bundle is 1.2 MB of text)
+    if (/\bgzip\b/.test(req.headers["accept-encoding"] || "") && /\.(html|js|css|json|svg|webmanifest)$/.test(file)) { head["Content-Encoding"] = "gzip"; head.Vary = "Accept-Encoding"; res.writeHead(200, head); return res.end(zlib.gzipSync(data)); }
+    res.writeHead(200, head);
     res.end(data);
   });
 });

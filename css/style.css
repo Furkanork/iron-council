@@ -79,7 +79,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 28px 24px 80px; }
 .card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--c); }
 .card:hover { transform: translateY(-3px); border-color: var(--c); box-shadow: 0 10px 30px -12px var(--c); }
 .card .era { font-family: var(--head); font-size: 12px; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; }
-.card h3 { font-family: var(--head); margin: 4px 0 2px; font-size: 21px; }
+.card h2 { font-family: var(--head); margin: 4px 0 2px; font-size: 21px; }
 .card .ttl { color: var(--c); font-size: 16px; font-style: italic; }
 .card .idea { margin-top: 12px; font-size: 17px; color: #cfcac2; }
 
@@ -97,7 +97,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 28px 24px 80px; }
 /* ---------- character page ---------- */
 .char-layout { display: grid; grid-template-columns: 340px 1fr; gap: 26px; align-items: start; }
 /* ---------- oath, memory, council, saved ---------- */
-.banner { --c: var(--blood2); display: block; max-width: 860px; margin: 0 auto 26px; padding: 14px 18px; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 6px; font-size: 17.5px; }
+.banner { --c: var(--blood-text); display: block; max-width: 860px; margin: 0 auto 26px; padding: 14px 18px; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 6px; font-size: 17.5px; }
 .banner b { font-family: var(--head); font-size: 14px; letter-spacing: .06em; }
 .banner span { color: var(--c); font-family: var(--head); font-size: 13px; letter-spacing: .08em; white-space: nowrap; }
 .banner:hover { border-color: var(--c); }

@@ -271,7 +271,7 @@
     return `<a class="card" href="#/c/${c.id}" style="--c:${c.color}">
       <div class="sigil" style="--c:${c.color}">${window.emblem(c)}</div>
       <div class="era">${esc(c.era)} · ${esc(c.region)}</div>
-      <h3>${esc(c.name)}</h3>
+      <h2>${esc(c.name)}</h2>
       <div class="ttl">${esc(c.title)}</div>
       <div class="idea">${esc(c.idea)}</div>
     </a>`;

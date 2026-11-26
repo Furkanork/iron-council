@@ -93,7 +93,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
   - Skip link, focus-visible outline, aria-live chat log, aria-pressed on toggle chips, aria-current in nav, page titles + focus on route change, names for all placeholder-only fields/selects, decorative emblems hidden from readers, lighter red for small text (contrast 3.8 → 5.6), prefers-reduced-motion. Smoke test now checks control names, titles, skip link and focus outline (495 checks pass). Not tested with a real screen reader (VoiceOver/TalkBack/NVDA); that is worth doing by hand.
 - [x] **4.3 Phone polish** (M). Go through every page on a small phone: tap sizes, spacing, the keyboard not covering the text box, iPhone notch and bottom bar. (2026-11-26)
   - Measured every page at 320x568 with touch emulation: no horizontal overflow; all tap targets under 36px found and raised to 44px on touch screens (@media pointer: coarse); safe-area insets + viewport-fit=cover for notch/home bar (the app already used a translucent status bar, so the header would have sat under the notch); 100dvh; focused fields scroll into view above the keyboard; nav scrolls the active page into view; search no longer auto-opens the keyboard. The keyboard-cover fix can only be tested on a real phone (headless has no soft keyboard), as can the notch padding.
-- [ ] **4.4 Speed** (S). Measure with Lighthouse on mobile. Target 90+ on performance, accessibility and best practices, and fix what it finds.
+- [x] **4.4 Speed** (S). Measure with Lighthouse on mobile. Target 90+ on performance, accessibility and best practices, and fix what it finds. (2026-11-26)
+  - Lighthouse 12, mobile preset, Hall page, local server with gzip: before 55 / 92 / 100 / 90 (perf / a11y / best practices / SEO; FCP 7.8 s, no gzip, nothing painted until the bundle ran), after 97 / 100 / 100 / 100. Changes: static first screen in index.html, deferred scripts, gzip in serve.js, meta description, one heading-order fix (member names h3 → h2), banner text colour contrast. Only the Hall was measured; the remaining cost is the 1.2 MB bundle (TBT ~210 ms). A real next step would be loading the member training data only when a chat opens. Numbers are simulated, not from a real phone.
 - [ ] **4.5 "How it works" page** (S). A short page explaining that there is no AI and no server, how the members were written, what **sourced** and **attributed** mean, and that everything stays on your device.
 
 ## Phase 5 — Finish
@@ -161,3 +162,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-26 — 3.7 done: 4 new campaigns + progress view.
 - 2026-11-26 — 4.2 done: accessibility pass.
 - 2026-11-26 — 4.3 done: phone polish.
+- 2026-11-26 — 4.4 done: speed (Lighthouse 97/100/100/100 on the Hall).
