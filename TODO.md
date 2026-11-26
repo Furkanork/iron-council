@@ -77,7 +77,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
 - [x] **3.2 Share an answer as a picture** (M). Turn any answer into a quote card image (member's colour, emblem, the words) to save or send from your phone. (2026-11-25)
   - ▣ Picture button in the chat answer tools: canvas card with colour wash, emblem, the answer (text size shrinks to fit), name/title, and a note that it is written in the spirit of the figure. Uses the Web Share API with a file where the phone supports it, otherwise downloads the PNG. Tested the download and looked at the image in Chromium; the share sheet itself could not be tested here. Chat only for now (not Council/Journal).
 - [ ] 🔒 **3.3 Read aloud** (S). A ▶ button that reads an answer aloud with the phone's built-in voice, so nothing extra is needed. **Do you want this?**
-- [ ] **3.4 Settings page** (M). Default tone, text size, reduce animations, language, and a "delete everything" button, all in one place.
+- [x] **3.4 Settings page** (M). Default tone, text size, reduce animations, language, and a "delete everything" button, all in one place. (2026-11-26)
+  - New Settings page (#/settings, in the nav): default tone, text size (normal/large/extra large), reduce animations, answer language (auto/EN/TR; applies to chat, Council, Journal), delete everything (double confirm). Smoke test covers it (348 checks pass); run.js 357/363 unchanged. Language override isn't applied to canned UI text, that is 4.1.
 - [ ] **3.5 Search** (S). Search your saved conversations and journal.
 - [ ] **3.6 Weekly review** (M). Once a week, a member you choose looks back at your week (feelings, oaths kept, journal) and answers it in their voice.
 - [ ] **3.7 Campaigns, more of them** (L). 4 more 14-day campaigns (e.g. Joan: courage, Tesla: deep work, Leonidas: endurance, Rumi: patience), and a progress view for each.
@@ -150,3 +151,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-25 — 2.5 done: drawn emblems replace monograms.
 - 2026-11-25 — 3.1 done: mood calendar page.
 - 2026-11-25 — 3.2 done: share an answer as a quote-card picture.
+- 2026-11-26 — 3.4 done: Settings page.

@@ -37,6 +37,17 @@
 
   // ---------- small storage helpers ----------
   const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } };
+  // Settings page (one JSON object): default tone, text size, reduced motion, answer language.
+  const SETKEY = "ironcouncil.settings";
+  const settings = () => { const o = load(SETKEY, {}); return o && typeof o === "object" ? o : {}; };
+  const applySettings = () => {
+    const st = settings(), root = document.documentElement;
+    root.style.fontSize = st.size === "large" ? "112%" : st.size === "xlarge" ? "125%" : "";
+    root.classList.toggle("calm", !!st.calm);
+  };
+  const toneFor = (id) => localStorage.getItem("ironcouncil.tone." + id) || settings().tone || "";
+  const forcedLang = () => { const l = settings().lang; return l === "en" || l === "tr" ? l : undefined; };
+  applySettings();
   const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { toast("Browser storage is full."); } };
   const pad = (n) => String(n).padStart(2, "0");
   const dayKey = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -218,6 +229,7 @@
   // ---------- answering (shared by chat + council) ----------
   // Composed instantly in under a millisecond; revealed quickly so it reads as spoken.
   async function answer(char, question, mood, ctx, onUpdate) {
+    ctx = Object.assign({ lang: forcedLang() }, ctx);
     const r = E.forgeReply(char, question, mood, ctx);
     if (!r.crisis && ctx && ctx.prefix) r.text = ctx.prefix + " " + r.text;
     if (r.crisis) { onUpdate(r.text, true, r); return; }
@@ -417,7 +429,7 @@
       }
       // Bond: coming back on a new day counts.
       { const b = bond(c.id); if (b.day !== dayKey()) { b.day = dayKey(); store(BKEY(c.id), b); bump(c.id, 1); } }
-      const tone = localStorage.getItem(TKEY) || "";
+      const tone = toneFor(id);
       // Did he ask you something last time? Then this message is your answer.
       const prev = log.filter((m) => m.role === "char" && m !== slot).pop();
       const answered = !!(text && prev && prev.asked);
@@ -468,7 +480,7 @@
     document.getElementById("moreBtn").onclick = (e) => { const d = e.target.closest(".dossier"); d.classList.toggle("open"); e.target.textContent = d.classList.contains("open") ? "Hide" : g(c, "About him"); };
     document.getElementById("clearChat").onclick = () => { if (log.length && !confirm("Clear this chat? Save it first if you want to keep it.")) return; log.length = 0; persist(); render(); };
     const toneEl = document.getElementById("tone");
-    toneEl.value = localStorage.getItem(TKEY) || "";
+    toneEl.value = localStorage.getItem(TKEY) || settings().tone || "";
     toneEl.onchange = () => { localStorage.setItem(TKEY, toneEl.value); toast(toneEl.value === "gentle" ? g(c, `${c.name} will be gentler with you.`) : toneEl.value === "hard" ? `${c.name} will not spare you.` : `${c.name} speaks as usual.`); };
     const asMessages = () => log.filter((m) => !m.pending && m.content).map((m) => ({ who: m.role === "user" ? "You" : c.name, text: m.content }));
     document.getElementById("saveChat").onclick = () => saveConversation("chat", [c.id], asMessages());
@@ -527,7 +539,7 @@
       const p = profile();
       for (let i = 0; i < list.length; i++) {
         const c = list[i];
-        const r = E.forgeReply(c, text, mood, {});
+        const r = E.forgeReply(c, text, mood, { lang: forcedLang() });
         let body = r.text, tag = "";
         const rival = i > 0 && session.said.map((s) => s.c).find((o) => c.rivals[o.id]);
         if (!r.crisis && i > 0 && (rival || chance(0.65))) {
@@ -795,7 +807,7 @@
       if (E.isCrisis(text)) reply = E.crisisMessage(text);
       else {
         learn(text);
-        const r = E.forgeReply(c, text, null, { tone: localStorage.getItem("ironcouncil.tone." + c.id) || "", bond: bondLevel(bond(c.id).score) });
+        const r = E.forgeReply(c, text, null, { tone: toneFor(c.id), lang: forcedLang(), bond: bondLevel(bond(c.id).score) });
         reply = [E.say(c, "journal"), r.text].filter(Boolean).join(" ");
         // Writing to him once a day counts toward the bond.
         const b = bond(c.id); if (b.wrote !== dayKey()) { b.wrote = dayKey(); store(BKEY(c.id), b); bump(c.id, 1); }
@@ -1068,6 +1080,40 @@
     app.querySelectorAll(".mc[data-d]").forEach((b) => b.onclick = () => { moodView.sel = b.dataset.d; viewMood(); });
   }
 
+  // ---------- settings ----------
+  function viewSettings() {
+    const st = settings();
+    const opt = (v, label, cur) => `<option value="${v}"${(cur || "") === v ? " selected" : ""}>${label}</option>`;
+    app.innerHTML = `
+      <h2 class="section-title">Settings</h2>
+      <p class="sub">Everything here is saved only on this device.</p>
+      <div class="panel set-list">
+        <label class="set-row" for="sTone"><span><b>Default tone</b><small>How hard they are on you, unless you set a member's tone in his own chat.</small></span>
+          <select id="sTone">${opt("", "Normal", st.tone)}${opt("gentle", "Gentle", st.tone)}${opt("hard", "Hard", st.tone)}</select></label>
+        <label class="set-row" for="sSize"><span><b>Text size</b><small>Makes everything on the site bigger or smaller.</small></span>
+          <select id="sSize">${opt("", "Normal", st.size)}${opt("large", "Large", st.size)}${opt("xlarge", "Extra large", st.size)}</select></label>
+        <label class="set-row" for="sCalm"><span><b>Reduce animations</b><small>Stops the blinking cursor, sliding and fading.</small></span>
+          <input type="checkbox" id="sCalm"${st.calm ? " checked" : ""}></label>
+        <label class="set-row" for="sLang"><span><b>Answer language</b><small>Automatic follows the language you write in. Or make every answer English or Türkçe.</small></span>
+          <select id="sLang">${opt("", "Automatic", st.lang)}${opt("en", "Always English", st.lang)}${opt("tr", "Always Türkçe", st.lang)}</select></label>
+      </div>
+      <div class="panel"><div class="label">Delete everything</div>
+        <p class="help">${esc(backupSummary())} Deleting removes all chats, oaths, bonds, moods, journal, saved items, Forge training, Misread-me fixes and these settings from this browser. Download a backup first (Saved page) if you may want them back.</p>
+        <button class="btn ghost" id="sWipe">Delete everything</button></div>`;
+    const save = (k, v) => { const o = settings(); if (v) o[k] = v; else delete o[k]; store(SETKEY, o); applySettings(); };
+    document.getElementById("sTone").onchange = (e) => save("tone", e.target.value);
+    document.getElementById("sSize").onchange = (e) => save("size", e.target.value);
+    document.getElementById("sCalm").onchange = (e) => save("calm", e.target.checked);
+    document.getElementById("sLang").onchange = (e) => save("lang", e.target.value);
+    document.getElementById("sWipe").onclick = () => {
+      if (!confirm("Delete ALL your data on this device? This cannot be undone.")) return;
+      if (!confirm("Really delete everything: chats, oaths, journal, saved items, training?")) return;
+      for (const k of Object.keys(localStorage)) if (k.startsWith("ironcouncil.")) localStorage.removeItem(k);
+      for (const id of Object.keys(state.chats)) delete state.chats[id];
+      applySettings(); toast("Everything was deleted."); location.hash = "#/"; route();
+    };
+  }
+
   // ---------- router ----------
   function route() {
     const h = location.hash.replace(/^#\/?/, "").split("/");
@@ -1081,6 +1127,7 @@
     else if (h[0] === "campaign") viewCampaign(h[1]);
     else if (h[0] === "saved") viewSaved(h[1]);
     else if (h[0] === "mood") viewMood();
+    else if (h[0] === "settings") viewSettings();
     else viewHall();
     window.scrollTo(0, 0);
   }
