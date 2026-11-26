@@ -40,6 +40,17 @@ Mehmed II · Vlad III · Mustafa Kemal Atatürk · Nihal Atsız · Miyamoto Musa
 - **Misread me**: if a member reads your message wrong, press **✎ Misread me** under the answer and pick what you meant (feeling and topic). That message — and ones worded almost the same — is read your way from then on, by every member. The list is on the Saved page; download it to have it trained into the engine for everyone.
 - **Forge**: train any character with your own beliefs, answers and lines (saved only in your browser).
 
+## Screenshots
+Phone (390 px) and desktop (1280 px), taken in headless Chromium from the real site.
+
+| | Phone | Desktop |
+|---|---|---|
+| Hall | ![Hall on a phone](docs/screenshots/phone-hall.png) | ![Hall on desktop](docs/screenshots/desktop-hall.png) |
+| Chat | ![Chat on a phone](docs/screenshots/phone-chat.png) | ![Chat on desktop](docs/screenshots/desktop-chat.png) |
+| Council | ![Council on a phone](docs/screenshots/phone-council.png) | ![Council on desktop](docs/screenshots/desktop-council.png) |
+| Mood calendar | ![Mood on a phone](docs/screenshots/phone-mood.png) | ![Mood on desktop](docs/screenshots/desktop-mood.png) |
+| Oath | ![Oath on a phone](docs/screenshots/phone-oath.png) | ![Oath on desktop](docs/screenshots/desktop-oath.png) |
+
 ## On your phone
 Open https://furkanork.github.io/iron-council/ on the phone, then:
 - **iPhone (Safari):** Share button → **Add to Home Screen**.
@@ -52,6 +63,14 @@ The engine detects whether a message is Turkish (`Engine.detectLang`: Turkish le
 
 ## How it works
 No AI and no server. Every character has a hand-written dossier of ~250 lines. A small engine reads the feeling, life topic and kind of question in your message and composes a fresh answer instantly. Real quotes are marked **sourced** or **attributed**; everything else is written in the spirit of the figure.
+
+## Changelog
+Everything done under the upgrade plan (see `TODO.md` for the notes on each task).
+- **Safety net**: smoke test of every page (`tests/smoke.js`), content checker (`tests/content.js`), GitHub Actions on every push, one script bundle instead of ~130 files, fonts stored with the site, and a full pass (`tests/full.js`: desktop, offline, backup/restore between two browsers).
+- **Understanding you**: Turkish answers for all 18 members (feelings, topics, personal questions, opinions of each other), language detection, follow-up messages, how strong the feeling is, 20 feeling+topic combination lines each, reviewed safety messages. Round 2 of the unseen-wording work (task 1.9) is not finished: honest blind scores are still about 52–60%, below the 75% goal.
+- **Characters**: 10 stories each (Atsız 8, see question 5), source check of the sourced quotes, 12 more Council rivalries and friendships, drawn emblems. Adding new members waits for the owner's choice (task 2.1).
+- **Features**: mood calendar, share an answer as a picture, settings page, search, weekly review, four more campaigns (courage, deep work, endurance, patience) with progress views. Read-aloud, daily reminder and a Turkish interface wait for the owner's yes/no (3.3, 3.8, 4.1).
+- **Polish**: accessibility pass, phone polish, speed (Lighthouse 97 / 100 / 100 / 100 on the Hall), a How it works page.
 
 ## Run locally
 Open `index.html` in a browser, or run `node serve.js` and visit http://localhost:8080.

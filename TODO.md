@@ -102,7 +102,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
 
 - [x] **5.1 Full test pass** (M). Every test, every page on phone and desktop, offline mode, backup and restore between two browsers. (2026-11-26)
   - Ran everything: run.js 357/363 (8 known misses allowed), lang, followup, intensity, safety (132/132 caught, 77/77 left alone), content (warnings only: 337 duplicate lines, as before), smoke at phone width (500 checks) and now also at 1280x800. New tests/full.js (added to CI): desktop pass, offline (service worker serves the Hall, a chat answer and 8 more pages with the network off), and backup/restore between two clean browser contexts (chat, journal and settings restored; restoring twice does not duplicate). All pass. Not covered: real devices, and two different browser engines (only Chromium).
-- [ ] **5.2 README and screenshots** (S). Up-to-date README with phone and desktop screenshots, and a changelog of everything in this plan.
+- [x] **5.2 README and screenshots** (S). Up-to-date README with phone and desktop screenshots, and a changelog of everything in this plan. (2026-11-26)
+  - README has a Screenshots table (phone 390px + desktop 1280px: Hall, chat, Council, Mood, Oath; files in docs/screenshots/) and a Changelog of the plan. It says plainly that 1.9 is unfinished and 2.1/3.3/3.8/4.1 wait for answers. Screenshots are of the site as of this commit; retake them after big visual changes.
 
 ---
 
@@ -167,3 +168,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-26 — 4.4 done: speed (Lighthouse 97/100/100/100 on the Hall).
 - 2026-11-26 — 4.5 done: How it works page.
 - 2026-11-26 — 5.1 done: full test pass, tests/full.js in CI.
+- 2026-11-26 — 5.2 done: README screenshots and changelog. Remaining: 1.9 (unfinished), 2.2 (question 5), and the 🔒 tasks 2.1, 3.3, 3.8, 4.1.
