@@ -34,3 +34,5 @@ jobs:
         run: npm install --no-save playwright@1.49.1 && npx playwright install --with-deps chromium
       - name: Smoke test (tests/smoke.js)
         run: node tests/smoke.js
+      - name: Desktop, offline, backup and restore (tests/full.js)
+        run: node tests/full.js

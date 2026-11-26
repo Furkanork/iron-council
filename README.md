@@ -63,6 +63,7 @@ Open `index.html` in a browser, or run `node serve.js` and visit http://localhos
 - `js/characters.js`, `js/c-*.js` — character dossiers
 - `js/training-pack*.js` — first training rounds
 - `js/campaigns*.js` — the 12 campaigns (`campaigns-3.js` holds courage, deep work, endurance, patience)
+- `tests/full.js` — the full pass: every page at desktop width, offline mode through the service worker, backup and restore between two clean browsers (starts its own server on port 8099)
 - `js/rivals-<id>.js` — more pairs who speak to each other in the Council (`rivals` in the pack)
 - `js/story-<id>.js` — more stories from his life (added to the three in the main pack)
 - `js/combo-<id>.js` — his 20 feeling + topic combination lines (`combos` in the pack, keyed `feeling+topic`)

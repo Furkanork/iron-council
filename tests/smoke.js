@@ -13,7 +13,7 @@ let chromium;
 try { ({ chromium } = require("playwright")); } catch (e) { console.error("playwright is not installed"); process.exit(2); }
 
 const BASE = process.env.BASE || "file://" + path.resolve(__dirname, "..", "index.html");
-const PHONE = { width: 375, height: 740 };
+const PHONE = (process.env.VIEWPORT || "375x740").split("x").reduce((w, h) => ({ width: +w, height: +h }));
 const BAD = /\{[a-zA-Z_]+\}|\bundefined\b|\bNaN\b|\[object |\bnull\b/;
 const fails = [];
 let checks = 0;
@@ -52,7 +52,7 @@ const ok = (c, where, what) => { checks++; if (!c) fail(where, what); };
     ok(!unnamed.length, name, "controls without an accessible name: " + unnamed.slice(0, 3).join(", "));
     ok(await page.evaluate(() => document.title.length > 3), name, "empty page title");
     const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-    ok(over <= 1, name, "horizontal overflow of " + over + "px at phone width");
+    ok(over <= 1, name, "horizontal overflow of " + over + "px at " + PHONE.width + "px width");
   };
 
   await page.goto(BASE);
