@@ -314,6 +314,37 @@
   };
   for (const k of Object.keys(ROUND7_MOOD)) MOOD_WORDS[k] = MOOD_WORDS[k].concat(ROUND7_MOOD[k].filter((w) => !MOOD_WORDS[k].includes(w)));
   for (const k of Object.keys(ROUND7_TOPIC)) TOPIC_WORDS[k] = TOPIC_WORDS[k].concat(ROUND7_TOPIC[k].filter((w) => !TOPIC_WORDS[k].includes(w)));
+  // Round 8: phrase families (not whole sentences) added after the fourth blind measurement (holdout 8: 49% before this round).
+  const ROUND8_MOOD = {
+    tired: ["battery", "drained", "given up on me", "eyes open", "running on empty", "burnt out", "burned out", "burnout", "wiped out", "night shifts", "enerjim yok", "enerjim", "ağır geliyor", "bitik"],
+    failed: ["ran out of cash", "shut it down", "shut down", "fell apart", "falling apart", "bombed", "messed up", "mess up", "blew it", "screwed up", "went bankrupt", "bozdum", "edemedim", "got fired", "let me go"],
+    afraid: ["imagining everything", "going badly", "go wrong", "goes wrong", "dreading", "dread ", "frightened", "hands shake", "shaking", "geleceğimden"],
+    lazy: ["stare at the wall", "putting off", "put off", "on the sofa", "on the couch", "force myself", "make myself", "go on monday", "start on monday", "start monday", "yatıyorum", "canım istemiyor", "istemiyor"],
+    alone: ["hole in my life", "by myself every", "eat dinner alone", "eat alone", "stopped replying", "stopped answering", "stopped talking to me", "never invites me", "nobody invites", "no one invites", "kimseyi tanımıyorum", "tek başıma", "should be"],
+    lost: ["no map", "no direction", "what comes next", "what to do next", "go back to school", "not sure it's me", "can't tell what i want", "cant tell what i want", "nothing excites", "anlamıyorum", "neyi yanlış"],
+    angry: ["took credit", "furious", "hate how", "laughing at", "keep laughing", "nefret", "yargılayan", "bureaucracy"],
+    doubt: ["not cut out", "good enough", "better at this than", "is any good", "wasting my", "güvenebilir miyim", "acaba", "does god hear", "hears me"]
+  };
+  const ROUND8_TOPIC = {
+    grief: ["passed away", "she's gone", "he's gone", "she is gone", "he is gone", "vefat", "alışamadım", "babamı kaybettim", "annemi kaybettim", "dedemi kaybettim", "ninemi kaybettim"],
+    bully: ["laughing at how i", "keep laughing at", "pushed me", "harassing", "harass", "keep mocking", "dalga geç"],
+    decision: ["job offers", "can't pick", "cant pick", "go back to school", "stay or go back", "which to choose"],
+    love: ["tell her how i feel", "tell him how i feel", "my ex", "marriage", "get over", "fight about everything", "girlfriend and i", "boyfriend and i", "boyfriend", "sevgilim"],
+    envy: ["perfect life", "perfect lives", "everyone's perfect", "better at this than", "bought a house", "buying a house", "everyone else seems"],
+    study: ["textbook", "lecture", "lectures", "midterm", "exams", "university", "kaldım", "ders"],
+    training: ["gym", "get fit", "bench press", "plateau", "squat", "deadlift", "spor"],
+    work: ["startup", "interview", "presentation", "emails", "promotion", "night shifts", "hired", "proje", "toplantı"],
+    money: ["cash", "debt", "bank", "renting", "rent ", "maaş", "borç", "paying"],
+    time: ["slipping away", "wasting my life", "wasting my twenties", "my twenties", "my thirties", "time is running", "running out of time"],
+    habits: ["smoking", "diyet", "diet", "sürdüremiyorum", "bad habit"],
+    family: ["akraba", "annem", "babam"],
+    phone: ["telefon"],
+    sleep: ["lie awake", "lying awake", "awake until", "awake all night", "uykusuz"],
+    creative: ["painted", "painting", "my art", "sketch", "drawing"],
+    health: ["doctors", "surgery", "hospital", "diagnosis", "test results"]
+  };
+  for (const k of Object.keys(ROUND8_MOOD)) MOOD_WORDS[k] = MOOD_WORDS[k].concat(ROUND8_MOOD[k].filter((w) => !MOOD_WORDS[k].includes(w)));
+  for (const k of Object.keys(ROUND8_TOPIC)) TOPIC_WORDS[k] = TOPIC_WORDS[k].concat(ROUND8_TOPIC[k].filter((w) => !TOPIC_WORDS[k].includes(w)));
   // Idioms that would be read literally ("lose 10 kilos" is not defeat, "quit smoking" is not giving up).
   const REWRITES = [
     [/\blos(e|ing) (\d+ ?|some |a few |a lot of )?(kilos?|kg|pounds|lbs|weight|fat|belly)\b/g, "weight loss"],
