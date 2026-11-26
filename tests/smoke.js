@@ -127,6 +127,7 @@ const ok = (c, where, what) => { checks++; if (!c) fail(where, what); };
   await page.click("#wGo"); await page.waitForTimeout(150);
   ok(await page.evaluate(() => document.querySelectorAll(".journal-list .msg .body").length > 0 && document.querySelector(".journal-list .msg .body").innerText.length > 30), "weekly", "no weekly review written");
   await checkPage("weekly (after review)");
+  await go("#/about"); await checkPage("about");
   await go("#/search"); await checkPage("search");
   await page.fill("#sq", "exam"); await page.waitForTimeout(400);
   ok(await page.evaluate(() => document.querySelectorAll("#sres .sres li").length > 0), "search", "no results for a word that is in the chats");

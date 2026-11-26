@@ -431,3 +431,8 @@ main { padding-bottom: max(60px, calc(env(safe-area-inset-bottom) + 40px)); }
   .mood-nav .btn { min-width: 44px; }
 }
 @media (max-width: 600px) { .set-row.set-check { flex-direction: row; align-items: center; } }
+
+.about p, .about ul { margin: 0 0 10px; }
+.about ul { padding-left: 22px; }
+.foot a { text-decoration: underline; }
+@media (pointer: coarse) { .foot a { display: inline-block; padding: 12px 4px; } }

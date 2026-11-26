@@ -95,7 +95,8 @@ Effort per task: **S** = part of a session · **M** = about one session · **L**
   - Measured every page at 320x568 with touch emulation: no horizontal overflow; all tap targets under 36px found and raised to 44px on touch screens (@media pointer: coarse); safe-area insets + viewport-fit=cover for notch/home bar (the app already used a translucent status bar, so the header would have sat under the notch); 100dvh; focused fields scroll into view above the keyboard; nav scrolls the active page into view; search no longer auto-opens the keyboard. The keyboard-cover fix can only be tested on a real phone (headless has no soft keyboard), as can the notch padding.
 - [x] **4.4 Speed** (S). Measure with Lighthouse on mobile. Target 90+ on performance, accessibility and best practices, and fix what it finds. (2026-11-26)
   - Lighthouse 12, mobile preset, Hall page, local server with gzip: before 55 / 92 / 100 / 90 (perf / a11y / best practices / SEO; FCP 7.8 s, no gzip, nothing painted until the bundle ran), after 97 / 100 / 100 / 100. Changes: static first screen in index.html, deferred scripts, gzip in serve.js, meta description, one heading-order fix (member names h3 → h2), banner text colour contrast. Only the Hall was measured; the remaining cost is the 1.2 MB bundle (TBT ~210 ms). A real next step would be loading the member training data only when a chat opens. Numbers are simulated, not from a real phone.
-- [ ] **4.5 "How it works" page** (S). A short page explaining that there is no AI and no server, how the members were written, what **sourced** and **attributed** mean, and that everything stays on your device.
+- [x] **4.5 "How it works" page** (S). A short page explaining that there is no AI and no server, how the members were written, what **sourced** and **attributed** mean, and that everything stays on your device. (2026-11-26)
+  - New page #/about, linked from the Hall footer: no AI/no server, how the engine reads a message, how the dossiers were written (spirit of the figure, Swordsman is invented), sourced vs attributed with live counts, data on device, help lines. In the smoke test (500 checks pass).
 
 ## Phase 5 — Finish
 
@@ -163,3 +164,4 @@ Claude writes here when a task needs your decision. Answer under the question.
 - 2026-11-26 — 4.2 done: accessibility pass.
 - 2026-11-26 — 4.3 done: phone polish.
 - 2026-11-26 — 4.4 done: speed (Lighthouse 97/100/100/100 on the Hall).
+- 2026-11-26 — 4.5 done: How it works page.

@@ -291,7 +291,7 @@
         <cite><a href="#/c/${o.c.id}">— ${esc(o.c.name)}</a></cite>
       </section>
       <section class="grid">${C.map(card).join("")}</section>
-      <footer class="foot">Lines are written in the spirit of each figure unless marked <b>sourced</b>. Nothing you type leaves your browser.</footer>`;
+      <footer class="foot">Lines are written in the spirit of each figure unless marked <b>sourced</b>. Nothing you type leaves your browser. <a href="#/about">How it works</a> · <a href="#/settings">Settings</a></footer>`;
   }
 
   function quotesHTML(c) {
@@ -1210,6 +1210,29 @@
     };
   }
 
+  // ---------- how it works ----------
+  function viewAbout() {
+    const qs = C.flatMap((c) => c.quotes || []), srcd = qs.filter((q) => q.status === "sourced").length, attr = qs.length - srcd;
+    app.innerHTML = `
+      <h2 class="section-title">How it works</h2>
+      <p class="sub">A short, honest explanation of what this site is and is not.</p>
+      <div class="panel about"><div class="label">No AI, no server</div>
+        <p>Nothing here is a chatbot. There is no language model and no server that sees what you write. The whole site is a folder of files that your browser opens; once loaded it also works offline.</p>
+        <p>When you write to one of them, a small program in your browser reads your message for the <b>feeling</b> (tired, afraid, lost…), the <b>topic</b> (exam, money, love…), and the <b>kind of question</b> (are you afraid? what do you think of Napoleon?). It then picks lines that member's dossier holds for exactly that, and joins them into an answer. It understands words and phrases it was taught, not meaning, so it can misread you: press <b>✎ Misread me</b> under an answer and it will read that message your way from then on.</p></div>
+      <div class="panel about"><div class="label">How the members were written</div>
+        <p>Each of the ${C.length} members has a hand-written dossier of about 250 lines: answers for every feeling and topic, how they speak, what they believe, what they think of each other and what they would say about themselves, plus stories from their lives. The lines were written <b>in the spirit of</b> the person from what is recorded of their life and thought, in English and in Türkçe. They are not their real words, and they are not predictions of what the real person would say to you. <b>The Black Swordsman</b> is an invented archetype, not a real person. There are no photos or likenesses of real people on the site; the emblems are original symbols.</p></div>
+      <div class="panel about"><div class="label">Sourced and attributed</div>
+        <p>Each member also has a few real quotations, shown in their dossier under <b>Words</b>:</p>
+        <ul><li><b>sourced</b> (${srcd} quotes): found in a known text, speech or record, and the source is named.</li>
+        <li><b>attributed</b> (${attr} quotes): popularly credited to them, but not confirmed in a contemporary source, or the wording is in dispute. A quote is only marked sourced when its source was checked; doubtful ones are downgraded to attributed.</li></ul>
+        <p>Everything else you read from them is written in the spirit of the figure, and the stories marked "they say" or "tradition says" are legends, not records. I did the checks from memory of the sources, without access to the books, so a historian's eye would still help.</p></div>
+      <div class="panel about"><div class="label">Everything stays on your device</div>
+        <p>Your chats, oaths, journal, moods, name and goal, how each member sees you, and anything you teach in the Forge are saved only in this browser (local storage). Nothing is sent anywhere, and there are no accounts, trackers or ads. The flip side: clearing your browser data erases it. Use <b>Saved → Backup</b> to keep a copy or move to another device, and <b>Settings → Delete everything</b> to wipe it.</p></div>
+      <div class="panel about"><div class="label">A word of care</div>
+        <p>This is a game of voices, not advice from a professional. If a message sounds like you may be in danger, the site answers with a plain support message and help lines instead of a character's reply. If you are in crisis, please talk to a real person: Türkiye 112, US 988, UK/Ireland Samaritans 116 123, or findahelpline.com elsewhere.</p></div>
+      <p><a class="btn ghost small" href="#/">← Back to the Hall</a></p>`;
+  }
+
   // ---------- router ----------
   function route() {
     const h = location.hash.replace(/^#\/?/, "").split("/");
@@ -1225,6 +1248,7 @@
     else if (h[0] === "mood") viewMood();
     else if (h[0] === "settings") viewSettings();
     else if (h[0] === "search") viewSearch();
+    else if (h[0] === "about") viewAbout();
     else if (h[0] === "weekly") viewWeekly();
     else viewHall();
     window.scrollTo(0, 0);
